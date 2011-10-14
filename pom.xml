@@ -15,7 +15,7 @@
         <jboss.home>/Users/billburke/jboss/jboss-4.2.3.GA</jboss.home>
     </properties>
 
-    <url>http://rest-easy.org</url>
+    <url>http://github.com/patriot1burke/Pitbull</url>
 
     <licenses>
         <license>
