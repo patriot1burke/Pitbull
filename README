@@ -1,0 +1,3 @@
+Pitbull is an HTTP abstraction that defines an SPI between the network socket layer and the component layer.  The network socket layer could be Netty, XNIO, or whatever.  The component layer could be a servlet container, JAX-RS, really anything that wants to receive and process HTTP requests.  The idea with the abstraction layer is that one HTTP engine can sit on top of a Servlet container as well as subsystems that need an HTTP layer, but don't want a big huge servlet container.
+
+Pitbull also has a servlet container implementation that is both embeddable and runnable standalone as well as integrated with JBoss AS7.
