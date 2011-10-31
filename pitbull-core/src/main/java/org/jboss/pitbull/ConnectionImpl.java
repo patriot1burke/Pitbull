@@ -1,4 +1,4 @@
-package org.jboss.pitbull.netty;
+package org.jboss.pitbull;
 
 import org.jboss.pitbull.spi.Connection;
 
@@ -9,7 +9,7 @@ import java.net.SocketAddress;
  * @author <a href="mailto:bill@burkecentral.com">Bill Burke</a>
  * @version $Revision: 1 $
  */
-public class NettyConnection implements Connection
+public class ConnectionImpl implements Connection
 {
    private int id;
    private SocketAddress localAddress;
@@ -17,7 +17,7 @@ public class NettyConnection implements Connection
    private SSLSession sslSession;
    private boolean secure;
 
-   public NettyConnection(int id, SocketAddress localAddress, SocketAddress remoteAddress, SSLSession sslSession, boolean secure)
+   public ConnectionImpl(int id, SocketAddress localAddress, SocketAddress remoteAddress, SSLSession sslSession, boolean secure)
    {
       this.id = id;
       this.localAddress = localAddress;
