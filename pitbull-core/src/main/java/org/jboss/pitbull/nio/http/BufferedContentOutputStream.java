@@ -1,5 +1,7 @@
-package org.jboss.pitbull.nio;
+package org.jboss.pitbull.nio.http;
 
+import org.jboss.pitbull.nio.socket.Channels;
+import org.jboss.pitbull.nio.socket.ManagedChannel;
 import org.jboss.pitbull.spi.ContentOutputStream;
 import org.jboss.pitbull.spi.ResponseHeader;
 
@@ -27,7 +29,7 @@ public class BufferedContentOutputStream extends ContentOutputStream
    protected ResponseHeader responseHeader;
    protected boolean closed;
    protected long timeout;
-   static final byte[] CRLF = new byte[] { HttpRequestDecoder.CR, HttpRequestDecoder.LF };
+   static final byte[] CRLF = new byte[]{HttpRequestDecoder.CR, HttpRequestDecoder.LF};
    static byte[] LAST_CHUNK;
 
    {

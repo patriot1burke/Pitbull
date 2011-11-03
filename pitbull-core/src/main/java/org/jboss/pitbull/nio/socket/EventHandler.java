@@ -1,4 +1,4 @@
-package org.jboss.pitbull.nio;
+package org.jboss.pitbull.nio.socket;
 
 /**
  * @author <a href="mailto:bill@burkecentral.com">Bill Burke</a>
@@ -7,5 +7,6 @@ package org.jboss.pitbull.nio;
 public interface EventHandler
 {
    void handleRead(ManagedChannel channel);
+
    void shutdown();
 }

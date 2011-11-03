@@ -4,6 +4,8 @@ import org.jboss.pitbull.spi.Connection;
 
 import javax.net.ssl.SSLSession;
 import java.net.SocketAddress;
+import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author <a href="mailto:bill@burkecentral.com">Bill Burke</a>
@@ -11,13 +13,21 @@ import java.net.SocketAddress;
  */
 public class ConnectionImpl implements Connection
 {
-   private int id;
+   private String id;
    private SocketAddress localAddress;
    private SocketAddress remoteAddress;
    private SSLSession sslSession;
    private boolean secure;
+   private static final AtomicInteger counter = new AtomicInteger();
 
-   public ConnectionImpl(int id, SocketAddress localAddress, SocketAddress remoteAddress, SSLSession sslSession, boolean secure)
+
+   public ConnectionImpl(SocketAddress localAddress, SocketAddress remoteAddress, SSLSession sslSession, boolean secure)
+   {
+      this(UUID.randomUUID().toString(), localAddress, remoteAddress, sslSession, secure);
+   }
+
+
+   public ConnectionImpl(String id, SocketAddress localAddress, SocketAddress remoteAddress, SSLSession sslSession, boolean secure)
    {
       this.id = id;
       this.localAddress = localAddress;
@@ -27,7 +37,7 @@ public class ConnectionImpl implements Connection
    }
 
    @Override
-   public int getId()
+   public String getId()
    {
       return id;
    }

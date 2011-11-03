@@ -1,4 +1,4 @@
-package org.jboss.pitbull.nio;
+package org.jboss.pitbull.nio.socket;
 
 import org.jboss.pitbull.logging.Logger;
 
@@ -10,7 +10,6 @@ import java.util.ArrayDeque;
 import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -177,7 +176,7 @@ public class Worker implements Runnable
       {
          try
          {
-            ((ManagedChannel)key.attachment()).shutdown();
+            ((ManagedChannel) key.attachment()).shutdown();
             key.cancel();
          }
          catch (Exception ignored)

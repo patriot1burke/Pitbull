@@ -1,4 +1,4 @@
-package org.jboss.pitbull.nio;
+package org.jboss.pitbull.nio.http;
 
 import org.jboss.netty.util.CharsetUtil;
 
@@ -66,37 +66,41 @@ public class HttpRequestDecoder
 
    enum States implements State
    {
-      SKIP_CONTROL_CHARS {
-         @Override
-         public boolean process(HttpRequestDecoder decoder, ByteBuffer buffer)
-         {
-            return decoder.skipControlChars(buffer);
-         }
-      },
+      SKIP_CONTROL_CHARS
+              {
+                 @Override
+                 public boolean process(HttpRequestDecoder decoder, ByteBuffer buffer)
+                 {
+                    return decoder.skipControlChars(buffer);
+                 }
+              },
 
-      READ_INITIAL {
-         @Override
-         public boolean process(HttpRequestDecoder decoder, ByteBuffer buffer)
-         {
-            return decoder.readInitial(buffer);
-         }
-      },
+      READ_INITIAL
+              {
+                 @Override
+                 public boolean process(HttpRequestDecoder decoder, ByteBuffer buffer)
+                 {
+                    return decoder.readInitial(buffer);
+                 }
+              },
 
-      READ_HEADERS {
-         @Override
-         public boolean process(HttpRequestDecoder decoder, ByteBuffer buffer)
-         {
-            return decoder.readHeader(buffer);
-         }
-      },
+      READ_HEADERS
+              {
+                 @Override
+                 public boolean process(HttpRequestDecoder decoder, ByteBuffer buffer)
+                 {
+                    return decoder.readHeader(buffer);
+                 }
+              },
 
-      DONE {
-         @Override
-         public boolean process(HttpRequestDecoder decoder, ByteBuffer buffer)
-         {
-            return false;
-         }
-      }
+      DONE
+              {
+                 @Override
+                 public boolean process(HttpRequestDecoder decoder, ByteBuffer buffer)
+                 {
+                    return false;
+                 }
+              }
    }
 
    protected StringBuilder currentString = new StringBuilder(64);
@@ -105,7 +109,10 @@ public class HttpRequestDecoder
    protected States currentState = States.SKIP_CONTROL_CHARS;
    protected HttpRequestHeader request = new HttpRequestHeader();
 
-   public HttpRequestHeader getRequest() { return request; }
+   public HttpRequestHeader getRequest()
+   {
+      return request;
+   }
 
    /**
     * @param buffer must be flipped
@@ -113,14 +120,14 @@ public class HttpRequestDecoder
    public boolean process(ByteBuffer buffer)
    {
       if (currentState == States.DONE) return true;
-      while (currentState.process(this, buffer));
+      while (currentState.process(this, buffer)) ;
       if (currentState == States.DONE) return true;
       return false;
    }
 
    protected boolean readHeader(ByteBuffer buffer)
    {
-      for(;;)
+      for (; ; )
       {
          String line = readLine(buffer);
          if (line == null) return false;
@@ -213,7 +220,6 @@ public class HttpRequestDecoder
       }
       return false;
    }
-
 
 
    private String[] splitInitialLine(String sb)

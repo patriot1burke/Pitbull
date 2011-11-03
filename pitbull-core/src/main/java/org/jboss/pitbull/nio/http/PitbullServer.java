@@ -1,11 +1,12 @@
-package org.jboss.pitbull.nio;
+package org.jboss.pitbull.nio.http;
 
+import org.jboss.pitbull.nio.socket.Acceptor;
+import org.jboss.pitbull.nio.socket.Worker;
 import org.jboss.pitbull.spi.RequestInitiator;
 import org.jboss.pitbull.util.registry.UriRegistry;
 
 import java.net.InetSocketAddress;
 import java.nio.channels.ServerSocketChannel;
-import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;

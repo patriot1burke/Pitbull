@@ -6,7 +6,7 @@ import javax.servlet.http.HttpServlet;
  * @author <a href="mailto:bill@burkecentral.com">Bill Burke</a>
  * @version $Revision: 1 $
  */
-public class SimpleServlet implements Servlet
+public class SimpleServlet implements ServletReference
 {
    protected String name;
    protected String urlPattern;

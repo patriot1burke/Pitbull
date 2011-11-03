@@ -1,4 +1,4 @@
-package org.jboss.pitbull.nio;
+package org.jboss.pitbull.nio.socket;
 
 import java.io.IOException;
 

@@ -2,31 +2,26 @@ package org.jboss.pitbull.servlet;
 
 import org.jboss.pitbull.logging.Logger;
 import org.jboss.pitbull.spi.Connection;
-import org.jboss.pitbull.spi.InputStreamHandler;
-import org.jboss.pitbull.spi.OutputStreamHandler;
-import org.jboss.pitbull.spi.RequestHandler;
 import org.jboss.pitbull.spi.RequestHeader;
+import org.jboss.pitbull.spi.StreamHandler;
 import org.jboss.pitbull.spi.StreamResponseWriter;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
 import java.io.InputStream;
 
 /**
  * @author <a href="mailto:bill@burkecentral.com">Bill Burke</a>
  * @version $Revision: 1 $
  */
-public class ServletRequestHandler implements InputStreamHandler, OutputStreamHandler, RequestHandler
+public class ServletRequestHandler implements StreamHandler
 {
    protected InputStream input;
    protected StreamResponseWriter writer;
    protected Connection connection;
-   protected Servlet servlet;
+   protected DeploymentServletRegistration servlet;
    protected static final Logger log = Logger.getLogger(ServletRequestHandler.class);
 
-   public ServletRequestHandler(Connection connection, Servlet servlet)
+   public ServletRequestHandler(Connection connection, DeploymentServletRegistration servlet)
    {
       this.connection = connection;
       this.servlet = servlet;
@@ -52,10 +47,17 @@ public class ServletRequestHandler implements InputStreamHandler, OutputStreamHa
       request.setHeaderBlob(requestHeader);
       request.setIs(input);
       HttpServletResponseImpl response = new HttpServletResponseImpl(writer);
-      HttpServlet instance = servlet.getServletInstance();
       try
       {
-         instance.service(request, response);
+         HttpServlet instance = (HttpServlet) servlet.startRequest();
+         try
+         {
+            instance.service(request, response);
+         }
+         finally
+         {
+            servlet.endRequest();
+         }
       }
       catch (Throwable e)
       {
@@ -70,7 +72,14 @@ public class ServletRequestHandler implements InputStreamHandler, OutputStreamHa
    }
 
    @Override
-   public void cancel()
+   public boolean isFast()
    {
+      return false;
+   }
+
+   @Override
+   public void unsupportedHandler()
+   {
+
    }
 }

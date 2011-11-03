@@ -1,4 +1,4 @@
-package org.jboss.pitbull.nio;
+package org.jboss.pitbull.nio.http;
 
 import org.jboss.pitbull.spi.RequestHeader;
 import org.jboss.pitbull.util.CaseInsensitiveMap;

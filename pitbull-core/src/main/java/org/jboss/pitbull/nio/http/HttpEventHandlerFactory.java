@@ -1,10 +1,11 @@
-package org.jboss.pitbull.nio;
+package org.jboss.pitbull.nio.http;
 
+import org.jboss.pitbull.nio.socket.EventHandler;
+import org.jboss.pitbull.nio.socket.EventHandlerFactory;
 import org.jboss.pitbull.spi.RequestInitiator;
 import org.jboss.pitbull.util.registry.UriRegistry;
 
 import javax.net.ssl.SSLEngine;
-import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 
 /**

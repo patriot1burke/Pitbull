@@ -1,6 +1,8 @@
-package org.jboss.pitbull.nio;
+package org.jboss.pitbull.nio.http;
 
 import org.jboss.pitbull.NotImplementedYetException;
+import org.jboss.pitbull.nio.socket.Channels;
+import org.jboss.pitbull.nio.socket.ManagedChannel;
 import org.jboss.pitbull.spi.ContentOutputStream;
 import org.jboss.pitbull.spi.ResponseHeader;
 import org.jboss.pitbull.spi.StreamResponseWriter;

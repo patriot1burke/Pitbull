@@ -1,4 +1,4 @@
-package org.jboss.pitbull.nio;
+package org.jboss.pitbull.nio.socket;
 
 import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
@@ -11,11 +11,13 @@ public class ByteBuffers
 {
    public static void skip(ByteBuffer buffer, int cnt)
    {
-      if (cnt < 0) {
-          throw new IllegalArgumentException();
+      if (cnt < 0)
+      {
+         throw new IllegalArgumentException();
       }
-      if (cnt > buffer.remaining()) {
-          throw new BufferUnderflowException();
+      if (cnt > buffer.remaining())
+      {
+         throw new BufferUnderflowException();
       }
       buffer.position(buffer.position() + cnt);
    }

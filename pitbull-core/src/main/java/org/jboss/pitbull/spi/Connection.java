@@ -9,10 +9,14 @@ import java.net.SocketAddress;
  */
 public interface Connection
 {
-   int getId();
+   String getId();
+
    SocketAddress getLocalAddress();
+
    SocketAddress getRemoteAddress();
+
    SSLSession getSSLSession();
+
    boolean isSecure();
 
 }

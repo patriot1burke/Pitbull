@@ -1,7 +1,6 @@
 package org.jboss.pitbull.spi;
 
-import java.util.List;
-import java.util.Map;
+import org.jboss.pitbull.util.CaseInsensitiveMap;
 
 /**
  * SPI that allows transport to lazily parse headers received from the network buffer.
@@ -12,6 +11,8 @@ import java.util.Map;
 public interface RequestHeader
 {
    String getMethod();
+
    String getUri();
-   List<Map.Entry<String, String>> getHeaders();
+
+   CaseInsensitiveMap<String> getHeaders();
 }

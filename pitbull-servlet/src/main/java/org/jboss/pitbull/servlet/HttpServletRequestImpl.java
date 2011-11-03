@@ -26,6 +26,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.security.Principal;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Enumeration;
@@ -34,6 +35,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @author <a href="mailto:bill@burkecentral.com">Bill Burke</a>
@@ -47,7 +49,6 @@ public class HttpServletRequestImpl implements HttpServletRequest
    protected String authType;
    protected RequestHeader headerBlob;
 
-   protected List<Map.Entry<String, String>> headerList;
    protected Map<String, Object> attributes = new HashMap<String, Object>();
    protected CaseInsensitiveMap<String> headers;
    protected Cookie[] cookies;
@@ -56,7 +57,8 @@ public class HttpServletRequestImpl implements HttpServletRequest
    protected Date dateHeader;
    protected String contentType;
    protected String characterEncoding;
-   public static final String DEFAULT_CHARACTER_ENCODING="ISO-8859-1";
+   public static final String DEFAULT_CHARACTER_ENCODING = "ISO-8859-1";
+   private static final Cookie[] emptyCookies = new Cookie[0];
 
 
    public void setConnection(Connection connection)
@@ -74,26 +76,11 @@ public class HttpServletRequestImpl implements HttpServletRequest
       this.headerBlob = headerBlob;
    }
 
-
-
-   protected List<Map.Entry<String, String>> getHeaderList()
-   {
-      if (headerList == null)
-      {
-         headerList = headerBlob.getHeaders();
-      }
-      return headerList;
-   }
-
    protected CaseInsensitiveMap<String> getHeaders()
    {
       if (headers == null)
       {
-         headers = new CaseInsensitiveMap<String>();
-         for (Map.Entry<String, String> header : getHeaderList())
-         {
-            headers.add(header.getKey(), header.getValue());
-         }
+         headers = headerBlob.getHeaders();
       }
       return headers;
    }
@@ -107,7 +94,23 @@ public class HttpServletRequestImpl implements HttpServletRequest
    @Override
    public Cookie[] getCookies()
    {
-      throw new NotImplementedYetException();
+      if (cookies != null) return cookies;
+      List<String> cookieHeaders = getHeaders().get("Cookie");
+      if (cookieHeaders == null)
+      {
+         cookies = emptyCookies;
+         return cookies;
+      }
+
+      List<Cookie> cookieList = new ArrayList<Cookie>();
+      for (String cookieHeader : cookieHeaders)
+      {
+         Set<Cookie> cooks = CookieDecoder.decode(cookieHeader);
+         cookieList.addAll(cooks);
+
+      }
+      cookies = cookieList.toArray(new Cookie[cookieList.size()]);
+      return cookies;
    }
 
    @Override
@@ -363,7 +366,7 @@ public class HttpServletRequestImpl implements HttpServletRequest
    @Override
    public void setCharacterEncoding(String env) throws UnsupportedEncodingException
    {
-     characterEncoding = env;
+      characterEncoding = env;
    }
 
    @Override
@@ -446,7 +449,8 @@ public class HttpServletRequestImpl implements HttpServletRequest
    @Override
    public BufferedReader getReader() throws IOException
    {
-      if (servletInputStream != null) throw new IllegalStateException("ServletInputStream already being used by HttpServletRequest");
+      if (servletInputStream != null)
+         throw new IllegalStateException("ServletInputStream already being used by HttpServletRequest");
       if (reader == null)
       {
          reader = new BufferedReader(new InputStreamReader(underlyingInputStream, getCharacterEncodingOrDefault()));

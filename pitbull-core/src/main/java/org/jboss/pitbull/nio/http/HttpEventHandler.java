@@ -1,7 +1,10 @@
-package org.jboss.pitbull.nio;
+package org.jboss.pitbull.nio.http;
 
 import org.jboss.pitbull.ConnectionImpl;
 import org.jboss.pitbull.logging.Logger;
+import org.jboss.pitbull.nio.socket.Channels;
+import org.jboss.pitbull.nio.socket.EventHandler;
+import org.jboss.pitbull.nio.socket.ManagedChannel;
 import org.jboss.pitbull.spi.Connection;
 import org.jboss.pitbull.spi.RequestHandler;
 import org.jboss.pitbull.spi.RequestInitiator;
@@ -15,9 +18,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 import java.util.List;
-import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.TimeUnit;
 
 /**
  * @author <a href="mailto:bill@burkecentral.com">Bill Burke</a>
@@ -137,7 +138,7 @@ public class HttpEventHandler implements EventHandler
          return;
       }
 
-      StreamHandler streamHandler = (StreamHandler)requestHandler;
+      StreamHandler streamHandler = (StreamHandler) requestHandler;
 
       ByteBuffer oldBuffer = buffer;
       buffer = null;

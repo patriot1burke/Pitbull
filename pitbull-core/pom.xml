@@ -17,6 +17,14 @@
         </dependency>
 
         <dependency>
+            <groupId>org.jboss.xnio</groupId>
+            <artifactId>xnio-nio</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.logging</groupId>
+            <artifactId>jboss-logging</artifactId>
+        </dependency>
+        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <scope>provided</scope>
@@ -32,11 +40,11 @@
             <artifactId>slf4j-api</artifactId>
             <scope>provided</scope>
         </dependency>
-            <dependency>
-               <groupId>org.jboss.resteasy</groupId>
-               <artifactId>resteasy-jaxrs</artifactId>
-               <version>2.3-beta-1</version>
-	       <scope>test</scope>
-            </dependency>
+        <dependency>
+            <groupId>org.jboss.resteasy</groupId>
+            <artifactId>resteasy-jaxrs</artifactId>
+            <version>2.3-beta-1</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 </project>

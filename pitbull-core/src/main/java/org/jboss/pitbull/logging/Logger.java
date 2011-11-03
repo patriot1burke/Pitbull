@@ -84,12 +84,11 @@ public abstract class Logger
       setLoggerType(type);
    }
 
-
-   public static Logger getLogger(Class<?> clazz)
+   public static Logger getLogger(String name)
    {
       try
       {
-         return (Logger) loggerConstructor.newInstance(clazz.getName());
+         return (Logger) loggerConstructor.newInstance(name);
       }
       catch (InstantiationException e)
       {
@@ -103,6 +102,12 @@ public abstract class Logger
       {
          throw new RuntimeException(e);
       }
+   }
+
+
+   public static Logger getLogger(Class<?> clazz)
+   {
+      return getLogger(clazz.getName());
    }
 
 

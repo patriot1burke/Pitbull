@@ -69,9 +69,20 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
-               <groupId>org.jboss.netty</groupId>
-               <artifactId>netty</artifactId>
-               <version>3.2.5.Final</version>
+                <groupId>org.jboss.xnio</groupId>
+                <artifactId>xnio-nio</artifactId>
+                <version>3.0.0.Beta4</version>
+            </dependency>
+            <dependency>
+                <groupId>org.jboss.logging</groupId>
+                <artifactId>jboss-logging</artifactId>
+                <version>3.0.0.GA</version>
+                <!-- Not part of the API, so set as "provided" -->
+            </dependency>
+            <dependency>
+                <groupId>org.jboss.netty</groupId>
+                <artifactId>netty</artifactId>
+                <version>3.2.5.Final</version>
             </dependency>
             <dependency>
                 <groupId>org.slf4j</groupId>
@@ -94,19 +105,19 @@
                 <version>1.2.14</version>
             </dependency>
             <dependency>
-               <groupId>org.jboss.spec.javax.servlet</groupId>
-               <artifactId>jboss-servlet-api_3.0_spec</artifactId>
-               <version>1.0.0.Final</version>
+                <groupId>org.jboss.spec.javax.servlet</groupId>
+                <artifactId>jboss-servlet-api_3.0_spec</artifactId>
+                <version>1.0.0.Final</version>
             </dependency>
             <dependency>
-               <groupId>org.jboss.metadata</groupId>
-               <artifactId>jboss-metadata-web</artifactId>
-               <version>7.0.0.Beta12</version>
+                <groupId>org.jboss.metadata</groupId>
+                <artifactId>jboss-metadata-web</artifactId>
+                <version>7.0.0.Beta12</version>
             </dependency>
             <dependency>
-               <groupId>org.jboss.resteasy</groupId>
-               <artifactId>resteasy-jaxrs</artifactId>
-               <version>2.3-beta-1</version>
+                <groupId>org.jboss.resteasy</groupId>
+                <artifactId>resteasy-jaxrs</artifactId>
+                <version>2.3-beta-1</version>
             </dependency>
             <dependency>
                 <groupId>junit</groupId>
@@ -156,7 +167,8 @@
                         <maxmemory>1024m</maxmemory>
                         <quiet>false</quiet>
                         <aggregate>true</aggregate>
-                        <excludePackageNames>com.restfully.*:org.jboss.resteasy.examples.*:se.unlogic.*:org.jboss.resteasy.tests.*
+                        <excludePackageNames>
+                            com.restfully.*:org.jboss.resteasy.examples.*:se.unlogic.*:org.jboss.resteasy.tests.*
                         </excludePackageNames>
                     </configuration>
                 </plugin>
@@ -209,7 +221,8 @@
                     <maxmemory>1024m</maxmemory>
                     <quiet>false</quiet>
                     <aggregate>true</aggregate>
-                    <excludePackageNames>se.unlogic.*:com.restfully.*:org.jboss.resteasy.examples.*:org.jboss.resteasy.tests.*
+                    <excludePackageNames>
+                        se.unlogic.*:com.restfully.*:org.jboss.resteasy.examples.*:org.jboss.resteasy.tests.*
                     </excludePackageNames>
                 </configuration>
             </plugin>

@@ -1,6 +1,10 @@
-package org.jboss.pitbull.nio;
+package org.jboss.pitbull.nio.http;
 
 import org.jboss.pitbull.NotImplementedYetException;
+import org.jboss.pitbull.nio.socket.ByteBuffers;
+import org.jboss.pitbull.nio.socket.Channels;
+import org.jboss.pitbull.nio.socket.ManagedChannel;
+import org.jboss.pitbull.nio.socket.ReadTimeoutException;
 
 import java.io.IOException;
 import java.io.InterruptedIOException;
@@ -14,7 +18,6 @@ import static java.lang.Math.*;
  * An input stream which reads from a stream source channel with a buffer.  It will only read a total fixed length
  * set of total bytes.  In addition, the
  * {@link #available()} method can be used to determine whether the next read will or will not block.
- *
  *
  * @apiviz.exclude
  * @since 2.1
@@ -51,7 +54,7 @@ public class ContentLengthInputStream extends ContentInputStream
    protected void resetBufferLimit()
    {
       buffer.clear();
-      if (totalRead + buffer.capacity() > contentLength) buffer.limit((int)(contentLength - totalRead));
+      if (totalRead + buffer.capacity() > contentLength) buffer.limit((int) (contentLength - totalRead));
    }
 
    @Override
@@ -134,7 +137,7 @@ public class ContentLengthInputStream extends ContentInputStream
       }
       if (len + totalRead > contentLength)
       {
-         len = (int)(contentLength - totalRead);
+         len = (int) (contentLength - totalRead);
       }
       int total = 0;
       final ByteBuffer buffer = this.buffer;
@@ -165,7 +168,7 @@ public class ContentLengthInputStream extends ContentInputStream
             }
             else if (res == 0)
             {
-              return total;
+               return total;
             }
             else
             {
@@ -196,7 +199,7 @@ public class ContentLengthInputStream extends ContentInputStream
             }
             else if (res == 0)
             {
-              return total;
+               return total;
             }
             else
             {

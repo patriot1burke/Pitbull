@@ -1,6 +1,7 @@
-package org.jboss.pitbull.nio;
+package org.jboss.pitbull.nio.http;
 
 import org.jboss.pitbull.logging.Logger;
+import org.jboss.pitbull.nio.socket.ManagedChannel;
 import org.jboss.pitbull.spi.StreamHandler;
 
 import java.nio.ByteBuffer;

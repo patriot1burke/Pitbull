@@ -4,7 +4,6 @@ import org.jboss.netty.handler.codec.http.HttpHeaders;
 import org.jboss.pitbull.NotImplementedYetException;
 import org.jboss.pitbull.spi.ContentOutputStream;
 import org.jboss.pitbull.spi.ResponseHeader;
-import org.jboss.pitbull.spi.ResponseWriter;
 import org.jboss.pitbull.spi.StreamResponseWriter;
 import org.jboss.pitbull.util.CaseInsensitiveMap;
 
@@ -15,7 +14,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -250,7 +248,7 @@ public class HttpServletResponseImpl implements HttpServletResponse, ResponseHea
    {
       if (underlyingStream == null) underlyingStream = streamResponseWriter.getStream(this);
       return underlyingStream;
- }
+   }
 
    @Override
    public ServletOutputStream getOutputStream() throws IOException

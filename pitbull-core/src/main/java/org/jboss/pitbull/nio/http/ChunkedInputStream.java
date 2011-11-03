@@ -1,4 +1,9 @@
-package org.jboss.pitbull.nio;
+package org.jboss.pitbull.nio.http;
+
+import org.jboss.pitbull.nio.socket.ByteBuffers;
+import org.jboss.pitbull.nio.socket.Channels;
+import org.jboss.pitbull.nio.socket.ManagedChannel;
+import org.jboss.pitbull.nio.socket.ReadTimeoutException;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -44,7 +49,7 @@ public class ChunkedInputStream extends ContentInputStream
 
    public void eat() throws IOException
    {
-      while (skip(1000) != 0);
+      while (skip(1000) != 0) ;
    }
 
    protected long getChunkSize(String hex)
@@ -155,7 +160,7 @@ public class ChunkedInputStream extends ContentInputStream
    {
       if (timeout == 0L)
       {
-         for (;;)
+         for (; ; )
          {
             final int res = Channels.readBlocking(channel.getChannel(), buf);
             if (res == -1)
@@ -173,7 +178,7 @@ public class ChunkedInputStream extends ContentInputStream
       {
          long now = System.currentTimeMillis();
          final long deadline = timeout - now;
-         for(;;)
+         for (; ; )
          {
             if (deadline <= now)
             {
@@ -370,7 +375,7 @@ public class ChunkedInputStream extends ContentInputStream
       if (closed || done) return 0;
       if (remainingChunkBytes < 1) return 0;
 
-      return (int)min(buffer.remaining(), remainingChunkBytes);
+      return (int) min(buffer.remaining(), remainingChunkBytes);
    }
 
    /**

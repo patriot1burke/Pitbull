@@ -1,6 +1,6 @@
-package org.jboss.pitbull.nio;
+package org.jboss.pitbull.nio.http;
 
-import org.jboss.pitbull.NotImplementedYetException;
+import org.jboss.pitbull.nio.socket.ManagedChannel;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -44,9 +44,8 @@ public abstract class ContentInputStream extends InputStream
 
    /**
     * Eat the entity body of the HTTP message
-    *
+    * <p/>
     * May return null which signifies that there is no entity.
-    *
     */
    public abstract void eat() throws IOException;
 

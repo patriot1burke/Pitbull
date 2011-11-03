@@ -1,4 +1,4 @@
-package org.jboss.pitbull.nio;
+package org.jboss.pitbull.nio.socket;
 
 import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
@@ -56,7 +56,10 @@ public class ManagedChannel
    {
       if (closed) return;
       closed = true;
-      try { channel.close(); } catch (Throwable ignored) {}
+      try
+      { channel.close(); }
+      catch (Throwable ignored)
+      {}
    }
 
 }

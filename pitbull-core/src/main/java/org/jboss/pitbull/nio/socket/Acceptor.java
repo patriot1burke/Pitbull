@@ -1,4 +1,4 @@
-package org.jboss.pitbull.nio;
+package org.jboss.pitbull.nio.socket;
 
 import org.jboss.pitbull.logging.Logger;
 
@@ -55,7 +55,7 @@ public class Acceptor implements Runnable
       if (shutdown) return;
       try
       {
-         synchronized(this) // to flush shutdown
+         synchronized (this) // to flush shutdown
          {
             shutdown = true;
          }
