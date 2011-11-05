@@ -21,14 +21,6 @@ public class Echo extends HttpServlet
    {
       resp.setContentType("text/plain");
       resp.setStatus(200);
-      try
-      {
-         Thread.sleep(50000);
-      }
-      catch (InterruptedException e)
-      {
-         throw new RuntimeException(e);
-      }
       resp.getOutputStream().write("hello world".getBytes());
    }
 
