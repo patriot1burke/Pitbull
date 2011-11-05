@@ -1,7 +1,7 @@
 package org.jboss.pitbull.spi;
 
 import javax.net.ssl.SSLSession;
-import java.net.SocketAddress;
+import java.net.InetSocketAddress;
 
 /**
  * @author <a href="mailto:bill@burkecentral.com">Bill Burke</a>
@@ -11,9 +11,9 @@ public interface Connection
 {
    String getId();
 
-   SocketAddress getLocalAddress();
+   InetSocketAddress getLocalAddress();
 
-   SocketAddress getRemoteAddress();
+   InetSocketAddress getRemoteAddress();
 
    SSLSession getSSLSession();
 

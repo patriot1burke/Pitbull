@@ -24,7 +24,10 @@ public class EmbeddedServletContainer extends PitbullServer
    {
       for (ServletDeployment deployment : deployments)
       {
-         registry.add(deployment.getDeploymentServletContext().getContextPath() + "/{.*}", deployment);
+         String path = deployment.getDeploymentServletContext().getContextPath();
+         if (path == null) path = "";
+         if ("/".equals(path.trim())) path = "";
+         registry.add(path + "/{.*}", deployment);
       }
       for (ServletDeployment deployment : deployments)
       {

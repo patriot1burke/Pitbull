@@ -1,9 +1,11 @@
 package org.jboss.pitbull.nio.http;
 
 import org.jboss.pitbull.NotImplementedYetException;
+import org.jboss.pitbull.logging.Logger;
 import org.jboss.pitbull.nio.socket.Channels;
 import org.jboss.pitbull.nio.socket.ManagedChannel;
 import org.jboss.pitbull.spi.ContentOutputStream;
+import org.jboss.pitbull.spi.RequestHeader;
 import org.jboss.pitbull.spi.ResponseHeader;
 import org.jboss.pitbull.spi.StreamResponseWriter;
 
@@ -19,17 +21,22 @@ public class NioStreamResponseWriter implements StreamResponseWriter
    private boolean keepAlive;
    private ManagedChannel channel;
    private ContentOutputStream stream;
+   private RequestHeader requestHeader;
+   private ContentInputStream is;
+   protected static final Logger log = Logger.getLogger(NioStreamResponseWriter.class);
 
-   public NioStreamResponseWriter(ManagedChannel channel, boolean keepAlive)
+   public NioStreamResponseWriter(ManagedChannel channel, RequestHeader requestHeader, ContentInputStream is, boolean keepAlive)
    {
       this.channel = channel;
+      this.requestHeader = requestHeader;
       this.keepAlive = keepAlive;
+      this.is = is;
    }
 
    @Override
    public ContentOutputStream getStream(ResponseHeader responseHeader)
    {
-      stream = new BufferedContentOutputStream(channel, responseHeader);
+      stream = new BufferedContentOutputStream(channel, requestHeader, responseHeader);
       return stream;
    }
 
@@ -42,11 +49,20 @@ public class NioStreamResponseWriter implements StreamResponseWriter
    @Override
    public void end(ResponseHeader responseHeader)
    {
+      try
+      {
+         is.eat();  // eat the input stream
+      }
+      catch (IOException e)
+      {
+         log.warn("Exception while eating", e);
+      }
       if (stream == null)
       {
          HttpResponse response = new HttpResponse(responseHeader);
          try
          {
+            response.prepareEmptyBody(requestHeader);
             byte[] bytes = response.responseBytes();
             Channels.writeBlocking(channel.getChannel(), ByteBuffer.wrap(bytes));
             if (keepAlive)

@@ -44,8 +44,6 @@ public abstract class ContentInputStream extends InputStream
 
    /**
     * Eat the entity body of the HTTP message
-    * <p/>
-    * May return null which signifies that there is no entity.
     */
    public abstract void eat() throws IOException;
 
@@ -62,6 +60,6 @@ public abstract class ContentInputStream extends InputStream
       {
          return new ChunkedInputStream(channel, initialBuffer);
       }
-      return null;
+      return new NullInputStream();
    }
 }

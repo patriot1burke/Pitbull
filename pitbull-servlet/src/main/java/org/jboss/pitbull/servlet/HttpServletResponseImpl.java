@@ -31,7 +31,6 @@ public class HttpServletResponseImpl implements HttpServletResponse, ResponseHea
    protected boolean committed;
    protected ContentOutputStream underlyingStream;
    protected StreamResponseWriter streamResponseWriter;
-   protected ServletOutputStream servletOutputStream;
 
    public HttpServletResponseImpl(StreamResponseWriter streamResponseWriter)
    {
@@ -89,13 +88,40 @@ public class HttpServletResponseImpl implements HttpServletResponse, ResponseHea
    @Override
    public void sendError(int sc, String msg) throws IOException
    {
-      throw new NotImplementedYetException();
+      if (isCommitted())
+      {
+         throw new IllegalStateException("Response is committed");
+      }
+      setStatus(sc);
+      headerList.clear();
+      headerMap.clear();
+      setContentType("text/html");
+      getUnderlyingStream().reset();
+      StringBuilder builder = new StringBuilder("<html><body><h1>Server Error</h1>");
+      builder.append("<p>Error code: ").append(sc).append("</p><p>");
+      builder.append(msg);
+      builder.append("</p></body></html>");
+      getUnderlyingStream().write(builder.toString().getBytes());
    }
 
    @Override
    public void sendError(int sc) throws IOException
    {
-      throw new NotImplementedYetException();
+      // todo error page.html
+
+      if (isCommitted())
+      {
+         throw new IllegalStateException("Response is committed");
+      }
+      setStatus(sc);
+      headerList.clear();
+      headerMap.clear();
+      setContentType("text/html");
+      getUnderlyingStream().reset();
+      StringBuilder builder = new StringBuilder("<html><body><h1>Server Error</h1>");
+      builder.append("<p>Error code: ").append(sc).append("</p><p>");
+      builder.append("</p></body></html>");
+      getUnderlyingStream().write(builder.toString().getBytes());
    }
 
    @Override

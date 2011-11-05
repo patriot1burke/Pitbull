@@ -1,6 +1,6 @@
 package org.jboss.pitbull.nio.http;
 
-import org.jboss.pitbull.NotImplementedYetException;
+import org.jboss.pitbull.logging.Logger;
 import org.jboss.pitbull.nio.socket.ByteBuffers;
 import org.jboss.pitbull.nio.socket.Channels;
 import org.jboss.pitbull.nio.socket.ManagedChannel;
@@ -26,9 +26,9 @@ public class ContentLengthInputStream extends ContentInputStream
 {
    private final ManagedChannel channel;
    private final ByteBuffer buffer;
-   private final long contentLength;
+   private long remainingBytes;
    private volatile boolean closed;
-   private long totalRead;
+   protected static final Logger log = Logger.getLogger(ContentLengthInputStream.class);
 
    /**
     * Construct a new instance.
@@ -48,19 +48,33 @@ public class ContentLengthInputStream extends ContentInputStream
       }
       this.buffer = buffer;
       this.channel = channel;
-      this.contentLength = contentLength;
+      this.remainingBytes = contentLength;
    }
 
    protected void resetBufferLimit()
    {
+      if (remainingBytes == 0)
+      {
+         log.debug("resetBufferLimit with 0 remaining bytes");
+      }
       buffer.clear();
-      if (totalRead + buffer.capacity() > contentLength) buffer.limit((int) (contentLength - totalRead));
+      if (buffer.capacity() > remainingBytes) buffer.limit((int) (remainingBytes));
    }
 
    @Override
    public void eat()
    {
-      throw new NotImplementedYetException();
+      while (remainingBytes > 0)
+      {
+         try
+         {
+            skip(1000);
+         }
+         catch (IOException e)
+         {
+            throw new RuntimeException(e);
+         }
+      }
    }
 
    /**
@@ -72,7 +86,7 @@ public class ContentLengthInputStream extends ContentInputStream
    public int read() throws IOException
    {
       if (closed) return -1;
-      if (!buffer.hasRemaining() && totalRead >= contentLength) return -1;
+      if (remainingBytes <= 0) return -1;
 
       final ByteBuffer buffer = this.buffer;
 
@@ -88,7 +102,6 @@ public class ContentLengthInputStream extends ContentInputStream
             {
                return -1;
             }
-            totalRead += res;
             buffer.flip();
          }
       }
@@ -110,11 +123,11 @@ public class ContentLengthInputStream extends ContentInputStream
                {
                   return -1;
                }
-               totalRead += res;
                buffer.flip();
             } while (!buffer.hasRemaining());
          }
       }
+      remainingBytes--;
       return buffer.get() & 0xff;
    }
 
@@ -130,14 +143,14 @@ public class ContentLengthInputStream extends ContentInputStream
    public int read(final byte[] b, int off, int len) throws IOException
    {
       if (closed) return -1;
-      if (!buffer.hasRemaining() && totalRead >= contentLength) return -1;
+      if (remainingBytes <= 0) return -1;
       if (len < 1)
       {
          return 0;
       }
-      if (len + totalRead > contentLength)
+      if (len > remainingBytes)
       {
-         len = (int) (contentLength - totalRead);
+         len = (int) remainingBytes;
       }
       int total = 0;
       final ByteBuffer buffer = this.buffer;
@@ -148,7 +161,7 @@ public class ContentLengthInputStream extends ContentInputStream
          total += cnt;
          off += cnt;
          len -= cnt;
-         totalRead += cnt;
+         remainingBytes -= cnt;
       }
       if (closed) return -1;
       if (len <= 0) return total;
@@ -172,7 +185,7 @@ public class ContentLengthInputStream extends ContentInputStream
             }
             else
             {
-               totalRead += res;
+               remainingBytes -= res;
                total += res;
                return total;
             }
@@ -203,7 +216,7 @@ public class ContentLengthInputStream extends ContentInputStream
             }
             else
             {
-               totalRead += res;
+               remainingBytes -= res;
                total += res;
                return total;
             }
@@ -226,7 +239,7 @@ public class ContentLengthInputStream extends ContentInputStream
    public long skip(long n) throws IOException
    {
       if (closed) return 0L;
-      if (totalRead >= contentLength) return 0L;
+      if (remainingBytes <= 0) return 0L;
       if (n < 1L)
       {
          return 0L;
@@ -237,7 +250,7 @@ public class ContentLengthInputStream extends ContentInputStream
       {
          final int cnt = (int) min(buffer.remaining(), n);
          ByteBuffers.skip(buffer, cnt);
-         totalRead += cnt;
+         remainingBytes -= cnt;
          total += cnt;
          n -= cnt;
       }
@@ -246,6 +259,10 @@ public class ContentLengthInputStream extends ContentInputStream
          return total;
       }
       final SocketChannel channel = this.channel.getChannel();
+      if (n > remainingBytes)
+      {
+         n = remainingBytes;
+      }
       if (n > 0L)
       {
          // Buffer was cleared
@@ -260,7 +277,7 @@ public class ContentLengthInputStream extends ContentInputStream
                   return total;
                }
                total += (long) res;
-               totalRead += res;
+               remainingBytes -= res;
             }
          }
          finally

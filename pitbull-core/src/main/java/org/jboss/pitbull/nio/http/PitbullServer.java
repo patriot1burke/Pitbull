@@ -1,6 +1,8 @@
 package org.jboss.pitbull.nio.http;
 
+import org.jboss.pitbull.logging.Logger;
 import org.jboss.pitbull.nio.socket.Acceptor;
+import org.jboss.pitbull.nio.socket.ExecutorThreadFactory;
 import org.jboss.pitbull.nio.socket.Worker;
 import org.jboss.pitbull.spi.RequestInitiator;
 import org.jboss.pitbull.util.registry.UriRegistry;
@@ -27,6 +29,7 @@ public class PitbullServer
    protected int numWorkers = 5;
    protected int numExecutors = 5;
    protected ServerSocketChannel channel;
+   protected static final Logger logger = Logger.getLogger(PitbullServer.class);
 
    public UriRegistry<RequestInitiator> getRegistry()
    {
@@ -36,6 +39,11 @@ public class PitbullServer
    public int getPort()
    {
       return port;
+   }
+
+   public void setPort(int port)
+   {
+      this.port = port;
    }
 
    public int getNumWorkers()
@@ -70,7 +78,7 @@ public class PitbullServer
 
    public void start() throws Exception
    {
-      requestExecutor = Executors.newFixedThreadPool(numExecutors);
+      requestExecutor = Executors.newFixedThreadPool(numExecutors, ExecutorThreadFactory.singleton);
       workerExecutor = Executors.newFixedThreadPool(numWorkers + 1);
       workers = new Worker[numWorkers];
       for (int i = 0; i < workers.length; i++)
@@ -88,24 +96,26 @@ public class PitbullServer
    public void stop() throws Exception
    {
       acceptor.shutdown();
+      logger.debug("Shutdown Acceptor Thread");
       for (Worker worker : workers)
       {
          worker.shutdown();
       }
+      logger.debug("Shutdown Workers");
+      workerExecutor.shutdown();
+      boolean awaitedWorker = workerExecutor.awaitTermination(60, TimeUnit.SECONDS);
+      logger.debug("Shutdown Worker Executor: " + awaitedWorker);
       requestExecutor.shutdown();
-      try
-      {
-         requestExecutor.awaitTermination(60, TimeUnit.SECONDS);
-      }
-      catch (InterruptedException ignore)
-      {
-
-      }
+      boolean awaited = requestExecutor.awaitTermination(60, TimeUnit.SECONDS);
+      logger.debug("Shutdown Request Executor: " + awaited);
+      if (awaited == false) requestExecutor.shutdownNow();
       for (Worker worker : workers)
       {
          worker.close();
       }
+      logger.debug("Closed all workers");
       channel.close();
+      logger.debug("Closed channel");
 
 
    }

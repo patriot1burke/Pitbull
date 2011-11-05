@@ -1,5 +1,7 @@
 package org.jboss.pitbull.nio.socket;
 
+import org.jboss.pitbull.logging.Logger;
+
 import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
 
@@ -13,6 +15,7 @@ public class ManagedChannel
    protected SelectionKey key;
    protected EventHandler handler;
    protected boolean closed;
+   protected static final Logger logger = Logger.getLogger(ManagedChannel.class);
 
    public ManagedChannel(SocketChannel channel, SelectionKey key, EventHandler handler)
    {
@@ -39,6 +42,7 @@ public class ManagedChannel
    public void resumeReads()
    {
       key.interestOps(SelectionKey.OP_READ);
+      key.selector().wakeup();
    }
 
    public void shutdown()
@@ -54,6 +58,7 @@ public class ManagedChannel
 
    public void close()
    {
+      logger.debug("Closing channel");
       if (closed) return;
       closed = true;
       try

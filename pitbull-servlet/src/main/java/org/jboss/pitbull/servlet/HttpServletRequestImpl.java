@@ -57,6 +57,9 @@ public class HttpServletRequestImpl implements HttpServletRequest
    protected Date dateHeader;
    protected String contentType;
    protected String characterEncoding;
+   protected String requestURL;
+   protected String requestURI;
+   protected String queryString;
    public static final String DEFAULT_CHARACTER_ENCODING = "ISO-8859-1";
    private static final Cookie[] emptyCookies = new Cookie[0];
 
@@ -209,7 +212,14 @@ public class HttpServletRequestImpl implements HttpServletRequest
    @Override
    public String getQueryString()
    {
-      throw new NotImplementedYetException();
+      if (queryString != null) return queryString;
+      String uri = headerBlob.getUri();
+      int idx = uri.indexOf('?');
+      if (idx >= 0)
+      {
+         queryString = uri.substring(idx + 1);
+      }
+      return queryString;
    }
 
    @Override
@@ -239,13 +249,46 @@ public class HttpServletRequestImpl implements HttpServletRequest
    @Override
    public String getRequestURI()
    {
-      throw new NotImplementedYetException();
+      if (requestURI != null) return requestURI;
+      String uri = headerBlob.getUri();
+      int idx = uri.indexOf('?');
+      if (idx >= 0)
+      {
+         uri = uri.substring(0, idx);
+      }
+      requestURI = uri;
+      return requestURI;
    }
 
    @Override
    public StringBuffer getRequestURL()
    {
-      throw new NotImplementedYetException();
+      // todo support for RequestDispatcher
+      if (requestURL != null) return new StringBuffer(requestURL);
+      StringBuilder builder = new StringBuilder();
+      if (connection.isSecure()) builder.append("https://");
+      else builder.append("http://");
+      String host = getHeaders().getFirst("Host");
+      if (host == null)
+      {
+         host = connection.getLocalAddress().getHostName();
+      }
+      builder.append(host);
+      if (host.indexOf(':') < 0)
+      {
+         int local = connection.getLocalAddress().getPort();
+         if (connection.isSecure() && local != 443)
+         {
+            builder.append(":").append(local);
+         }
+         else if (!connection.isSecure() && local != 80)
+         {
+            builder.append(":").append(local);
+         }
+      }
+      builder.append(getRequestURI());
+      requestURL = builder.toString();
+      return new StringBuffer(requestURL);
    }
 
    @Override

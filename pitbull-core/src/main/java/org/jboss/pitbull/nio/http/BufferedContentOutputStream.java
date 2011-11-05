@@ -3,6 +3,7 @@ package org.jboss.pitbull.nio.http;
 import org.jboss.pitbull.nio.socket.Channels;
 import org.jboss.pitbull.nio.socket.ManagedChannel;
 import org.jboss.pitbull.spi.ContentOutputStream;
+import org.jboss.pitbull.spi.RequestHeader;
 import org.jboss.pitbull.spi.ResponseHeader;
 
 import java.io.IOException;
@@ -26,6 +27,7 @@ public class BufferedContentOutputStream extends ContentOutputStream
    protected ByteBuffer buffer;
    protected boolean initialFlush = true;
    protected int size;
+   protected RequestHeader requestHeader;
    protected ResponseHeader responseHeader;
    protected boolean closed;
    protected long timeout;
@@ -49,9 +51,9 @@ public class BufferedContentOutputStream extends ContentOutputStream
     *
     * @param out
     */
-   public BufferedContentOutputStream(ManagedChannel channel, ResponseHeader responseHeader)
+   public BufferedContentOutputStream(ManagedChannel channel, RequestHeader requestHeader, ResponseHeader responseHeader)
    {
-      this(channel, responseHeader, 8192);
+      this(channel, requestHeader, responseHeader, 8192);
    }
 
    /**
@@ -60,9 +62,10 @@ public class BufferedContentOutputStream extends ContentOutputStream
     * @param out
     * @param size must be > 0
     */
-   public BufferedContentOutputStream(ManagedChannel channel, ResponseHeader responseHeader, int size)
+   public BufferedContentOutputStream(ManagedChannel channel, RequestHeader requestHeader, ResponseHeader responseHeader, int size)
    {
       this.channel = channel;
+      this.requestHeader = requestHeader;
       this.responseHeader = responseHeader;
       setBufferSize(size);
    }
@@ -223,8 +226,9 @@ public class BufferedContentOutputStream extends ContentOutputStream
             writeMessage(buffer);
             buffer.clear();
          }
-         else
+         else // we have nothing in buffer
          {
+            response.prepareEmptyBody(requestHeader);
             writeResponseHeader(response);
          }
       }

@@ -3,6 +3,7 @@ package org.jboss.pitbull;
 import org.jboss.pitbull.spi.Connection;
 
 import javax.net.ssl.SSLSession;
+import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -14,8 +15,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class ConnectionImpl implements Connection
 {
    private String id;
-   private SocketAddress localAddress;
-   private SocketAddress remoteAddress;
+   private InetSocketAddress localAddress;
+   private InetSocketAddress remoteAddress;
    private SSLSession sslSession;
    private boolean secure;
    private static final AtomicInteger counter = new AtomicInteger();
@@ -30,8 +31,8 @@ public class ConnectionImpl implements Connection
    public ConnectionImpl(String id, SocketAddress localAddress, SocketAddress remoteAddress, SSLSession sslSession, boolean secure)
    {
       this.id = id;
-      this.localAddress = localAddress;
-      this.remoteAddress = remoteAddress;
+      this.localAddress = (InetSocketAddress) localAddress;
+      this.remoteAddress = (InetSocketAddress) remoteAddress;
       this.sslSession = sslSession;
       this.secure = secure;
    }
@@ -43,13 +44,13 @@ public class ConnectionImpl implements Connection
    }
 
    @Override
-   public SocketAddress getLocalAddress()
+   public InetSocketAddress getLocalAddress()
    {
       return localAddress;
    }
 
    @Override
-   public SocketAddress getRemoteAddress()
+   public InetSocketAddress getRemoteAddress()
    {
       return remoteAddress;
    }

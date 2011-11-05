@@ -52,6 +52,7 @@ public class Worker implements Runnable
 
    protected void executeRegistration(SocketChannel channel) throws IOException
    {
+      logger.debug("Registered channel.");
       channel.configureBlocking(false);
       SelectionKey key = channel.register(selector, SelectionKey.OP_READ);
       key.attach(new ManagedChannel(channel, key, factory.create()));
@@ -96,6 +97,7 @@ public class Worker implements Runnable
          shutdown = true;
          registrationQueue.notify();
       }
+      selector.wakeup();
       try
       {
          shutdownLatch.await();

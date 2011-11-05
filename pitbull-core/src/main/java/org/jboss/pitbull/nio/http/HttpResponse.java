@@ -1,5 +1,6 @@
 package org.jboss.pitbull.nio.http;
 
+import org.jboss.pitbull.spi.RequestHeader;
 import org.jboss.pitbull.spi.ResponseHeader;
 
 import java.io.IOException;
@@ -82,6 +83,24 @@ public class HttpResponse
          Map.Entry<String, String> entry = it.next();
          if (entry.getKey().equalsIgnoreCase(name)) it.remove();
       }
+   }
+
+   /**
+    * Depending on response code and HTTP method an empty message body may have to be sent.  i.e. a Content-Length of 0
+    *
+    * @param request
+    */
+   public void prepareEmptyBody(RequestHeader request)
+   {
+      if (status < 200 || status == 204 || status == 304)
+      {
+         return;
+      }
+      if (request.getMethod().equalsIgnoreCase("HEAD")) return;
+      removeHeader("Content-Length");
+      removeHeader("Transfer-Encoding");
+      addHeader("Content-Length", "0");
+      return;
    }
 
    public byte[] responseBytes() throws IOException

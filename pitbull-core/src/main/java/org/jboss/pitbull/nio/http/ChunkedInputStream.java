@@ -49,7 +49,7 @@ public class ChunkedInputStream extends ContentInputStream
 
    public void eat() throws IOException
    {
-      while (skip(1000) != 0) ;
+      while (!done) skip(1000);
    }
 
    protected long getChunkSize(String hex)
