@@ -31,7 +31,7 @@ public class ExecutorThreadFactory implements ThreadFactory
             finally
             {
                SelectorUtil.cleanupThreadSelector();
-               logger.debug("Cleaned up ThreadLocal selector");
+               logger.trace("Cleaned up ThreadLocal selector");
             }
          }
       };

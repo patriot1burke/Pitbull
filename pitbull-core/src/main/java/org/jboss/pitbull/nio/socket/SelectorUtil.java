@@ -56,7 +56,7 @@ final class SelectorUtil
       catch (CancelledKeyException e)
       {
          // Harmless exception - log anyway
-         logger.debug(
+         logger.trace(
                  CancelledKeyException.class.getSimpleName() +
                          " raised by a Selector - JDK bug?", e);
       }

@@ -17,9 +17,7 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -33,30 +31,6 @@ import java.net.URL;
 public class BasicTest
 {
    protected static EmbeddedServletContainer server;
-
-   public static String readString(InputStream in, String charset) throws IOException
-   {
-      byte[] buffer = new byte[1024];
-      ByteArrayOutputStream builder = new ByteArrayOutputStream();
-      int wasRead = 0;
-      StringBuilder sb = new StringBuilder();
-      do
-      {
-         wasRead = in.read(buffer, 0, 1024);
-         if (wasRead > 0)
-         {
-            builder.write(buffer, 0, wasRead);
-            for (int i = 0; i < wasRead; i++) sb.append((char) buffer[i]);
-            if (true)
-            { int x = 1; }  // this just here so i can set breakpoint when debugging
-         }
-      }
-      while (wasRead > -1);
-      byte[] bytes = builder.toByteArray();
-
-      if (charset != null) return new String(bytes, charset);
-      else return new String(bytes, "UTF-8");
-   }
 
 
    public static class FixedLengthServlet extends HttpServlet
@@ -84,7 +58,7 @@ public class BasicTest
       protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException
       {
          ServletInputStream is = req.getInputStream();
-         String val = readString(is, null);
+         String val = Util.readString(is, null);
          Assert.assertEquals("hello world", val);
          resp.setStatus(204);
 
@@ -110,7 +84,7 @@ public class BasicTest
       {
          Assert.assertNotNull(req.getHeader("Transfer-Encoding"));
          ServletInputStream is = req.getInputStream();
-         String val = readString(is, null);
+         String val = Util.readString(is, null);
          Assert.assertEquals("hello world, bonjeur, guten morgen, yo, goodbye, cheers", val);
          resp.setStatus(204);
 

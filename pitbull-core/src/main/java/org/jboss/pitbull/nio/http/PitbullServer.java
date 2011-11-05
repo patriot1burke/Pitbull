@@ -96,26 +96,26 @@ public class PitbullServer
    public void stop() throws Exception
    {
       acceptor.shutdown();
-      logger.debug("Shutdown Acceptor Thread");
+      logger.trace("Shutdown Acceptor Thread");
       for (Worker worker : workers)
       {
          worker.shutdown();
       }
-      logger.debug("Shutdown Workers");
+      logger.trace("Shutdown Workers");
       workerExecutor.shutdown();
       boolean awaitedWorker = workerExecutor.awaitTermination(60, TimeUnit.SECONDS);
-      logger.debug("Shutdown Worker Executor: " + awaitedWorker);
+      logger.trace("Shutdown Worker Executor: {0}", awaitedWorker);
       requestExecutor.shutdown();
       boolean awaited = requestExecutor.awaitTermination(60, TimeUnit.SECONDS);
-      logger.debug("Shutdown Request Executor: " + awaited);
+      logger.trace("Shutdown Request Executor: {0}", awaited);
       if (awaited == false) requestExecutor.shutdownNow();
       for (Worker worker : workers)
       {
          worker.close();
       }
-      logger.debug("Closed all workers");
+      logger.trace("Closed all workers");
       channel.close();
-      logger.debug("Closed channel");
+      logger.trace("Closed channel");
 
 
    }

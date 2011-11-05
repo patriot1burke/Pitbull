@@ -58,7 +58,6 @@ public class ManagedChannel
 
    public void close()
    {
-      logger.debug("Closing channel");
       if (closed) return;
       closed = true;
       try

@@ -7,6 +7,7 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
 import java.util.ArrayDeque;
+import java.util.Iterator;
 import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
@@ -52,7 +53,7 @@ public class Worker implements Runnable
 
    protected void executeRegistration(SocketChannel channel) throws IOException
    {
-      logger.debug("Registered channel.");
+      logger.trace("Registered channel.");
       channel.configureBlocking(false);
       SelectionKey key = channel.register(selector, SelectionKey.OP_READ);
       key.attach(new ManagedChannel(channel, key, factory.create()));
@@ -74,9 +75,11 @@ public class Worker implements Runnable
 
    protected void processReads()
    {
-      Set<SelectionKey> keys = selector.selectedKeys();
-      for (SelectionKey key : keys)
+      Set<SelectionKey> selectedKeys = selector.selectedKeys();
+      for (Iterator<SelectionKey> i = selectedKeys.iterator(); i.hasNext(); )
       {
+         SelectionKey key = i.next();
+         i.remove();
          int readyOps = key.readyOps();
          if ((readyOps & SelectionKey.OP_READ) != 0 || readyOps == 0)
          {

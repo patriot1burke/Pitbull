@@ -55,7 +55,7 @@ public class ContentLengthInputStream extends ContentInputStream
    {
       if (remainingBytes == 0)
       {
-         log.debug("resetBufferLimit with 0 remaining bytes");
+         log.trace("resetBufferLimit with 0 remaining bytes");
       }
       buffer.clear();
       if (buffer.capacity() > remainingBytes) buffer.limit((int) (remainingBytes));

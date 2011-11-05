@@ -45,7 +45,7 @@ public class Acceptor implements Runnable
 
    protected void registerAcceptedChannel(SocketChannel accepted) throws IOException
    {
-      logger.debug("Accepted Connection.");
+      logger.trace("Accepted Connection.");
       Worker worker = nextWorker();
       worker.register(accepted);
    }
