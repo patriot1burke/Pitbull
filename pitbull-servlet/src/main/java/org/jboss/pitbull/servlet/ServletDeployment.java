@@ -83,6 +83,6 @@ public class ServletDeployment implements RequestInitiator
       }
       if (servlets.size() < 1) return null;
       DeploymentServletRegistration servlet = servlets.get(0);
-      return new ServletRequestHandler(connection, servlet);
+      return new ServletRequestHandler(connection, servlet, ctx);
    }
 }

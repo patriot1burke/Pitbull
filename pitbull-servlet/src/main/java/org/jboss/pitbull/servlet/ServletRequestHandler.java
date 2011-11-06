@@ -19,12 +19,14 @@ public class ServletRequestHandler implements StreamHandler
    protected StreamResponseWriter writer;
    protected Connection connection;
    protected DeploymentServletRegistration servlet;
+   protected DeploymentServletContext context;
    protected static final Logger log = Logger.getLogger(ServletRequestHandler.class);
 
-   public ServletRequestHandler(Connection connection, DeploymentServletRegistration servlet)
+   public ServletRequestHandler(Connection connection, DeploymentServletRegistration servlet, DeploymentServletContext context)
    {
       this.connection = connection;
       this.servlet = servlet;
+      this.context = context;
    }
 
    @Override
@@ -46,6 +48,7 @@ public class ServletRequestHandler implements StreamHandler
       request.setConnection(connection);
       request.setHeaderBlob(requestHeader);
       request.setIs(input);
+      request.setContext(context);
       HttpServletResponseImpl response = new HttpServletResponseImpl(writer);
       try
       {

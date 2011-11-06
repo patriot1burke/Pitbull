@@ -60,9 +60,16 @@ public class HttpServletRequestImpl implements HttpServletRequest
    protected String requestURL;
    protected String requestURI;
    protected String queryString;
+   protected Map<String, String[]> parameters;
+   protected DeploymentServletContext context;
    public static final String DEFAULT_CHARACTER_ENCODING = "ISO-8859-1";
    private static final Cookie[] emptyCookies = new Cookie[0];
 
+
+   public void setContext(DeploymentServletContext context)
+   {
+      this.context = context;
+   }
 
    public void setConnection(Connection connection)
    {
@@ -206,7 +213,7 @@ public class HttpServletRequestImpl implements HttpServletRequest
    @Override
    public String getContextPath()
    {
-      throw new NotImplementedYetException();
+      return context.getContextPath();
    }
 
    @Override
@@ -444,25 +451,52 @@ public class HttpServletRequestImpl implements HttpServletRequest
    @Override
    public String getParameter(String name)
    {
-      throw new NotImplementedYetException();
+      String[] values = getParameterMap().get(name);
+      if (values == null || values.length == 0) return null;
+      return values[0];
    }
 
    @Override
    public Enumeration<String> getParameterNames()
    {
-      throw new NotImplementedYetException();
+      final Iterator<String> it = getParameterMap().keySet().iterator();
+      return new Enumeration<String>()
+      {
+         @Override
+         public boolean hasMoreElements()
+         {
+            return it.hasNext();
+         }
+
+         @Override
+         public String nextElement()
+         {
+            return it.next();
+         }
+      };
    }
 
    @Override
    public String[] getParameterValues(String name)
    {
-      throw new NotImplementedYetException();
+      return getParameterMap().get(name);
    }
 
    @Override
    public Map<String, String[]> getParameterMap()
    {
-      throw new NotImplementedYetException();
+      if (parameters == null)
+      {
+         try
+         {
+            parameters = ParameterParser.parseParameters(getQueryString(), underlyingInputStream);
+         }
+         catch (IOException e)
+         {
+            throw new RuntimeException(e);
+         }
+      }
+      return parameters;
    }
 
    @Override
