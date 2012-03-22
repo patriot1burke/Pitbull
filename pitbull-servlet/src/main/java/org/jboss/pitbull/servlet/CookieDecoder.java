@@ -206,11 +206,11 @@ public class CookieDecoder
 
          c.setVersion(version);
          c.setMaxAge(maxAge);
-         c.setPath(path);
-         c.setDomain(domain);
+         if (path != null) c.setPath(path);
+         if (domain != null) c.setDomain(domain);
          c.setSecure(secure);
          c.setHttpOnly(httpOnly);
-         if (version > 0)
+         if (version > 0 && comment != null)
          {
             c.setComment(comment);
          }

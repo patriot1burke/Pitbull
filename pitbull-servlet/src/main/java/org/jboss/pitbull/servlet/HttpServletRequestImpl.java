@@ -238,7 +238,7 @@ public class HttpServletRequestImpl implements HttpServletRequest
    @Override
    public boolean isUserInRole(String role)
    {
-      throw new NotImplementedYetException();
+      return false;
    }
 
    @Override

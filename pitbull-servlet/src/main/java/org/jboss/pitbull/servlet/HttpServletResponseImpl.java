@@ -52,7 +52,10 @@ public class HttpServletResponseImpl implements HttpServletResponse, ResponseHea
    @Override
    public void addCookie(Cookie cookie)
    {
-      throw new NotImplementedYetException();
+      StringBuffer buf = new StringBuffer();
+      ServerCookie.appendCookieValue(buf, cookie.getVersion(), cookie.getName(), cookie.getValue(), cookie.getPath(),
+              cookie.getDomain(), cookie.getComment(), cookie.getMaxAge(), cookie.getSecure(), cookie.isHttpOnly());
+      addHeader("Set-Cookie", buf.toString());
    }
 
    @Override

@@ -41,17 +41,6 @@ public class BasicTest
          resp.setContentType("text/plain");
          resp.setStatus(200);
          resp.getOutputStream().write("hello world".getBytes());
-         /*
-         System.out.println("Thread: " + Thread.currentThread().getName());
-         try
-         {
-            Thread.sleep(1000);
-         }
-         catch (InterruptedException e)
-         {
-            throw new RuntimeException(e);
-         }
-         */
       }
 
       @Override
