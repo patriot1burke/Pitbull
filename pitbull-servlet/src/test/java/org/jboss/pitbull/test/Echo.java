@@ -2,6 +2,7 @@ package org.jboss.pitbull.test;
 
 import org.jboss.pitbull.servlet.DeploymentServletContext;
 import org.jboss.pitbull.servlet.EmbeddedServletContainer;
+import org.jboss.pitbull.servlet.EmbeddedServletContainerBuilder;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletInputStream;
@@ -47,9 +48,11 @@ public class Echo extends HttpServlet
 
    public static void main(String[] args) throws Exception
    {
-      EmbeddedServletContainer server = new EmbeddedServletContainer();
-      server.setNumWorkers(1);
-      server.setNumExecutors(1);
+      EmbeddedServletContainer server = new EmbeddedServletContainerBuilder()
+              .numExecutors(1)
+              .numWorkers(1)
+              .build();
+
       DeploymentServletContext ctx = server.newDeployment("");
       ctx.addServlet("fixed", new Echo()).addMapping("/*");
       server.start();

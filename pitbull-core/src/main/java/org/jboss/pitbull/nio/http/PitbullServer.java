@@ -1,17 +1,12 @@
 package org.jboss.pitbull.nio.http;
 
 import org.jboss.pitbull.logging.Logger;
-import org.jboss.pitbull.nio.socket.Acceptor;
-import org.jboss.pitbull.nio.socket.ExecutorThreadFactory;
-import org.jboss.pitbull.nio.socket.Worker;
 import org.jboss.pitbull.spi.RequestInitiator;
 import org.jboss.pitbull.util.registry.UriRegistry;
 
-import java.net.InetSocketAddress;
-import java.nio.channels.ServerSocketChannel;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
+import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.SSLContext;
+import java.security.KeyStore;
 
 /**
  * @author <a href="mailto:bill@burkecentral.com">Bill Burke</a>
@@ -19,21 +14,30 @@ import java.util.concurrent.TimeUnit;
  */
 public class PitbullServer
 {
-   protected int port = 8080;
+   protected int port = -1;
+   protected int sslPort = -1;
+   protected KeyStore keyStore;
    protected String root = "";
    protected UriRegistry<RequestInitiator> registry = new UriRegistry<RequestInitiator>();
-   protected ExecutorService requestExecutor;
-   protected ExecutorService workerExecutor;
-   protected Acceptor acceptor;
-   protected Worker[] workers;
    protected int numWorkers = 5;
    protected int numExecutors = 5;
-   protected ServerSocketChannel channel;
    protected static final Logger logger = Logger.getLogger(PitbullServer.class);
+   protected HttpEndpoint http;
+   protected HttpEndpoint https;
 
    public UriRegistry<RequestInitiator> getRegistry()
    {
       return registry;
+   }
+
+   public KeyStore getKeyStore()
+   {
+      return keyStore;
+   }
+
+   public void setKeyStore(KeyStore keyStore)
+   {
+      this.keyStore = keyStore;
    }
 
    public int getPort()
@@ -44,6 +48,16 @@ public class PitbullServer
    public void setPort(int port)
    {
       this.port = port;
+   }
+
+   public int getSslPort()
+   {
+      return sslPort;
+   }
+
+   public void setSslPort(int sslPort)
+   {
+      this.sslPort = sslPort;
    }
 
    public int getNumWorkers()
@@ -78,45 +92,35 @@ public class PitbullServer
 
    public void start() throws Exception
    {
-      requestExecutor = Executors.newFixedThreadPool(numExecutors, ExecutorThreadFactory.singleton);
-      workerExecutor = Executors.newFixedThreadPool(numWorkers + 1);
-      workers = new Worker[numWorkers];
-      for (int i = 0; i < workers.length; i++)
+      if (port > -1)
       {
-         workers[i] = new Worker(new HttpEventHandlerFactory(requestExecutor, null, registry));
-         workerExecutor.execute(workers[i]);
+         logger.info("**** PORT: " + port);
+         http = new HttpEndpoint();
+         http.setPort(port);
+         http.setNumWorkers(numWorkers);
+         http.setNumExecutors(numExecutors);
+         http.setRegistry(registry);
+         http.setRoot(root);
+         http.start();
       }
-      channel = ServerSocketChannel.open();
-      channel.configureBlocking(false);
-      channel.socket().bind(new InetSocketAddress(port));
-      acceptor = new Acceptor(channel, workers);
-      workerExecutor.execute(acceptor);
+      if (sslPort > -1)
+      {
+         logger.info("**** SSLPORT: " + sslPort);
+         KeyManagerFactory kmf = KeyManagerFactory.getInstance("SunX509");
+         kmf.init(keyStore, null);
+
+         // Initialize the SSLContext to work with our key managers.
+         SSLContext serverContext = SSLContext.getInstance("TLS");
+         serverContext.init(kmf.getKeyManagers(), null, null);
+      }
+
    }
 
    public void stop() throws Exception
    {
-      acceptor.shutdown();
-      logger.trace("Shutdown Acceptor Thread");
-      for (Worker worker : workers)
+      if (http != null)
       {
-         worker.shutdown();
+         http.stop();
       }
-      logger.trace("Shutdown Workers");
-      workerExecutor.shutdown();
-      boolean awaitedWorker = workerExecutor.awaitTermination(60, TimeUnit.SECONDS);
-      logger.trace("Shutdown Worker Executor: {0}", awaitedWorker);
-      requestExecutor.shutdown();
-      boolean awaited = requestExecutor.awaitTermination(60, TimeUnit.SECONDS);
-      logger.trace("Shutdown Request Executor: {0}", awaited);
-      if (awaited == false) requestExecutor.shutdownNow();
-      for (Worker worker : workers)
-      {
-         worker.close();
-      }
-      logger.trace("Closed all workers");
-      channel.close();
-      logger.trace("Closed channel");
-
-
    }
 }

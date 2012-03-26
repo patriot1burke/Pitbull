@@ -2,6 +2,7 @@ package org.jboss.pitbull.test;
 
 import org.jboss.pitbull.servlet.DeploymentServletContext;
 import org.jboss.pitbull.servlet.EmbeddedServletContainer;
+import org.jboss.pitbull.servlet.EmbeddedServletContainerBuilder;
 import org.jboss.resteasy.client.ClientExecutor;
 import org.jboss.resteasy.client.ClientRequest;
 import org.jboss.resteasy.client.ClientResponse;
@@ -83,9 +84,10 @@ public class BasicTest
    @BeforeClass
    public static void startup() throws Exception
    {
-      server = new EmbeddedServletContainer();
-      server.setNumWorkers(1);
-      server.setNumExecutors(1);
+      server = new EmbeddedServletContainerBuilder()
+              .numExecutors(1)
+              .numWorkers(1)
+              .build();
       DeploymentServletContext ctx = server.newDeployment("");
       ctx.addServlet("fixed", new FixedLengthServlet()).addMapping("/fixed");
       ctx.addServlet("chunked", new ChunkedServlet()).addMapping("/chunked");

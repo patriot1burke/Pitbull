@@ -4,10 +4,14 @@ package org.jboss.pitbull.crypto;
 import org.bouncycastle.x509.X509V1CertificateGenerator;
 
 import javax.security.auth.x500.X500Principal;
+import java.security.cert.Certificate;
 import java.math.BigInteger;
 import java.security.InvalidKeyException;
 import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.KeyStore;
 import java.security.NoSuchProviderException;
+import java.security.PrivateKey;
 import java.security.SignatureException;
 import java.security.cert.X509Certificate;
 import java.util.Date;
@@ -38,5 +42,19 @@ public class KeyTools
       certGen.setSignatureAlgorithm("SHA256WithRSAEncryption");
 
       return certGen.generateX509Certificate(pair.getPrivate(), "BC");
+   }
+
+   public static KeyStore generateKeyStore() throws Exception
+   {
+      KeyPair keyPair = KeyPairGenerator.getInstance("RSA", "BC").generateKeyPair();
+      PrivateKey privateKey = keyPair.getPrivate();
+      X509Certificate cert = KeyTools.generateTestCertificate(keyPair);
+
+      KeyStore ks = KeyStore.getInstance("JKS", "BC");
+      ks.load(null, null);
+      Certificate[] certs = {cert};
+      ks.setKeyEntry("alias", privateKey.getEncoded(), certs);
+      return ks;
+
    }
 }
