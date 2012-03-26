@@ -1,6 +1,5 @@
 package org.jboss.pitbull.servlet;
 
-import org.jboss.netty.handler.codec.http.HttpHeaders;
 import org.jboss.pitbull.NotImplementedYetException;
 import org.jboss.pitbull.spi.ContentOutputStream;
 import org.jboss.pitbull.spi.ResponseHeader;
@@ -339,7 +338,7 @@ public class HttpServletResponseImpl implements HttpServletResponse, ResponseHea
    @Override
    public void setContentType(String type)
    {
-      setHeader(HttpHeaders.Names.CONTENT_TYPE, type);
+      setHeader("Content-Type", type);
    }
 
    @Override

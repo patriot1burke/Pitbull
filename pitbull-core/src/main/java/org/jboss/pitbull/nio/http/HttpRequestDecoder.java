@@ -1,9 +1,7 @@
 package org.jboss.pitbull.nio.http;
 
-import org.jboss.netty.util.CharsetUtil;
 
 import java.nio.ByteBuffer;
-import java.nio.charset.Charset;
 
 /**
  * Class that will handle parsing an HTTP request
@@ -56,7 +54,6 @@ public class HttpRequestDecoder
 
    static final byte DOUBLE_QUOTE = '"';
 
-   static final Charset DEFAULT_CHARSET = CharsetUtil.UTF_8;
 
 
    interface State
