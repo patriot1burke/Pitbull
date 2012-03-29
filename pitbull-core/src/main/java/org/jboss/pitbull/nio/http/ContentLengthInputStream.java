@@ -90,14 +90,14 @@ public class ContentLengthInputStream extends ContentInputStream
 
       final ByteBuffer buffer = this.buffer;
 
-      final SocketChannel channel = this.channel.getChannel();
+      //final SocketChannel channel = this.channel.getChannel();
       final long timeout = this.timeout;
       if (timeout == 0L)
       {
          while (!buffer.hasRemaining())
          {
             resetBufferLimit();
-            final int res = Channels.readBlocking(channel, buffer);
+            final int res = channel.readBlocking(buffer);
             if (res == -1)
             {
                return -1;
@@ -118,7 +118,7 @@ public class ContentLengthInputStream extends ContentInputStream
                {
                   throw new ReadTimeoutException("Read timed out");
                }
-               final int res = Channels.readBlocking(channel, buffer, deadline - now, TimeUnit.MILLISECONDS);
+               final int res = channel.readBlocking(buffer, deadline - now, TimeUnit.MILLISECONDS);
                if (res == -1)
                {
                   return -1;
@@ -167,14 +167,13 @@ public class ContentLengthInputStream extends ContentInputStream
       if (len <= 0) return total;
 
 
-      final SocketChannel channel = this.channel.getChannel();
       final long timeout = this.timeout;
       try
       {
          if (timeout == 0L)
          {
             final ByteBuffer dst = ByteBuffer.wrap(b, off, len);
-            int res = total > 0 ? channel.read(dst) : Channels.readBlocking(channel, dst);
+            int res = total > 0 ? channel.read(dst) : channel.readBlocking(dst);
             if (res == -1)
             {
                return total == 0 ? -1 : total;
@@ -200,7 +199,7 @@ public class ContentLengthInputStream extends ContentInputStream
             }
             else
             {
-               res = Channels.readBlocking(channel, dst, timeout, TimeUnit.MILLISECONDS);
+               res = channel.readBlocking(dst, timeout, TimeUnit.MILLISECONDS);
                if (res == 0)
                {
                   throw new ReadTimeoutException("Read timed out");
@@ -258,7 +257,6 @@ public class ContentLengthInputStream extends ContentInputStream
       {
          return total;
       }
-      final SocketChannel channel = this.channel.getChannel();
       if (n > remainingBytes)
       {
          n = remainingBytes;
@@ -271,7 +269,7 @@ public class ContentLengthInputStream extends ContentInputStream
             while (n > 0L)
             {
                resetBufferLimit();
-               int res = total > 0L ? channel.read(buffer) : Channels.readBlocking(channel, buffer);
+               int res = total > 0L ? channel.read(buffer) : channel.readBlocking(buffer);
                if (res <= 0)
                {
                   return total;
@@ -303,7 +301,6 @@ public class ContentLengthInputStream extends ContentInputStream
          return rem;
       }
       resetBufferLimit();
-      final SocketChannel channel = this.channel.getChannel();
       try
       {
          channel.read(buffer);

@@ -49,13 +49,13 @@ public class HttpEventHandler implements EventHandler
       if (is != null) is.eat();
       HttpResponse response = new HttpResponse(code, null);
       byte[] bytes = response.responseBytes();
-      Channels.writeBlocking(channel.getChannel(), ByteBuffer.wrap(bytes));
+      channel.writeBlocking(ByteBuffer.wrap(bytes));
    }
 
    @Override
-   public void handleRead(ManagedChannel managedChannel)
+   public void handleRead(ManagedChannel channel)
    {
-      SocketChannel channel = managedChannel.getChannel();
+      //SocketChannel channel = managedChannel.getChannel();
       if (buffer == null) buffer = ByteBuffer.allocate(BUFFER_SIZE);
 
       try
@@ -64,7 +64,7 @@ public class HttpEventHandler implements EventHandler
          int c = channel.read(buffer);
          if (c == -1)
          {
-            managedChannel.close();
+            channel.close();
          }
          else if (c == 0) return;
          buffer.flip();
@@ -82,7 +82,7 @@ public class HttpEventHandler implements EventHandler
          {
             sslSession = ssl.getSession();
          }
-         connection = new ConnectionImpl(channel.socket().getLocalSocketAddress(), channel.socket().getRemoteSocketAddress(), sslSession, sslSession != null);
+         connection = new ConnectionImpl(channel.getChannel().socket().getLocalSocketAddress(), channel.getChannel().socket().getRemoteSocketAddress(), sslSession, sslSession != null);
       }
 
       if (!decoder.process(buffer))
@@ -106,20 +106,20 @@ public class HttpEventHandler implements EventHandler
       catch (NotFoundException e1)
       {
       }
-      managedChannel.suspendReads();
+      channel.suspendReads();
 
       if (requestHandler == null)
       {
          try
          {
-            error(managedChannel, 404, requestHeader);
+            error(channel, 404, requestHeader);
          }
          catch (IOException e)
          {
             log.error("Failed to send error message to client, closing", e);
-            managedChannel.close();
+            channel.close();
          }
-         managedChannel.resumeReads();
+         channel.resumeReads();
          return;
       }
 
@@ -130,12 +130,12 @@ public class HttpEventHandler implements EventHandler
          requestHandler.unsupportedHandler();
          try
          {
-            error(managedChannel, 500, requestHeader);
+            error(channel, 500, requestHeader);
          }
          catch (IOException e)
          {
             log.error("Failed to send error message to client, closing", e);
-            managedChannel.close();
+            channel.close();
          }
          return;
       }
@@ -145,7 +145,7 @@ public class HttpEventHandler implements EventHandler
       ByteBuffer oldBuffer = buffer;
       buffer = null;
 
-      StreamExecutor task = new StreamExecutor(managedChannel, streamHandler, oldBuffer, requestHeader);
+      StreamExecutor task = new StreamExecutor(channel, streamHandler, oldBuffer, requestHeader);
 
       if (requestHandler.isFast())
       {

@@ -162,7 +162,7 @@ public class ChunkedInputStream extends ContentInputStream
       {
          for (; ; )
          {
-            final int res = Channels.readBlocking(channel.getChannel(), buf);
+            final int res = channel.readBlocking(buf);
             if (res == -1)
             {
                return -1;
@@ -184,7 +184,7 @@ public class ChunkedInputStream extends ContentInputStream
             {
                throw new ReadTimeoutException("Read timed out");
             }
-            final int res = Channels.readBlocking(channel.getChannel(), buf, deadline - now, TimeUnit.MILLISECONDS);
+            final int res = channel.readBlocking(buf, deadline - now, TimeUnit.MILLISECONDS);
             if (res == -1)
             {
                return -1;

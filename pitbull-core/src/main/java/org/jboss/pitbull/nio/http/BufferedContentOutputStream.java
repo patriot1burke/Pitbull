@@ -180,7 +180,7 @@ public class BufferedContentOutputStream extends ContentOutputStream
       {
          try
          {
-            total = Channels.writeBlocking(channel.getChannel(), tmp);
+            total = channel.writeBlocking(tmp);
          }
          catch (InterruptedIOException e)
          {
@@ -192,7 +192,7 @@ public class BufferedContentOutputStream extends ContentOutputStream
       {
          try
          {
-            total = Channels.writeBlocking(channel.getChannel(), tmp, timeout, TimeUnit.MILLISECONDS);
+            total = channel.writeBlocking(tmp, timeout, TimeUnit.MILLISECONDS);
          }
          catch (InterruptedIOException e)
          {

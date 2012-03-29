@@ -64,7 +64,7 @@ public class NioStreamResponseWriter implements StreamResponseWriter
          {
             response.prepareEmptyBody(requestHeader);
             byte[] bytes = response.responseBytes();
-            Channels.writeBlocking(channel.getChannel(), ByteBuffer.wrap(bytes));
+            channel.writeBlocking(ByteBuffer.wrap(bytes));
             if (keepAlive)
             {
                channel.resumeReads();

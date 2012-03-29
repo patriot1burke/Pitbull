@@ -2,8 +2,11 @@ package org.jboss.pitbull.nio.socket;
 
 import org.jboss.pitbull.logging.Logger;
 
+import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author <a href="mailto:bill@burkecentral.com">Bill Burke</a>
@@ -32,6 +35,50 @@ public class ManagedChannel
    public EventHandler getHandler()
    {
       return handler;
+   }
+
+   /**
+    * Non-blocking
+    *
+    * @param buf
+    * @return
+    * @throws IOException
+    */
+   public int read(ByteBuffer buf) throws IOException
+   {
+      return channel.read(buf);
+   }
+
+   public int readBlocking(ByteBuffer buf) throws IOException
+   {
+      return Channels.readBlocking(getChannel(), buf);
+   }
+
+   public int readBlocking(ByteBuffer buf, long time, TimeUnit unit) throws IOException
+   {
+      return Channels.readBlocking(getChannel(), buf, time, unit);
+   }
+
+   /**
+    * Non-blocking
+    *
+    * @param buf
+    * @return
+    * @throws IOException
+    */
+   public int write(ByteBuffer buf) throws IOException
+   {
+      return channel.write(buf);
+   }
+
+   public int writeBlocking(ByteBuffer buffer) throws IOException
+   {
+      return Channels.writeBlocking(getChannel(), buffer);
+   }
+
+   public int writeBlocking(ByteBuffer buffer, long time, TimeUnit unit) throws IOException
+   {
+      return Channels.writeBlocking(getChannel(), buffer, time, unit);
    }
 
    public void suspendReads()
