@@ -3,10 +3,13 @@ package org.jboss.pitbull.nio.http;
 import org.jboss.pitbull.logging.Logger;
 import org.jboss.pitbull.nio.socket.Acceptor;
 import org.jboss.pitbull.nio.socket.ExecutorThreadFactory;
+import org.jboss.pitbull.nio.socket.ManagedChannelFactory;
+import org.jboss.pitbull.nio.socket.SSLChannelFactory;
 import org.jboss.pitbull.nio.socket.Worker;
 import org.jboss.pitbull.spi.RequestInitiator;
 import org.jboss.pitbull.util.registry.UriRegistry;
 
+import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLEngine;
 import java.net.InetSocketAddress;
 import java.nio.channels.ServerSocketChannel;
@@ -20,7 +23,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class HttpEndpoint
 {
-   protected SSLEngine engine;
+   protected SSLContext sslContext;
    protected int port = 8080;
    protected String root = "";
    protected UriRegistry<RequestInitiator> registry;
@@ -34,14 +37,14 @@ public class HttpEndpoint
    protected static final Logger logger = Logger.getLogger(HttpEndpoint.class);
 
 
-   public SSLEngine getEngine()
+   public SSLContext getSslContext()
    {
-      return engine;
+      return sslContext;
    }
 
-   public void setEngine(SSLEngine engine)
+   public void setSslContext(SSLContext sslContext)
    {
-      this.engine = engine;
+      this.sslContext = sslContext;
    }
 
    public UriRegistry<RequestInitiator> getRegistry()
@@ -127,13 +130,22 @@ public class HttpEndpoint
       workers = new Worker[numWorkers];
       for (int i = 0; i < workers.length; i++)
       {
-         workers[i] = new Worker(new HttpEventHandlerFactory(requestExecutor, engine, registry));
+         workers[i] = new Worker();
          workerExecutor.execute(workers[i]);
       }
       channel = ServerSocketChannel.open();
       channel.configureBlocking(false);
       channel.socket().bind(new InetSocketAddress(port));
-      acceptor = new Acceptor(channel, workers);
+      ManagedChannelFactory factory = null;
+      if (sslContext != null)
+      {
+         factory = new SSLChannelFactory(sslContext, new HttpEventHandlerFactory(requestExecutor, registry));
+      }
+      else
+      {
+         factory = new ManagedChannelFactory(new HttpEventHandlerFactory(requestExecutor, registry));
+      }
+      acceptor = new Acceptor(channel, factory, workers);
       workerExecutor.execute(acceptor);
    }
 

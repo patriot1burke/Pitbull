@@ -31,15 +31,13 @@ public class HttpEventHandler implements EventHandler
    protected ByteBuffer buffer = ByteBuffer.allocate(BUFFER_SIZE);
    protected Connection connection;
    protected UriRegistry<RequestInitiator> registry;
-   protected SSLEngine ssl;
    protected ExecutorService executor;
    protected static final Logger log = Logger.getLogger(HttpEventHandler.class);
    protected long count;
 
-   public HttpEventHandler(ExecutorService executor, SSLEngine ssl, UriRegistry<RequestInitiator> registry)
+   public HttpEventHandler(ExecutorService executor, UriRegistry<RequestInitiator> registry)
    {
       this.executor = executor;
-      this.ssl = ssl;
       this.registry = registry;
    }
 
@@ -77,12 +75,11 @@ public class HttpEventHandler implements EventHandler
       if (decoder == null) decoder = new HttpRequestDecoder();
       if (connection == null)
       {
-         SSLSession sslSession = null;
-         if (ssl != null)
-         {
-            sslSession = ssl.getSession();
-         }
-         connection = new ConnectionImpl(channel.getChannel().socket().getLocalSocketAddress(), channel.getChannel().socket().getRemoteSocketAddress(), sslSession, sslSession != null);
+         connection = new ConnectionImpl(
+                 channel.getChannel().socket().getLocalSocketAddress(),
+                 channel.getChannel().socket().getRemoteSocketAddress(),
+                 channel.getSslSession(),
+                 channel.getSslSession() != null);
       }
 
       if (!decoder.process(buffer))

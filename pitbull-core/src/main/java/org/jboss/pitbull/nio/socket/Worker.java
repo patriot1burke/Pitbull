@@ -23,18 +23,16 @@ public class Worker implements Runnable
    protected volatile boolean shutdown;
    protected volatile boolean idle;
    protected CountDownLatch shutdownLatch = new CountDownLatch(1);
-   protected Queue<SocketChannel> registrationQueue = new ArrayDeque<SocketChannel>(10);
+   protected Queue<ManagedChannel> registrationQueue = new ArrayDeque<ManagedChannel>(10);
    protected static final Logger logger = Logger.getLogger(Worker.class);
-   protected EventHandlerFactory factory;
    protected static final AtomicInteger counter = new AtomicInteger();
 
-   public Worker(EventHandlerFactory factory) throws IOException
+   public Worker() throws IOException
    {
       this.selector = Selector.open();
-      this.factory = factory;
    }
 
-   public void register(SocketChannel channel) throws IOException
+   public void register(ManagedChannel channel) throws Exception
    {
       synchronized (registrationQueue)
       {
@@ -51,19 +49,28 @@ public class Worker implements Runnable
       }
    }
 
-   protected void executeRegistration(SocketChannel channel) throws IOException
+   protected void executeRegistration(ManagedChannel channel)
    {
-      logger.trace("Registered channel.");
-      channel.configureBlocking(false);
-      SelectionKey key = channel.register(selector, SelectionKey.OP_READ);
-      key.attach(new ManagedChannel(channel, key, factory.create()));
+      try
+      {
+         logger.trace("Registered channel.");
+         channel.getChannel().configureBlocking(false);
+         SelectionKey key = channel.getChannel().register(selector, SelectionKey.OP_READ);
+         channel.bindSelectionKey(key);
+         key.attach(channel);
+      }
+      catch (Exception e)
+      {
+         logger.error("Failed to execute socket registration", e);
+         try { channel.close(); } catch (Exception ignored) {}
+      }
    }
 
-   protected void processRegistrations() throws IOException
+   protected void processRegistrations()
    {
       for (; ; )
       {
-         SocketChannel channel = null;
+         ManagedChannel channel = null;
          synchronized (registrationQueue)
          {
             channel = registrationQueue.poll();

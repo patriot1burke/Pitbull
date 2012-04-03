@@ -25,12 +25,14 @@ public class Acceptor implements Runnable
    protected CountDownLatch shutdownLatch = new CountDownLatch(1);
    protected volatile boolean shutdown;
    protected final AtomicInteger workerIndex = new AtomicInteger();
+   protected ManagedChannelFactory channelFactory;
    protected Worker[] workers;
    protected static final Logger logger = Logger.getLogger(Acceptor.class);
    protected static final AtomicInteger counter = new AtomicInteger();
 
-   public Acceptor(ServerSocketChannel channel, Worker[] workers) throws IOException
+   public Acceptor(ServerSocketChannel channel, ManagedChannelFactory channelFactory, Worker[] workers) throws IOException
    {
+      this.channelFactory = channelFactory;
       this.workers = workers;
       this.channel = channel;
       selector = Selector.open();
@@ -47,7 +49,22 @@ public class Acceptor implements Runnable
    {
       logger.trace("Accepted Connection.");
       Worker worker = nextWorker();
-      worker.register(accepted);
+      try
+      {
+         worker.register(channelFactory.create(accepted));
+      }
+      catch (Exception e)
+      {
+         logger.error("Error registering accepted socket", e);
+         try
+         {
+            accepted.close();
+         }
+         catch (Exception ignored)
+         {
+
+         }
+      }
    }
 
    public void shutdown()

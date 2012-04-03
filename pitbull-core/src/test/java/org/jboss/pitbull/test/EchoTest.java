@@ -15,12 +15,10 @@ public class EchoTest
    @BeforeClass
    public static void startup() throws Exception
    {
-      /*
       server = new PitbullServerBuilder().build();
       server.setNumWorkers(1);
       server.setNumExecutors(1);
       server.start();
-      */
    }
 
 }

@@ -2,6 +2,7 @@ package org.jboss.pitbull.nio.socket;
 
 import org.jboss.pitbull.logging.Logger;
 
+import javax.net.ssl.SSLSession;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
@@ -19,12 +20,22 @@ public class ManagedChannel
    protected EventHandler handler;
    protected boolean closed;
    protected static final Logger logger = Logger.getLogger(ManagedChannel.class);
+   protected SSLSession sslSession;
 
-   public ManagedChannel(SocketChannel channel, SelectionKey key, EventHandler handler)
+   public ManagedChannel(SocketChannel channel, EventHandler handler)
    {
       this.channel = channel;
-      this.key = key;
       this.handler = handler;
+   }
+
+   public void bindSelectionKey(SelectionKey key)
+   {
+      this.key = key;
+   }
+
+   public SSLSession getSslSession()
+   {
+      return sslSession;
    }
 
    public SocketChannel getChannel()

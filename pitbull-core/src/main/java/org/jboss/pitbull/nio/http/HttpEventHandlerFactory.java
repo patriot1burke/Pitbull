@@ -15,19 +15,17 @@ import java.util.concurrent.ExecutorService;
 public class HttpEventHandlerFactory implements EventHandlerFactory
 {
    protected ExecutorService executor;
-   protected SSLEngine ssl;
    protected UriRegistry<RequestInitiator> registry;
 
-   public HttpEventHandlerFactory(ExecutorService executor, SSLEngine ssl, UriRegistry<RequestInitiator> registry)
+   public HttpEventHandlerFactory(ExecutorService executor, UriRegistry<RequestInitiator> registry)
    {
       this.executor = executor;
-      this.ssl = ssl;
       this.registry = registry;
    }
 
    @Override
    public EventHandler create()
    {
-      return new HttpEventHandler(executor, ssl, registry);
+      return new HttpEventHandler(executor, registry);
    }
 }
