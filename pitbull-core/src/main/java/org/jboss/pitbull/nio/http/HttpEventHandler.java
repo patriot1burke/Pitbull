@@ -43,11 +43,15 @@ public class HttpEventHandler implements EventHandler
 
    protected void error(ManagedChannel channel, int code, HttpRequestHeader requestHeader) throws IOException
    {
+      log.trace("Error returning with code: {0}", code);
       ContentInputStream is = ContentInputStream.create(channel, buffer, requestHeader);
       if (is != null) is.eat();
+      log.trace("ate stream");
       HttpResponse response = new HttpResponse(code, null);
       byte[] bytes = response.responseBytes();
+      log.trace("writing error");
       channel.writeBlocking(ByteBuffer.wrap(bytes));
+      log.trace("wrote error");
    }
 
    @Override
