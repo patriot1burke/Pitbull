@@ -19,7 +19,7 @@ public class ManagedChannel
    protected SelectionKey key;
    protected EventHandler handler;
    protected boolean closed;
-   protected static final Logger logger = Logger.getLogger(ManagedChannel.class);
+   private static final Logger log = Logger.getLogger(ManagedChannel.class);
    protected SSLSession sslSession;
 
    public ManagedChannel(SocketChannel channel, EventHandler handler)

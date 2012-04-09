@@ -54,4 +54,14 @@ public class HttpRequestHeader implements RequestHeader
    {
       headers.add(name, value);
    }
+
+   @Override
+   public String toString()
+   {
+      return "HttpRequestHeader{" +
+              "httpVersion='" + httpVersion + '\'' +
+              ", method='" + method + '\'' +
+              ", uri='" + uri + '\'' +
+              '}';
+   }
 }

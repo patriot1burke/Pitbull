@@ -24,6 +24,8 @@ public class SSLChannelFactory extends ManagedChannelFactory
    {
       SSLEngine engine = sslContext.createSSLEngine();
       engine.setUseClientMode(false);
+      engine.setNeedClientAuth(false);
+      engine.setWantClientAuth(false);
       return new SSLManagedChannel(channel, eventHandlerFactory.create(), engine);
    }
 }

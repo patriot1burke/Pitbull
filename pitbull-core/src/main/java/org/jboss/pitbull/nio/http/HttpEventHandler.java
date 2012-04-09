@@ -57,104 +57,118 @@ public class HttpEventHandler implements EventHandler
    @Override
    public void handleRead(ManagedChannel channel)
    {
-      //SocketChannel channel = managedChannel.getChannel();
-      if (buffer == null) buffer = ByteBuffer.allocate(BUFFER_SIZE);
-
+      log.trace("handleRead()");
       try
       {
-         buffer.clear();
-         int c = channel.read(buffer);
-         if (c == -1)
-         {
-            channel.close();
-         }
-         else if (c == 0) return;
-         buffer.flip();
-      }
-      catch (IOException e)
-      {
-         throw new RuntimeException(e);
-      }
+         if (buffer == null) buffer = ByteBuffer.allocate(BUFFER_SIZE);
 
-      if (decoder == null) decoder = new HttpRequestDecoder();
-      if (connection == null)
-      {
-         connection = new ConnectionImpl(
-                 channel.getChannel().socket().getLocalSocketAddress(),
-                 channel.getChannel().socket().getRemoteSocketAddress(),
-                 channel.getSslSession(),
-                 channel.getSslSession() != null);
-      }
-
-      if (!decoder.process(buffer))
-      {
-         return;
-      }
-
-      HttpRequestHeader requestHeader = decoder.getRequest();
-      decoder = null;
-
-      RequestHandler requestHandler = null;
-      try
-      {
-         List<RequestInitiator> initiators = registry.match(requestHeader.getUri());
-         for (RequestInitiator initiator : initiators)
-         {
-            requestHandler = initiator.begin(connection, requestHeader);
-            if (requestHandler != null) break;
-         }
-      }
-      catch (NotFoundException e1)
-      {
-      }
-      channel.suspendReads();
-
-      if (requestHandler == null)
-      {
          try
          {
-            error(channel, 404, requestHeader);
+            buffer.clear();
+            int c = channel.read(buffer);
+            if (c == -1)
+            {
+               channel.close();
+            }
+            else if (c == 0) return;
+            buffer.flip();
          }
          catch (IOException e)
          {
-            log.error("Failed to send error message to client, closing", e);
-            channel.close();
+            throw new RuntimeException(e);
          }
-         channel.resumeReads();
-         return;
-      }
 
+         if (decoder == null) decoder = new HttpRequestDecoder();
+         if (connection == null)
+         {
+            connection = new ConnectionImpl(
+                    channel.getChannel().socket().getLocalSocketAddress(),
+                    channel.getChannel().socket().getRemoteSocketAddress(),
+                    channel.getSslSession(),
+                    channel.getSslSession() != null);
+         }
 
-      if (!(requestHandler instanceof StreamHandler))
-      {
-         log.error("Unsupported requestHandler type: " + requestHandler.getClass().getName());
-         requestHandler.unsupportedHandler();
+         log.trace("decode buffer");
+         if (!decoder.process(buffer))
+         {
+            log.trace("Not enough to decode buffer");
+            return;
+         }
+
+         log.trace("Http request decoded");
+
+         HttpRequestHeader requestHeader = decoder.getRequest();
+         log.trace("-- Http request: {0}", requestHeader);
+         decoder = null;
+
+         RequestHandler requestHandler = null;
          try
          {
-            error(channel, 500, requestHeader);
+            List<RequestInitiator> initiators = registry.match(requestHeader.getUri());
+            for (RequestInitiator initiator : initiators)
+            {
+               requestHandler = initiator.begin(connection, requestHeader);
+               if (requestHandler != null) break;
+            }
          }
-         catch (IOException e)
+         catch (NotFoundException e1)
          {
-            log.error("Failed to send error message to client, closing", e);
-            channel.close();
          }
-         return;
+         channel.suspendReads();
+         log.trace("suspended reads");
+         if (requestHandler == null)
+         {
+            log.trace("requestHandler was null, returning 404");
+            try
+            {
+               error(channel, 404, requestHeader);
+            }
+            catch (IOException e)
+            {
+               log.error("Failed to send error message to client, closing", e);
+               channel.close();
+            }
+            channel.resumeReads();
+            return;
+         }
+
+
+         if (!(requestHandler instanceof StreamHandler))
+         {
+            log.error("Unsupported requestHandler type: " + requestHandler.getClass().getName());
+            requestHandler.unsupportedHandler();
+            try
+            {
+               error(channel, 500, requestHeader);
+            }
+            catch (IOException e)
+            {
+               log.error("Failed to send error message to client, closing", e);
+               channel.close();
+            }
+            return;
+         }
+
+         log.trace("Using StreamHandler");
+         StreamHandler streamHandler = (StreamHandler) requestHandler;
+
+         ByteBuffer oldBuffer = buffer;
+         buffer = null;
+
+         StreamExecutor task = new StreamExecutor(channel, streamHandler, oldBuffer, requestHeader);
+
+         if (requestHandler.isFast())
+         {
+            task.run();
+         }
+         else
+         {
+            executor.execute(task);
+         }
       }
-
-      StreamHandler streamHandler = (StreamHandler) requestHandler;
-
-      ByteBuffer oldBuffer = buffer;
-      buffer = null;
-
-      StreamExecutor task = new StreamExecutor(channel, streamHandler, oldBuffer, requestHeader);
-
-      if (requestHandler.isFast())
+      finally
       {
-         task.run();
-      }
-      else
-      {
-         executor.execute(task);
+         log.trace("<--- Exit handleRead()");
       }
    }
 

@@ -94,7 +94,7 @@ public class PitbullServer
    {
       if (port > -1)
       {
-         logger.info("**** PORT: " + port);
+         logger.trace("**** PORT: " + port);
          http = new HttpEndpoint();
          http.setPort(port);
          http.setNumWorkers(numWorkers);
@@ -105,7 +105,7 @@ public class PitbullServer
       }
       if (sslPort > -1)
       {
-         logger.info("**** SSLPORT: " + sslPort);
+         logger.trace("**** SSLPORT: " + sslPort);
          KeyManagerFactory kmf = KeyManagerFactory.getInstance("SunX509");
          kmf.init(keyStore, null);
 

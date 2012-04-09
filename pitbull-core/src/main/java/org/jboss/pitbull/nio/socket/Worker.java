@@ -91,7 +91,15 @@ public class Worker implements Runnable
          if ((readyOps & SelectionKey.OP_READ) != 0 || readyOps == 0)
          {
             ManagedChannel channel = (ManagedChannel) key.attachment();
-            channel.getHandler().handleRead(channel);
+            try
+            {
+               channel.getHandler().handleRead(channel);
+            }
+            catch (Exception e)
+            {
+               logger.error("Error reading channel: ", e);
+               channel.close();
+            }
             if (!channel.getChannel().isOpen())
             {
                key.cancel();

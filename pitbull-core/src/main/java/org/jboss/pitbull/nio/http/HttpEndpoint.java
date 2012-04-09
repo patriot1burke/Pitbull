@@ -119,6 +119,7 @@ public class HttpEndpoint
 
    public void start() throws Exception
    {
+
       if (requestExecutor == null)
       {
          requestExecutor = Executors.newFixedThreadPool(numExecutors, ExecutorThreadFactory.singleton);

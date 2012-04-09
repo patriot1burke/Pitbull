@@ -7,7 +7,6 @@ import javax.net.ssl.SSLEngineResult;
 import javax.net.ssl.SSLSession;
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
 import java.util.concurrent.TimeUnit;
 
@@ -28,16 +27,24 @@ public class SSLManagedChannel extends ManagedChannel
 
    protected static final Logger log = Logger.getLogger(SSLManagedChannel.class);
 
-   protected boolean handshakeFinished;
-
    public SSLManagedChannel(SocketChannel channel, EventHandler handler, SSLEngine engine) throws Exception
    {
       super(channel, handler);
       this.engine = engine;
       this.sslSession = engine.getSession();
-      inputBuffer = ByteBuffer.allocate(sslSession.getPacketBufferSize());
-      outputBuffer = ByteBuffer.allocate(sslSession.getPacketBufferSize());
-      appBuffer = ByteBuffer.allocate(sslSession.getApplicationBufferSize());
+      int packetBufferSize = sslSession.getPacketBufferSize();
+      inputBuffer = ByteBuffer.allocate(packetBufferSize);
+      outputBuffer = ByteBuffer.allocate(packetBufferSize);
+      int applicationBufferSize = sslSession.getApplicationBufferSize();
+      appBuffer = ByteBuffer.allocate(applicationBufferSize);
+
+      // Change the position of the buffers so that a
+      // call to hasRemaining() returns false. A buffer is considered
+      // empty when the position is set to its limit, that is when
+      // hasRemaining() returns false.
+      appBuffer.position(appBuffer.limit());
+      outputBuffer.position(outputBuffer.limit());
+
       engine.beginHandshake();
       handshakeStatus = engine.getHandshakeStatus();
    }
@@ -58,64 +65,28 @@ public class SSLManagedChannel extends ManagedChannel
       handshakeStatus = engine.getHandshakeStatus();
    }
 
-   private int unwrapBuffer(int bytesRead) throws IOException
+   /**
+    * @return true if status == CLOSED
+    * @throws IOException
+    */
+   protected boolean needUnwrap() throws IOException
    {
-      if (bytesRead == -1)
-      {
-         // We will not receive any more data. Closing the engine
-         // is a signal that the end of stream was reached.
-         engine.closeInbound();
-         // EOF. But do we still have some useful data available?
-         if (inputBuffer.position() == 0 ||
-                 engineStatus == SSLEngineResult.Status.BUFFER_UNDERFLOW)
-         {
-            // Yup. Either the buffer is empty or it's in underflow,
-            // meaning that there is not enough data to reassemble a
-            // TLS packet. So we can return EOF.
-            return -1;
-         }
-         // Although we reach EOF, we still have some data left to
-         // be decrypted. We must process it
-      }
-      else if (bytesRead == 0)
-      {
-         return 0;
-      }
+      if (inputBuffer.position() == 0) return false;
 
-      // Prepare the application buffer to receive decrypted data
-      assert !appBuffer.hasRemaining() : "Application buffer not empty";
-      appBuffer.clear();
+      log.trace("needUnwrap()");
 
-      // Prepare the net data for reading.
-      inputBuffer.flip();
       SSLEngineResult res;
+      inputBuffer.flip();
+
       do
       {
          res = engine.unwrap(inputBuffer, appBuffer);
-         log.info("Unwrapping:\n" + res);
+         log.trace("Unwrapping:\n" + res);
          // During an handshake renegotiation we might need to perform
          // several unwraps to consume the handshake data.
       } while (res.getStatus() == SSLEngineResult.Status.OK &&
-              res.getHandshakeStatus() == SSLEngineResult.HandshakeStatus.NEED_UNWRAP &&
-              res.bytesProduced() == 0);
+              res.getHandshakeStatus() == SSLEngineResult.HandshakeStatus.NEED_UNWRAP);
 
-      // If no data was produced, and the status is still ok, try to read once more
-      if (appBuffer.position() == 0 &&
-              res.getStatus() == SSLEngineResult.Status.OK &&
-              inputBuffer.hasRemaining())
-      {
-         res = engine.unwrap(inputBuffer, appBuffer);
-         log.info("Unwrapping:\n" + res);
-      }
-
-      /*
-         * The status may be:
-         * OK - Normal operation
-         * OVERFLOW - Should never happen since the application buffer is
-         * 	sized to hold the maximum packet size.
-         * UNDERFLOW - Need to read more data from the socket. It's normal.
-         * CLOSED - The other peer closed the socket. Also normal.
-         */
       engineStatus = res.getStatus();
       handshakeStatus = res.getHandshakeStatus();
       // Should never happen, the peerAppData must always have enough space
@@ -129,51 +100,66 @@ public class SSLManagedChannel extends ManagedChannel
       if (engineStatus == SSLEngineResult.Status.CLOSED)
       {
          log.debug("Connection is being closed by peer.");
-         return -1;
+         return true;
       }
 
-      // Prepare the buffer to be written again.
       inputBuffer.compact();
-      // And the app buffer to be read.
-      appBuffer.flip();
+      return false;
 
-      return appBuffer.remaining();
+
    }
 
-   /**
-    * Process everything but reads
-    *
-    * @throws IOException
-    */
-   protected void processHandshake() throws IOException
+   protected int processHandshake() throws IOException
    {
+      log.trace("processHandshake()");
       SSLEngineResult res;
-      for (; ; )
+      try
       {
-         handshakeStatus = engine.getHandshakeStatus();
-         switch (handshakeStatus)
+         for (; ; )
          {
-            case FINISHED:
-               return;
-            case NEED_TASK:
-               executeEngineTasks();
-               break;
-            case NEED_UNWRAP:
-               // let reading handle this
-               return;
-            case NEED_WRAP:
-               outputBuffer.clear();
-               res = engine.wrap(dummy, outputBuffer);
-               handshakeStatus = res.getHandshakeStatus();
-               outputBuffer.flip();
-               super.writeBlocking(outputBuffer);
-               break;
-            case NOT_HANDSHAKING:
-               return;
+            handshakeStatus = engine.getHandshakeStatus();
+            switch (handshakeStatus)
+            {
+               case FINISHED:
+                  log.trace("Handshake FINISHED");
+                  return appBuffer.remaining();
+               case NEED_TASK:
+                  log.trace("Handshake NEED_TASK");
+                  executeEngineTasks();
+                  break;
+               case NEED_UNWRAP:
+                  log.trace("Handshake NEED_UNWRAP");
+                  if (inputBuffer.position() > 0
+                          && engineStatus != SSLEngineResult.Status.BUFFER_UNDERFLOW)
+                  {
+                     if (needUnwrap())
+                     {
+                        return -1;
+                     }
+                  }
+                  else
+                  {
+                     return appBuffer.remaining();
+                  }
+               case NEED_WRAP:
+                  log.trace("Handshake NEED_WRAP");
+                  outputBuffer.clear();
+                  res = engine.wrap(dummy, outputBuffer);
+                  handshakeStatus = res.getHandshakeStatus();
+                  outputBuffer.flip();
+                  super.writeBlocking(outputBuffer);
+                  break;
+               case NOT_HANDSHAKING:
+                  log.trace("Handshake NOT_HANDSHAKING");
+                  return appBuffer.remaining();
+            }
          }
       }
-
-
+      finally
+      {
+         handshakeStatus = engine.getHandshakeStatus();
+         log.trace("End processHandshake() : {0}", handshakeStatus);
+      }
    }
 
    private int readBuffer(ByteBuffer buf)
@@ -181,7 +167,8 @@ public class SSLManagedChannel extends ManagedChannel
       if (appBuffer.hasRemaining())
       {
          int limit = Math.min(appBuffer.remaining(), buf.remaining());
-         for (int i = 0; i < limit; i++) {
+         for (int i = 0; i < limit; i++)
+         {
             buf.put(appBuffer.get());
          }
          return limit;
@@ -189,58 +176,138 @@ public class SSLManagedChannel extends ManagedChannel
       return 0;
    }
 
-   // NOTE: a lot of duplicate code in read methods.  Tried to use a closure-like construct,
-   // but there's no way to call a super method of parent from inner class that I know of.
+   protected int readSuper(ByteBuffer buf) throws IOException
+   {
+      return super.read(buf);
+   }
 
-   @Override
+   protected int readBlockingSuper(ByteBuffer buf) throws IOException
+   {
+      return super.readBlocking(buf);
+   }
+
+   protected int readBlockingSuper(ByteBuffer buf, long time, TimeUnit unit) throws IOException
+   {
+      return super.readBlocking(buf, time, unit);
+   }
+
+   protected interface ReadExecution
+   {
+      int read(ByteBuffer buf) throws IOException;
+   }
+
+   protected int readExecution(ByteBuffer buf, ReadExecution execution) throws IOException
+   {
+      try
+      {
+         int bufBytesRead = readBuffer(buf);
+         log.trace("Bytes read from buffer: {0}", bufBytesRead);
+
+         if (bufBytesRead > 0)
+         {
+            return bufBytesRead;
+         }
+
+
+         // nothing in appBuffer so clear it
+         appBuffer.clear();
+
+         // do everything but reading from channel
+         int bytesRead = processHandshake();
+         if (bytesRead == -1)
+         {
+            log.trace("processEngine resulted in closed channel");
+            return -1;
+         }
+
+         bytesRead = execution.read(inputBuffer);
+         log.trace("Bytes read from channel: {0}", bytesRead);
+         if (bytesRead < 1) return bytesRead;
+
+
+         // Now that we have bytes in the buffer, do something with it.
+
+         log.trace("Start loop--");
+         do
+         {
+            int status = processHandshake();
+            if (status == -1)
+            {
+               log.trace("channel closed after processHandshake");
+               return -1;
+            }
+            log.trace("Unwrapping");
+            inputBuffer.flip();
+            SSLEngineResult res = engine.unwrap(inputBuffer, appBuffer);
+            log.trace("Unwrapped: {0}", res);
+            handshakeStatus = res.getHandshakeStatus();
+            engineStatus = res.getStatus();
+            inputBuffer.compact();
+         } while (engineStatus == SSLEngineResult.Status.OK && inputBuffer.hasRemaining());
+
+         log.trace("--After loop:");
+         log.trace("HandshakeStatus: {0}", handshakeStatus);
+         log.trace("Engine Status: {0}", engineStatus);
+         // handle any need-task, need-wrap
+         processHandshake();
+
+         // Prepare the buffer to be written again.
+         log.trace("prepare buffers");
+         appBuffer.flip();
+         log.trace("remaining inputBuffer: {0}", inputBuffer.position());
+
+         return readBuffer(buf);
+      }
+      finally
+      {
+         log.trace("---> exit - read");
+      }
+
+   }
+
+
    public int read(ByteBuffer buf) throws IOException
    {
-      int bufBytesRead = readBuffer(buf);
-      if (bufBytesRead > 0) return bufBytesRead;
-
-      // do everything but reading from channel
-      processHandshake();
-
-      int bytesRead = super.read(inputBuffer);
-      // let unwrapBuffer handle -1 and 0 values
-      bytesRead = unwrapBuffer(bytesRead);
-      if (bytesRead < 1) return bytesRead;
-
-      return readBuffer(buf);
+      log.trace("read()");
+      return readExecution(buf,
+              new ReadExecution()
+              {
+                 @Override
+                 public int read(ByteBuffer buf) throws IOException
+                 {
+                    return readSuper(buf);
+                 }
+              });
    }
 
    @Override
    public int readBlocking(ByteBuffer buf) throws IOException
    {
-      int bufBytesRead = readBuffer(buf);
-      if (bufBytesRead > 0) return bufBytesRead;
-
-      // do everything but reading from channel
-      processHandshake();
-
-      int bytesRead = super.readBlocking(inputBuffer);
-      // let unwrapBuffer handle -1 and 0 values
-      bytesRead = unwrapBuffer(bytesRead);
-      if (bytesRead < 1) return bytesRead;
-
-      return readBuffer(buf);
+      log.trace("readBlocking()");
+      return readExecution(buf,
+              new ReadExecution()
+              {
+                 @Override
+                 public int read(ByteBuffer buf) throws IOException
+                 {
+                    return readBlockingSuper(buf);
+                 }
+              });
    }
 
    @Override
-   public int readBlocking(ByteBuffer buf, long time, TimeUnit unit) throws IOException
+   public int readBlocking(final ByteBuffer buf, final long time, final TimeUnit unit) throws IOException
    {
-      int bufBytesRead = readBuffer(buf);
-      if (bufBytesRead > 0) return bufBytesRead;
-
-      // do everything but reading from channel
-      processHandshake();
-
-      int bytesRead = super.readBlocking(inputBuffer, time, unit);
-      // let unwrapBuffer handle -1 and 0 values
-      bytesRead = unwrapBuffer(bytesRead);
-      if (bytesRead < 1) return bytesRead;
-
-      return readBuffer(buf);
+      log.trace("readBlocking() with timeout");
+      return readExecution(buf,
+              new ReadExecution()
+              {
+                 @Override
+                 public int read(ByteBuffer buf) throws IOException
+                 {
+                    return readBlockingSuper(buf, time, unit);
+                 }
+              });
    }
 
    @Override

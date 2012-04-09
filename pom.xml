@@ -130,6 +130,11 @@
                 <version>1.46</version>
             </dependency>
             <dependency>
+                <groupId>org.bouncycastle</groupId>
+                <artifactId>bcmail-jdk16</artifactId>
+                <version>1.46</version>
+            </dependency>
+            <dependency>
                 <groupId>commons-httpclient</groupId>
                 <artifactId>commons-httpclient</artifactId>
                 <version>3.1</version>
