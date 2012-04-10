@@ -67,12 +67,12 @@ public final class Channels
          if (res == 0)
          {
             SelectorUtil.awaitWritable(channel, remaining, TimeUnit.MILLISECONDS);
-            remaining -= Math.max(-now + (now = System.currentTimeMillis()), 0L);
          }
          else
          {
             t += res;
          }
+         remaining -= Math.max(-now + (now = System.currentTimeMillis()), 0L);
       }
       return t;
    }

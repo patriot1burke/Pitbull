@@ -5,6 +5,7 @@ import org.jboss.pitbull.logging.Logger;
 import javax.net.ssl.SSLEngine;
 import javax.net.ssl.SSLEngineResult;
 import javax.net.ssl.SSLSession;
+import javax.xml.transform.OutputKeys;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
@@ -319,29 +320,48 @@ public class SSLManagedChannel extends ManagedChannel
    @Override
    public int writeBlocking(ByteBuffer buffer) throws IOException
    {
-      outputBuffer.clear();
-      SSLEngineResult res = engine.wrap(buffer, outputBuffer);
-      // Prepare the buffer for reading
-      outputBuffer.flip();
-      super.writeBlocking(outputBuffer);
+      int size = buffer.remaining();
+      while (buffer.hasRemaining())
+      {
+         outputBuffer.clear();
+         SSLEngineResult res = engine.wrap(buffer, outputBuffer);
+         if (res.getStatus() != SSLEngineResult.Status.OK)
+         {
+            throw new IOException("Illegal status for write: " + res.getStatus());
+         }
+         // Prepare the buffer for reading
+         outputBuffer.flip();
+         int result = super.writeBlocking(outputBuffer);
+         if (result == -1) return -1;
+      }
 
       // Return the number of bytes read
       // from the source buffer
-      return res.bytesConsumed();
+      return size;
    }
 
    @Override
    public int writeBlocking(ByteBuffer buffer, long time, TimeUnit unit) throws IOException
    {
-      outputBuffer.clear();
-      SSLEngineResult res = engine.wrap(buffer, outputBuffer);
-      // Prepare the buffer for reading
-      outputBuffer.flip();
-      super.writeBlocking(outputBuffer, time, unit);
-
-      // Return the number of bytes read
-      // from the source buffer
-      return res.bytesConsumed();
+      long timeRemaining = unit.toMillis(time);
+      long now = System.currentTimeMillis();
+      int numBufWritten = 0;
+      while (buffer.hasRemaining() && timeRemaining > 0L)
+      {
+         outputBuffer.clear();
+         SSLEngineResult res = engine.wrap(buffer, outputBuffer);
+         if (res.getStatus() != SSLEngineResult.Status.OK)
+         {
+            throw new IOException("Illegal status for write: " + res.getStatus());
+         }
+         // Prepare the buffer for reading
+         outputBuffer.flip();
+         int result = super.writeBlocking(outputBuffer, timeRemaining, TimeUnit.MILLISECONDS);
+         if (result == -1) return -1;
+         numBufWritten += res.bytesConsumed();
+         timeRemaining -= Math.max(-now + (now = System.currentTimeMillis()), 0L);
+      }
+      return numBufWritten;
    }
 
 }
