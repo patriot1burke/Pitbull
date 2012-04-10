@@ -1,6 +1,6 @@
 package org.jboss.pitbull.servlet;
 
-import org.jboss.pitbull.nio.http.PitbullServer;
+import org.jboss.pitbull.HttpServer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,7 +9,7 @@ import java.util.List;
  * @author <a href="mailto:bill@burkecentral.com">Bill Burke</a>
  * @version $Revision: 1 $
  */
-public class EmbeddedServletContainer extends PitbullServer
+public class EmbeddedServletContainer extends HttpServer
 {
    protected List<ServletDeployment> deployments = new ArrayList<ServletDeployment>();
 

@@ -1,7 +1,7 @@
 package org.jboss.pitbull.test;
 
-import org.jboss.pitbull.nio.http.HttpRequestDecoder;
-import org.jboss.pitbull.nio.http.HttpRequestHeader;
+import org.jboss.pitbull.internal.nio.http.HttpRequestDecoder;
+import org.jboss.pitbull.internal.nio.http.HttpRequestHeader;
 import org.junit.Assert;
 import org.junit.Test;
 

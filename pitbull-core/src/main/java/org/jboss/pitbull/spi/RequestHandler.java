@@ -17,7 +17,7 @@ public interface RequestHandler
     *
     * @return
     */
-   boolean isFast();
+   boolean canExecuteInWorkerThread();
 
    void execute(RequestHeader requestHeader);
 

@@ -1,15 +1,12 @@
 package org.jboss.pitbull.servlet;
 
-import org.jboss.pitbull.crypto.KeyTools;
-import org.jboss.pitbull.nio.http.PitbullServer;
-import org.jboss.pitbull.nio.http.PitbullServerBuilder;
+import org.jboss.pitbull.HttpServer;
+import org.jboss.pitbull.HttpServerBuilder;
 
-import java.security.KeyStore;
-
-public class EmbeddedServletContainerBuilder extends PitbullServerBuilder<EmbeddedServletContainerBuilder, EmbeddedServletContainer>
+public class EmbeddedServletContainerBuilder extends HttpServerBuilder<EmbeddedServletContainerBuilder, EmbeddedServletContainer>
 {
    @Override
-   protected PitbullServer create()
+   protected HttpServer create()
    {
       return new EmbeddedServletContainer();
    }

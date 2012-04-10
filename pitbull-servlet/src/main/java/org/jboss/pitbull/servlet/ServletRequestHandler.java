@@ -1,6 +1,6 @@
 package org.jboss.pitbull.servlet;
 
-import org.jboss.pitbull.logging.Logger;
+import org.jboss.pitbull.internal.logging.Logger;
 import org.jboss.pitbull.spi.Connection;
 import org.jboss.pitbull.spi.RequestHeader;
 import org.jboss.pitbull.spi.StreamHandler;
@@ -75,7 +75,7 @@ public class ServletRequestHandler implements StreamHandler
    }
 
    @Override
-   public boolean isFast()
+   public boolean canExecuteInWorkerThread()
    {
       return false;
    }

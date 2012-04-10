@@ -1,6 +1,7 @@
 package org.jboss.pitbull.test;
 
-import org.jboss.pitbull.nio.http.HttpConnector;
+import org.jboss.pitbull.HttpServer;
+import org.jboss.pitbull.HttpServerBuilder;
 import org.jboss.pitbull.spi.Connection;
 import org.jboss.pitbull.spi.ContentOutputStream;
 import org.jboss.pitbull.spi.RequestHandler;
@@ -9,7 +10,6 @@ import org.jboss.pitbull.spi.RequestInitiator;
 import org.jboss.pitbull.spi.ResponseHeader;
 import org.jboss.pitbull.spi.StreamHandler;
 import org.jboss.pitbull.spi.StreamResponseWriter;
-import org.jboss.pitbull.util.registry.UriRegistry;
 import org.jboss.resteasy.client.ClientRequest;
 import org.jboss.resteasy.client.ClientResponse;
 import org.jboss.resteasy.util.ReadFromStream;
@@ -30,15 +30,14 @@ import java.util.Map;
  */
 public class EchoTest
 {
-   public static HttpConnector http;
+   public static HttpServer http;
 
    @BeforeClass
    public static void startup() throws Exception
    {
-      http = new HttpConnector();
-      http.setNumWorkers(1);
-      http.setNumExecutors(1);
-      http.setRegistry(new UriRegistry<RequestInitiator>());
+      http = new HttpServerBuilder().connector().add()
+              .workers(1)
+               .maxRequestThreads(1).build();
       http.start();
    }
 
@@ -72,7 +71,7 @@ public class EchoTest
             }
 
             @Override
-            public boolean isFast()
+            public boolean canExecuteInWorkerThread()
             {
                return false;
             }

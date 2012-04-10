@@ -9,8 +9,8 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.conn.SingleClientConnManager;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpParams;
-import org.jboss.pitbull.crypto.KeyTools;
-import org.jboss.pitbull.nio.http.HttpConnector;
+import org.jboss.pitbull.HttpServer;
+import org.jboss.pitbull.HttpServerBuilder;
 import org.jboss.pitbull.spi.Connection;
 import org.jboss.pitbull.spi.ContentOutputStream;
 import org.jboss.pitbull.spi.RequestHandler;
@@ -19,7 +19,6 @@ import org.jboss.pitbull.spi.RequestInitiator;
 import org.jboss.pitbull.spi.ResponseHeader;
 import org.jboss.pitbull.spi.StreamHandler;
 import org.jboss.pitbull.spi.StreamResponseWriter;
-import org.jboss.pitbull.util.registry.UriRegistry;
 import org.jboss.resteasy.client.ClientRequest;
 import org.jboss.resteasy.client.ClientResponse;
 import org.jboss.resteasy.client.core.executors.ApacheHttpClient4Executor;
@@ -29,13 +28,11 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 import java.io.IOException;
 import java.io.InputStream;
-import java.security.KeyStore;
 import java.security.SecureRandom;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
@@ -50,29 +47,16 @@ import java.util.Map;
  */
 public class SslEchoTest
 {
-   public static HttpConnector http;
+   public static HttpServer http;
 
    @BeforeClass
    public static void startup() throws Exception
    {
-      java.lang.System.setProperty(
-              "sun.security.ssl.allowUnsafeRenegotiation", "true");
-      http = new HttpConnector();
-      KeyManagerFactory kmf = KeyManagerFactory.getInstance("SunX509");
-      KeyStore keyStore = KeyTools.generateKeyStore();
-      kmf.init(keyStore, new char[]{'p', 'a', 's', 's', 'w', 'o', 'r', 'd'});
-
-      // Initialize the SSLContext to work with our key managers.
-      SSLContext sslContext = SSLContext.getInstance("TLS");
-      sslContext.init(kmf.getKeyManagers(), null, null);
-      http.setSslContext(sslContext);
-      http.setPort(8443);
-      http.setNumWorkers(1);
-      http.setNumExecutors(1);
-      http.setRegistry(new UriRegistry<RequestInitiator>());
+      http = new HttpServerBuilder()
+              .connector().https().add()
+              .workers(1)
+               .maxRequestThreads(1).build();
       http.start();
-
-
    }
 
    @AfterClass
@@ -105,7 +89,7 @@ public class SslEchoTest
             }
 
             @Override
-            public boolean isFast()
+            public boolean canExecuteInWorkerThread()
             {
                return false;
             }

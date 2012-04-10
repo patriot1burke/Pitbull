@@ -32,6 +32,7 @@ import java.net.URL;
 public class BasicTest
 {
    protected static EmbeddedServletContainer server;
+   protected static int PORT = 8080;
 
 
    public static class FixedLengthServlet extends HttpServlet
@@ -85,8 +86,9 @@ public class BasicTest
    public static void startup() throws Exception
    {
       server = new EmbeddedServletContainerBuilder()
-              .numExecutors(1)
-              .numWorkers(1)
+              .connector().port(PORT).add()
+              .maxRequestThreads(1)
+              .workers(1)
               .build();
       DeploymentServletContext ctx = server.newDeployment("");
       ctx.addServlet("fixed", new FixedLengthServlet()).addMapping("/fixed");
@@ -111,7 +113,7 @@ public class BasicTest
          {
             try
             {
-               ClientRequest request = new ClientRequest("http://localhost:" + server.getPort() + "/fixed");
+               ClientRequest request = new ClientRequest("http://localhost:8080/fixed");
                ClientResponse response = request.get();
                Assert.assertEquals(200, response.getStatus());
                String cl = (String) response.getHeaders().getFirst("Content-Length");
@@ -149,7 +151,7 @@ public class BasicTest
    public void testFixedOutput() throws Exception
    {
       ClientExecutor ex = new ApacheHttpClientExecutor();
-      ClientRequest request = new ClientRequest("http://localhost:" + server.getPort() + "/fixed", ex);
+      ClientRequest request = new ClientRequest("http://localhost:" + PORT + "/fixed", ex);
       long start = System.currentTimeMillis();
       ClientResponse response = request.get();
       System.out.println("Got back: " + (System.currentTimeMillis() - start));
@@ -163,7 +165,7 @@ public class BasicTest
       start = System.currentTimeMillis();
       for (int i = 0; i < 5; i++)
       {
-         request = new ClientRequest("http://localhost:" + server.getPort() + "/fixed", ex);
+         request = new ClientRequest("http://localhost:" + PORT + "/fixed", ex);
          response = request.get();
          Assert.assertEquals("hello world", response.getEntity(String.class));
          response.releaseConnection();
@@ -177,7 +179,7 @@ public class BasicTest
    @Test
    public void testChunkedOutput() throws Exception
    {
-      ClientRequest request = new ClientRequest("http://localhost:" + server.getPort() + "/chunked");
+      ClientRequest request = new ClientRequest("http://localhost:" + PORT + "/chunked");
       ClientResponse response = request.get();
       Assert.assertEquals(200, response.getStatus());
       String cl = (String) response.getHeaders().getFirst("Content-Length");
@@ -190,7 +192,7 @@ public class BasicTest
    @Test
    public void testFixedInput() throws Exception
    {
-      ClientRequest request = new ClientRequest("http://localhost:" + server.getPort() + "/fixed");
+      ClientRequest request = new ClientRequest("http://localhost:" + PORT + "/fixed");
       ClientResponse response = request.body("text/plain", "hello world").put();
       Assert.assertEquals(204, response.getStatus());
    }
@@ -198,7 +200,7 @@ public class BasicTest
    @Test
    public void testChunkedInput() throws Exception
    {
-      URL postUrl = new URL("http://localhost:" + server.getPort() + "/chunked");
+      URL postUrl = new URL("http://localhost:" + PORT + "/chunked");
       HttpURLConnection connection = (HttpURLConnection) postUrl.openConnection();
       connection.setChunkedStreamingMode(10);
       connection.setDoOutput(true);
@@ -219,7 +221,7 @@ public class BasicTest
    @Test
    public void testFixedInputError() throws Exception
    {
-      ClientRequest request = new ClientRequest("http://localhost:" + server.getPort() + "/fixed");
+      ClientRequest request = new ClientRequest("http://localhost:" + PORT + "/fixed");
       ClientResponse response = request.body("text/plain", "error").put();
       Assert.assertEquals(500, response.getStatus());
    }
