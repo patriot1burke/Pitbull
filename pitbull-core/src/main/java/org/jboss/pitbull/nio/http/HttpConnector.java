@@ -10,7 +10,6 @@ import org.jboss.pitbull.spi.RequestInitiator;
 import org.jboss.pitbull.util.registry.UriRegistry;
 
 import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLEngine;
 import java.net.InetSocketAddress;
 import java.nio.channels.ServerSocketChannel;
 import java.util.concurrent.ExecutorService;
@@ -21,11 +20,10 @@ import java.util.concurrent.TimeUnit;
  * @author <a href="mailto:bill@burkecentral.com">Bill Burke</a>
  * @version $Revision: 1 $
  */
-public class HttpEndpoint
+public class HttpConnector
 {
    protected SSLContext sslContext;
    protected int port = 8080;
-   protected String root = "";
    protected UriRegistry<RequestInitiator> registry;
    protected ExecutorService requestExecutor;
    protected ExecutorService workerExecutor;
@@ -34,7 +32,7 @@ public class HttpEndpoint
    protected int numWorkers = 5;
    protected int numExecutors = 5;
    protected ServerSocketChannel channel;
-   protected static final Logger logger = Logger.getLogger(HttpEndpoint.class);
+   protected static final Logger logger = Logger.getLogger(HttpConnector.class);
 
 
    public SSLContext getSslContext()
@@ -105,16 +103,6 @@ public class HttpEndpoint
    public void setWorkerExecutor(ExecutorService workerExecutor)
    {
       this.workerExecutor = workerExecutor;
-   }
-
-   public String getRoot()
-   {
-      return root;
-   }
-
-   public void setRoot(String root)
-   {
-      this.root = root;
    }
 
    public void start() throws Exception

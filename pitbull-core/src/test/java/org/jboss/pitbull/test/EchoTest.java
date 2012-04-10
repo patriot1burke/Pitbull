@@ -1,6 +1,6 @@
 package org.jboss.pitbull.test;
 
-import org.jboss.pitbull.nio.http.HttpEndpoint;
+import org.jboss.pitbull.nio.http.HttpConnector;
 import org.jboss.pitbull.spi.Connection;
 import org.jboss.pitbull.spi.ContentOutputStream;
 import org.jboss.pitbull.spi.RequestHandler;
@@ -30,16 +30,15 @@ import java.util.Map;
  */
 public class EchoTest
 {
-   public static HttpEndpoint http;
+   public static HttpConnector http;
 
    @BeforeClass
    public static void startup() throws Exception
    {
-      http = new HttpEndpoint();
+      http = new HttpConnector();
       http.setNumWorkers(1);
       http.setNumExecutors(1);
       http.setRegistry(new UriRegistry<RequestInitiator>());
-      http.setRoot("");
       http.start();
    }
 

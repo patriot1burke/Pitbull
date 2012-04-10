@@ -17,13 +17,12 @@ public class PitbullServer
    protected int port = -1;
    protected int sslPort = -1;
    protected KeyStore keyStore;
-   protected String root = "";
    protected UriRegistry<RequestInitiator> registry = new UriRegistry<RequestInitiator>();
    protected int numWorkers = 5;
    protected int numExecutors = 5;
    protected static final Logger logger = Logger.getLogger(PitbullServer.class);
-   protected HttpEndpoint http;
-   protected HttpEndpoint https;
+   protected HttpConnector http;
+   protected HttpConnector https;
 
    public UriRegistry<RequestInitiator> getRegistry()
    {
@@ -80,27 +79,16 @@ public class PitbullServer
       this.numExecutors = numExecutors;
    }
 
-   public String getRoot()
-   {
-      return root;
-   }
-
-   public void setRoot(String root)
-   {
-      this.root = root;
-   }
-
    public void start() throws Exception
    {
       if (port > -1)
       {
          logger.trace("**** PORT: " + port);
-         http = new HttpEndpoint();
+         http = new HttpConnector();
          http.setPort(port);
          http.setNumWorkers(numWorkers);
          http.setNumExecutors(numExecutors);
          http.setRegistry(registry);
-         http.setRoot(root);
          http.start();
       }
       if (sslPort > -1)

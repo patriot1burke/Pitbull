@@ -10,7 +10,7 @@ import org.apache.http.impl.conn.SingleClientConnManager;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpParams;
 import org.jboss.pitbull.crypto.KeyTools;
-import org.jboss.pitbull.nio.http.HttpEndpoint;
+import org.jboss.pitbull.nio.http.HttpConnector;
 import org.jboss.pitbull.spi.Connection;
 import org.jboss.pitbull.spi.ContentOutputStream;
 import org.jboss.pitbull.spi.RequestHandler;
@@ -50,14 +50,14 @@ import java.util.Map;
  */
 public class SslEchoTest
 {
-   public static HttpEndpoint http;
+   public static HttpConnector http;
 
    @BeforeClass
    public static void startup() throws Exception
    {
       java.lang.System.setProperty(
               "sun.security.ssl.allowUnsafeRenegotiation", "true");
-      http = new HttpEndpoint();
+      http = new HttpConnector();
       KeyManagerFactory kmf = KeyManagerFactory.getInstance("SunX509");
       KeyStore keyStore = KeyTools.generateKeyStore();
       kmf.init(keyStore, new char[]{'p', 'a', 's', 's', 'w', 'o', 'r', 'd'});
@@ -70,7 +70,6 @@ public class SslEchoTest
       http.setNumWorkers(1);
       http.setNumExecutors(1);
       http.setRegistry(new UriRegistry<RequestInitiator>());
-      http.setRoot("");
       http.start();
 
 

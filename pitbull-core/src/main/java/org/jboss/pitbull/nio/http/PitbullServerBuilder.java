@@ -10,7 +10,6 @@ public class PitbullServerBuilder<T extends PitbullServerBuilder, Z extends Pitb
    protected int port = 8080;
    protected int sslPort = 8443;
    protected KeyStore keyStore;
-   protected String root;
    protected int numWorkers;
    protected int numExecutors;
    protected boolean enableHttps = false;
@@ -38,12 +37,6 @@ public class PitbullServerBuilder<T extends PitbullServerBuilder, Z extends Pitb
    {
       enableHttps = true;
       this.keyStore = keyStore;
-      return (T)this;
-   }
-
-   public T root(String root)
-   {
-      this.root = root;
       return (T)this;
    }
 
@@ -84,7 +77,6 @@ public class PitbullServerBuilder<T extends PitbullServerBuilder, Z extends Pitb
          server.setSslPort(sslPort);
          server.setKeyStore(keyStore);
       }
-      server.setRoot(root);
       server.setNumWorkers(numWorkers);
       server.setNumExecutors(numExecutors);
       return (Z)server;
