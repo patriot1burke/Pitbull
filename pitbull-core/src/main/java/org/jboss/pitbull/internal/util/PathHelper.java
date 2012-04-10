@@ -1,7 +1,7 @@
 /**
  *
  */
-package org.jboss.pitbull.util;
+package org.jboss.pitbull.internal.util;
 
 import java.util.regex.Pattern;
 

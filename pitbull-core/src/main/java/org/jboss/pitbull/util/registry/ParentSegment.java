@@ -1,6 +1,6 @@
 package org.jboss.pitbull.util.registry;
 
-import org.jboss.pitbull.util.PathHelper;
+import org.jboss.pitbull.internal.util.PathHelper;
 
 import java.util.ArrayList;
 import java.util.Collections;
