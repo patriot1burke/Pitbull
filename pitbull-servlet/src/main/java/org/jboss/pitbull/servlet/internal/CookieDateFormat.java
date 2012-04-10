@@ -13,39 +13,23 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
-package org.jboss.pitbull.servlet;
+package org.jboss.pitbull.servlet.internal;
+
+import java.text.SimpleDateFormat;
+import java.util.Locale;
+import java.util.TimeZone;
 
 /**
  * @author <a href="http://www.jboss.org/netty/">The Netty Project</a>
- * @author Andy Taylor (andy.taylor@jboss.org)
  * @author <a href="http://gleamynode.net/">Trustin Lee</a>
  * @version $Rev: 2080 $, $Date: 2010-01-26 18:04:19 +0900 (Tue, 26 Jan 2010) $
  */
-final class CookieHeaderNames
-{
-    static final String PATH = "Path";
+final class CookieDateFormat extends SimpleDateFormat {
 
-    static final String EXPIRES = "Expires";
+    private static final long serialVersionUID = 1789486337887402640L;
 
-    static final String MAX_AGE = "Max-Age";
-
-    static final String DOMAIN = "Domain";
-
-    static final String SECURE = "Secure";
-
-    static final String HTTPONLY = "HTTPOnly";
-
-    static final String COMMENT = "Comment";
-
-    static final String COMMENTURL = "CommentURL";
-
-    static final String DISCARD = "Discard";
-
-    static final String PORT = "Port";
-
-    static final String VERSION = "Version";
-
-    private CookieHeaderNames() {
-        // Unused.
+    CookieDateFormat() {
+        super("E, d-MMM-y HH:mm:ss z", Locale.ENGLISH);
+        setTimeZone(TimeZone.getTimeZone("GMT"));
     }
 }

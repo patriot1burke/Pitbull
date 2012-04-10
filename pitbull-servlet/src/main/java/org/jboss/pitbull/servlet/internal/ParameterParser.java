@@ -1,4 +1,4 @@
-package org.jboss.pitbull.servlet;
+package org.jboss.pitbull.servlet.internal;
 
 import org.jboss.pitbull.util.MultivalueMap;
 

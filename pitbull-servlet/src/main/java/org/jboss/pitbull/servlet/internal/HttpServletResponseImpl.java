@@ -1,4 +1,4 @@
-package org.jboss.pitbull.servlet;
+package org.jboss.pitbull.servlet.internal;
 
 import org.jboss.pitbull.NotImplementedYetException;
 import org.jboss.pitbull.spi.ContentOutputStream;

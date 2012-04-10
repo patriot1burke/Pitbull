@@ -1,4 +1,4 @@
-package org.jboss.pitbull.servlet.session;
+package org.jboss.pitbull.servlet.internal.session;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpSession;

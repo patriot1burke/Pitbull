@@ -1,5 +1,6 @@
 package org.jboss.pitbull.servlet;
 
+import org.jboss.pitbull.servlet.internal.ServletRequestHandler;
 import org.jboss.pitbull.spi.Connection;
 import org.jboss.pitbull.spi.RequestHandler;
 import org.jboss.pitbull.spi.RequestHeader;

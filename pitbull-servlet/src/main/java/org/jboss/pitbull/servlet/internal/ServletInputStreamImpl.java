@@ -1,4 +1,4 @@
-package org.jboss.pitbull.servlet;
+package org.jboss.pitbull.servlet.internal;
 
 import javax.servlet.ServletInputStream;
 import java.io.IOException;

@@ -1,4 +1,4 @@
-package org.jboss.pitbull.servlet;
+package org.jboss.pitbull.servlet.internal;
 
 import java.io.Serializable;
 import java.text.DateFormat;
