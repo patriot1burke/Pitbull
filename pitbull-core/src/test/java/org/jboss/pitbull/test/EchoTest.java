@@ -2,6 +2,8 @@ package org.jboss.pitbull.test;
 
 import org.jboss.pitbull.HttpServer;
 import org.jboss.pitbull.HttpServerBuilder;
+import org.jboss.pitbull.initiators.StreamedRequestInitiator;
+import org.jboss.pitbull.initiators.StreamedResponse;
 import org.jboss.pitbull.spi.Connection;
 import org.jboss.pitbull.spi.ContentOutputStream;
 import org.jboss.pitbull.spi.OrderedHeaders;
@@ -49,88 +51,28 @@ public class EchoTest
       http.stop();
    }
 
-
-   public static class Initiator implements RequestInitiator
+   public static class Initiator extends StreamedRequestInitiator
    {
       @Override
-      public RequestHandler begin(Connection connection, RequestHeader requestHeader)
+      public void service(Connection connection, RequestHeader requestHeader, InputStream is, StreamedResponse response) throws IOException
       {
-         return new StreamHandler()
+         response.setStatus(200);
+         response.setStatusMessage("Ok");
+         response.getHeaders().addHeader("Content-Type", "text/plain");
+
+         if (requestHeader.getMethod().equalsIgnoreCase("POST"))
          {
-            protected InputStream is;
-            protected StreamResponseWriter writer;
-
-            @Override
-            public void setInputStream(InputStream input)
-            {
-               is = input;
-            }
-
-            @Override
-            public void setWriter(StreamResponseWriter writer)
-            {
-               this.writer = writer;
-            }
-
-            @Override
-            public boolean canExecuteInWorkerThread()
-            {
-               return false;
-            }
-
-            @Override
-            public void execute(RequestHeader requestHeader)
-            {
-               ResponseHeader res = new ResponseHeader()
-               {
-                  @Override
-                  public int getStatus()
-                  {
-                     return 200;
-                  }
-
-                  @Override
-                  public String getStatusMessage()
-                  {
-                     return "OK";
-                  }
-
-                  @Override
-                  public OrderedHeaders getHeaders()
-                  {
-                     OrderedHeaders headers = new OrderedHeadersImpl();
-                     headers.addHeader("Content-Type", "text/plain");
-                     return headers;
-                  }
-               };
-
-               ContentOutputStream os = writer.getStream(res);
-               try
-               {
-                  if (requestHeader.getMethod().equalsIgnoreCase("POST"))
-                  {
-                     byte[] bytes = ReadFromStream.readFromStream(1024, is);
-                     os.write(bytes);
-                  }
-                  else if (requestHeader.getMethod().equalsIgnoreCase("GET"))
-                  {
-                     os.write("How are you".getBytes());
-                  }
-               }
-               catch (IOException e)
-               {
-                  throw new RuntimeException(e);
-               }
-               writer.end(res);
-            }
-
-            @Override
-            public void unsupportedHandler()
-            {
-            }
-         };
+            byte[] bytes = ReadFromStream.readFromStream(1024, is);
+            response.getStream().write(bytes);
+         }
+         else if (requestHeader.getMethod().equalsIgnoreCase("GET"))
+         {
+            response.getStream().write("How are you".getBytes());
+         }
       }
    }
+
+
 
    @Test
    public void test404() throws Exception

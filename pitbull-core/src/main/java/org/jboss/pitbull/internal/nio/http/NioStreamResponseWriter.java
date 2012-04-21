@@ -17,11 +17,12 @@ import java.nio.ByteBuffer;
  */
 public class NioStreamResponseWriter implements StreamResponseWriter
 {
-   private boolean keepAlive;
-   private ManagedChannel channel;
-   private ContentOutputStream stream;
-   private RequestHeader requestHeader;
-   private ContentInputStream is;
+   protected boolean keepAlive;
+   protected ManagedChannel channel;
+   protected ContentOutputStream stream;
+   protected RequestHeader requestHeader;
+   protected ContentInputStream is;
+   protected boolean ended;
    protected static final Logger log = Logger.getLogger(NioStreamResponseWriter.class);
 
    public NioStreamResponseWriter(ManagedChannel channel, RequestHeader requestHeader, ContentInputStream is, boolean keepAlive)
@@ -48,6 +49,8 @@ public class NioStreamResponseWriter implements StreamResponseWriter
    @Override
    public void end(ResponseHeader responseHeader)
    {
+      if (ended) return;
+      ended = true;
       try
       {
          is.eat();  // eat the input stream

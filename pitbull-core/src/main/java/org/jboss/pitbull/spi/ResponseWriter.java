@@ -11,6 +11,7 @@ public interface ResponseWriter
 {
    /**
     * Ends the request, flushing the status, statusMessage, and headers to client.
+    * This method can be called more than once, but will only execute flushes the first time.
     *
     * @param status
     * @param statusMessage
