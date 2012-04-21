@@ -11,6 +11,8 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
+ * Helper class for basic stream handling
+ *
  * @author <a href="mailto:bill@burkecentral.com">Bill Burke</a>
  * @version $Revision: 1 $
  */

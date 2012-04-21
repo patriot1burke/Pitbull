@@ -10,5 +10,5 @@ import java.util.Map;
  */
 public interface ZeroCopyResponseWriter
 {
-   void write(int status, String statusMessage, List<Map.Entry<String, String>> headers, FileChannel fileChannel);
+   void write(ResponseHeader responseHeader, FileChannel fileChannel);
 }
