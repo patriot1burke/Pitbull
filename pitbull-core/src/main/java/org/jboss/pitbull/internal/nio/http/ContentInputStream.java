@@ -49,13 +49,13 @@ public abstract class ContentInputStream extends InputStream
 
    public static ContentInputStream create(ManagedChannel channel, ByteBuffer initialBuffer, HttpRequestHeader header)
    {
-      String cl = header.getHeaders().getFirst("Content-Length");
+      String cl = header.getHeaders().getFirstHeader("Content-Length");
       if (cl != null)
       {
          long contentLength = Long.parseLong(cl);
          return new ContentLengthInputStream(channel, initialBuffer, contentLength);
       }
-      String transferEncoding = header.getHeaders().getFirst("Transfer-Encoding");
+      String transferEncoding = header.getHeaders().getFirstHeader("Transfer-Encoding");
       if (transferEncoding != null)
       {
          return new ChunkedInputStream(channel, initialBuffer);

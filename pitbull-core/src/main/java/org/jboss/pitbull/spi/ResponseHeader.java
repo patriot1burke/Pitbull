@@ -13,5 +13,5 @@ public interface ResponseHeader
 {
    int getStatus();
    String getStatusMessage();
-   List<Map.Entry<String, String>> getHeaders();
+   OrderedHeaders getHeaders();
 }

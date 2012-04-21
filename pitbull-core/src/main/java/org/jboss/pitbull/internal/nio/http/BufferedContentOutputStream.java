@@ -77,8 +77,8 @@ public class BufferedContentOutputStream extends ContentOutputStream
          {
             initialFlush = false;
             HttpResponse response = new HttpResponse(responseHeader);
-            response.removeHeader("Content-Length");
-            response.addHeader("Transfer-Encoding", "chunked");
+            response.getHeaders().removeHeader("Content-Length");
+            response.getHeaders().addHeader("Transfer-Encoding", "chunked");
             writeResponseHeader(response);
             buffer.flip();
             writeChunk(buffer);
@@ -219,8 +219,8 @@ public class BufferedContentOutputStream extends ContentOutputStream
          if (buffer.position() > 0) // set content-length header and full content
          {
             buffer.flip();
-            response.removeHeader("Content-Length");
-            response.addHeader("Content-Length", Integer.toString(buffer.remaining()));
+            response.getHeaders().removeHeader("Content-Length");
+            response.getHeaders().addHeader("Content-Length", Integer.toString(buffer.remaining()));
             writeResponseHeader(response);
             writeMessage(buffer);
             buffer.clear();

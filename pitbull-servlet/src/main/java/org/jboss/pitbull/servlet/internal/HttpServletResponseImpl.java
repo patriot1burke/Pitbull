@@ -2,9 +2,11 @@ package org.jboss.pitbull.servlet.internal;
 
 import org.jboss.pitbull.NotImplementedYetException;
 import org.jboss.pitbull.spi.ContentOutputStream;
+import org.jboss.pitbull.spi.OrderedHeaders;
 import org.jboss.pitbull.spi.ResponseHeader;
 import org.jboss.pitbull.spi.StreamResponseWriter;
 import org.jboss.pitbull.util.CaseInsensitiveMap;
+import org.jboss.pitbull.util.OrderedHeadersImpl;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.Cookie;
@@ -23,8 +25,7 @@ import java.util.Map;
  */
 public class HttpServletResponseImpl implements HttpServletResponse, ResponseHeader
 {
-   protected List<Map.Entry<String, String>> headerList = new ArrayList<Map.Entry<String, String>>();
-   protected CaseInsensitiveMap<Map.Entry<String, String>> headerMap = new CaseInsensitiveMap<Map.Entry<String, String>>();
+   protected OrderedHeaders headers = new OrderedHeadersImpl();
    protected int status;
    protected String statusMessage;
    protected boolean committed;
@@ -43,9 +44,9 @@ public class HttpServletResponseImpl implements HttpServletResponse, ResponseHea
    }
 
    @Override
-   public List<Map.Entry<String, String>> getHeaders()
+   public OrderedHeaders getHeaders()
    {
-      return headerList;
+      return headers;
    }
 
    @Override
@@ -60,7 +61,7 @@ public class HttpServletResponseImpl implements HttpServletResponse, ResponseHea
    @Override
    public boolean containsHeader(String name)
    {
-      return headerMap.containsKey(name);
+      return headers.containsHeader(name);
    }
 
    @Override
@@ -95,8 +96,7 @@ public class HttpServletResponseImpl implements HttpServletResponse, ResponseHea
          throw new IllegalStateException("Response is committed");
       }
       setStatus(sc);
-      headerList.clear();
-      headerMap.clear();
+      headers.clear();
       setContentType("text/html");
       getUnderlyingStream().reset();
       StringBuilder builder = new StringBuilder("<html><body><h1>Server Error</h1>");
@@ -116,8 +116,7 @@ public class HttpServletResponseImpl implements HttpServletResponse, ResponseHea
          throw new IllegalStateException("Response is committed");
       }
       setStatus(sc);
-      headerList.clear();
-      headerMap.clear();
+      headers.clear();
       setContentType("text/html");
       getUnderlyingStream().reset();
       StringBuilder builder = new StringBuilder("<html><body><h1>Server Error</h1>");
@@ -147,15 +146,7 @@ public class HttpServletResponseImpl implements HttpServletResponse, ResponseHea
    @Override
    public void setHeader(String name, String value)
    {
-      List<Map.Entry<String, String>> values = headerMap.remove(name);
-      if (values != null)
-      {
-         for (Map.Entry<String, String> entry : values)
-         {
-            headerList.remove(entry);
-         }
-      }
-      addHeader(name, value);
+      headers.setHeader(name, value);
    }
 
    private static class HeaderEntry implements Map.Entry<String, String>
@@ -191,9 +182,7 @@ public class HttpServletResponseImpl implements HttpServletResponse, ResponseHea
    @Override
    public void addHeader(String name, String value)
    {
-      Map.Entry<String, String> entry = new HeaderEntry(name, value);
-      headerList.add(entry);
-      headerMap.add(name, entry);
+      headers.addHeader(name, value);
    }
 
 
@@ -231,33 +220,19 @@ public class HttpServletResponseImpl implements HttpServletResponse, ResponseHea
    @Override
    public String getHeader(String name)
    {
-      Map.Entry<String, String> entry = headerMap.getFirst(name);
-      if (entry == null) return null;
-      return entry.getValue();
+      return headers.getFirstHeader(name);
    }
 
    @Override
    public Collection<String> getHeaders(String name)
    {
-      List<Map.Entry<String, String>> entries = headerMap.get(name);
-      if (entries == null) return new ArrayList<String>(0);
-      ArrayList<String> list = new ArrayList<String>(entries.size());
-      for (Map.Entry<String, String> entry : entries)
-      {
-         list.add(entry.getValue());
-      }
-      return list;
+      return headers.getHeaderValues(name);
    }
 
    @Override
    public Collection<String> getHeaderNames()
    {
-      ArrayList<String> list = new ArrayList<String>(headerMap.keySet().size());
-      for (String name : headerMap.keySet())
-      {
-         list.add(name);
-      }
-      return list;
+      return headers.getHeaderNames();
    }
 
    @Override

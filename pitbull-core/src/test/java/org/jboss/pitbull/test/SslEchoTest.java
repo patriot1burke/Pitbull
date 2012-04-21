@@ -13,12 +13,14 @@ import org.jboss.pitbull.HttpServer;
 import org.jboss.pitbull.HttpServerBuilder;
 import org.jboss.pitbull.spi.Connection;
 import org.jboss.pitbull.spi.ContentOutputStream;
+import org.jboss.pitbull.spi.OrderedHeaders;
 import org.jboss.pitbull.spi.RequestHandler;
 import org.jboss.pitbull.spi.RequestHeader;
 import org.jboss.pitbull.spi.RequestInitiator;
 import org.jboss.pitbull.spi.ResponseHeader;
 import org.jboss.pitbull.spi.StreamHandler;
 import org.jboss.pitbull.spi.StreamResponseWriter;
+import org.jboss.pitbull.util.OrderedHeadersImpl;
 import org.jboss.resteasy.client.ClientRequest;
 import org.jboss.resteasy.client.ClientResponse;
 import org.jboss.resteasy.client.core.executors.ApacheHttpClient4Executor;
@@ -40,6 +42,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @author <a href="mailto:bill@burkecentral.com">Bill Burke</a>
@@ -112,29 +115,10 @@ public class SslEchoTest
                   }
 
                   @Override
-                  public List<Map.Entry<String, String>> getHeaders()
+                  public OrderedHeaders getHeaders()
                   {
-                     List<Map.Entry<String, String>> headers = new ArrayList<Map.Entry<String, String>>();
-                     headers.add(new Map.Entry<String, String>()
-                     {
-                        @Override
-                        public String getKey()
-                        {
-                           return "Content-Type";
-                        }
-
-                        @Override
-                        public String getValue()
-                        {
-                           return "text/plain";
-                        }
-
-                        @Override
-                        public String setValue(String s)
-                        {
-                           return null;
-                        }
-                     });
+                     OrderedHeaders headers = new OrderedHeadersImpl();
+                     headers.addHeader("Content-Type", "text/plain");
                      return headers;
                   }
                };

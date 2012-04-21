@@ -1,7 +1,9 @@
 package org.jboss.pitbull.internal.nio.http;
 
+import org.jboss.pitbull.spi.OrderedHeaders;
 import org.jboss.pitbull.spi.RequestHeader;
 import org.jboss.pitbull.util.CaseInsensitiveMap;
+import org.jboss.pitbull.util.OrderedHeadersImpl;
 
 /**
  * @author <a href="mailto:bill@burkecentral.com">Bill Burke</a>
@@ -12,7 +14,7 @@ public class HttpRequestHeader implements RequestHeader
    protected String httpVersion;
    protected String method;
    protected String uri;
-   protected CaseInsensitiveMap<String> headers = new CaseInsensitiveMap<String>();
+   protected OrderedHeaders headers = new OrderedHeadersImpl();
    protected boolean chunked;
 
    public String getHttpVersion()
@@ -45,14 +47,9 @@ public class HttpRequestHeader implements RequestHeader
       this.uri = uri;
    }
 
-   public CaseInsensitiveMap<String> getHeaders()
+   public OrderedHeaders getHeaders()
    {
       return headers;
-   }
-
-   public void addHeader(final String name, final String value)
-   {
-      headers.add(name, value);
    }
 
    @Override

@@ -133,7 +133,7 @@ public class HttpRequestDecoder
          {
             if (currentHeaderName != null && currentHeaderValue != null)
             {
-               request.addHeader(currentHeaderName, currentHeaderValue);
+               request.getHeaders().addHeader(currentHeaderName, currentHeaderValue);
             }
             currentState = States.DONE;
             return false;
@@ -149,7 +149,7 @@ public class HttpRequestDecoder
             {
                if (currentHeaderName != null)
                {
-                  request.addHeader(currentHeaderName, currentHeaderValue);
+                  request.getHeaders().addHeader(currentHeaderName, currentHeaderValue);
                   currentHeaderName = null;
                   currentHeaderValue = null;
                }

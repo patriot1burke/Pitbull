@@ -14,5 +14,5 @@ public interface RequestHeader
 
    String getUri();
 
-   CaseInsensitiveMap<String> getHeaders();
+   OrderedHeaders getHeaders();
 }

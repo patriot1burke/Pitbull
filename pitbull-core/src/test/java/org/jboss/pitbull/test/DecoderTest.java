@@ -37,8 +37,8 @@ public class DecoderTest
       HttpRequestHeader header = decoder.getRequest();
       Assert.assertEquals(header.getMethod(), "GET");
       Assert.assertEquals(header.getUri(), "/foo/bar");
-      Assert.assertEquals(2, header.getHeaders().size());
-      Assert.assertEquals("localhost", header.getHeaders().getFirst("Host"));
+      Assert.assertEquals(2, header.getHeaders().getHeaderNames().size());
+      Assert.assertEquals("localhost", header.getHeaders().getFirstHeader("Host"));
 
    }
 
@@ -101,8 +101,8 @@ public class DecoderTest
          HttpRequestHeader header = decoder.getRequest();
          Assert.assertEquals(header.getMethod(), "GET");
          Assert.assertEquals(header.getUri(), "/foo/bar");
-         Assert.assertEquals(1, header.getHeaders().size());
-         Assert.assertEquals("localhost", header.getHeaders().getFirst("Host"));
+         Assert.assertEquals(1, header.getHeaders().getHeaderNames().size());
+         Assert.assertEquals("localhost", header.getHeaders().getFirstHeader("Host"));
       }
 
 
@@ -128,9 +128,9 @@ public class DecoderTest
          HttpRequestHeader header = decoder.getRequest();
          Assert.assertEquals(header.getMethod(), "GET");
          Assert.assertEquals(header.getUri(), "/foo/bar");
-         Assert.assertEquals(3, header.getHeaders().size());
-         Assert.assertEquals("localhost", header.getHeaders().getFirst("Host"));
-         Assert.assertEquals("text/html; application/xml; text/plain", header.getHeaders().getFirst("Accept"));
+         Assert.assertEquals(3, header.getHeaders().getHeaderNames().size());
+         Assert.assertEquals("localhost", header.getHeaders().getFirstHeader("Host"));
+         Assert.assertEquals("text/html; application/xml; text/plain", header.getHeaders().getFirstHeader("Accept"));
       }
 
 

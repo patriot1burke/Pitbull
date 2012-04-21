@@ -1,5 +1,6 @@
 package org.jboss.pitbull.internal.nio.http;
 
+import org.jboss.pitbull.spi.OrderedHeaders;
 import org.jboss.pitbull.spi.RequestHeader;
 import org.jboss.pitbull.spi.ResponseHeader;
 
@@ -17,7 +18,7 @@ public class HttpResponse
 {
    protected int status;
    protected String statusMessage;
-   protected List<Map.Entry<String, String>> headers;
+   protected OrderedHeaders headers;
 
    public HttpResponse(int status, String statusMessage)
    {
@@ -29,8 +30,7 @@ public class HttpResponse
    {
       this.status = response.getStatus();
       this.statusMessage = response.getStatusMessage();
-      this.headers = new ArrayList<Map.Entry<String, String>>(response.getHeaders().size());
-      this.headers.addAll(response.getHeaders());
+      this.headers = response.getHeaders();
    }
 
    public int getStatus()
@@ -43,46 +43,9 @@ public class HttpResponse
       return statusMessage;
    }
 
-   public List<Map.Entry<String, String>> getHeaders()
+   public OrderedHeaders getHeaders()
    {
       return headers;
-   }
-
-   public void addHeader(final String name, final String value)
-   {
-      headers.add(new Map.Entry<String, String>()
-      {
-         protected String n = name;
-         protected String val = value;
-
-         @Override
-         public String getKey()
-         {
-            return n;
-         }
-
-         @Override
-         public String getValue()
-         {
-            return val;
-         }
-
-         @Override
-         public String setValue(String s)
-         {
-            return val = s;
-         }
-      });
-   }
-
-   public void removeHeader(String name)
-   {
-      Iterator<Map.Entry<String, String>> it = headers.iterator();
-      while (it.hasNext())
-      {
-         Map.Entry<String, String> entry = it.next();
-         if (entry.getKey().equalsIgnoreCase(name)) it.remove();
-      }
    }
 
    /**
@@ -97,9 +60,9 @@ public class HttpResponse
          return;
       }
       if (request.getMethod().equalsIgnoreCase("HEAD")) return;
-      removeHeader("Content-Length");
-      removeHeader("Transfer-Encoding");
-      addHeader("Content-Length", "0");
+      getHeaders().removeHeader("Content-Length");
+      getHeaders().removeHeader("Transfer-Encoding");
+      getHeaders().addHeader("Content-Length", "0");
       return;
    }
 
@@ -119,7 +82,7 @@ public class HttpResponse
       builder.append("\r\n");
       if (getHeaders() != null)
       {
-         for (Map.Entry<String, String> entry : getHeaders())
+         for (Map.Entry<String, String> entry : getHeaders().getHeaderList())
          {
             builder.append(entry.getKey()).append(": ").append(entry.getValue()).append("\r\n");
          }

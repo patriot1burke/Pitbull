@@ -5,6 +5,7 @@ import org.jboss.pitbull.internal.util.ContentType;
 import org.jboss.pitbull.internal.util.DateUtil;
 import org.jboss.pitbull.servlet.DeploymentServletContext;
 import org.jboss.pitbull.spi.Connection;
+import org.jboss.pitbull.spi.OrderedHeaders;
 import org.jboss.pitbull.spi.RequestHeader;
 import org.jboss.pitbull.util.CaseInsensitiveMap;
 
@@ -51,7 +52,7 @@ public class HttpServletRequestImpl implements HttpServletRequest
    protected RequestHeader headerBlob;
 
    protected Map<String, Object> attributes = new HashMap<String, Object>();
-   protected CaseInsensitiveMap<String> headers;
+   protected OrderedHeaders headers;
    protected Cookie[] cookies;
    protected ServletInputStream servletInputStream;
    protected BufferedReader reader;
@@ -87,7 +88,7 @@ public class HttpServletRequestImpl implements HttpServletRequest
       this.headerBlob = headerBlob;
    }
 
-   protected CaseInsensitiveMap<String> getHeaders()
+   protected OrderedHeaders getHeaders()
    {
       if (headers == null)
       {
@@ -106,7 +107,7 @@ public class HttpServletRequestImpl implements HttpServletRequest
    public Cookie[] getCookies()
    {
       if (cookies != null) return cookies;
-      List<String> cookieHeaders = getHeaders().get("Cookie");
+      List<String> cookieHeaders = getHeaders().getHeaderValues("Cookie");
       if (cookieHeaders == null)
       {
          cookies = emptyCookies;
@@ -129,7 +130,7 @@ public class HttpServletRequestImpl implements HttpServletRequest
    {
       if (dateHeader == null)
       {
-         String val = getHeaders().getFirst("Date");
+         String val = getHeaders().getFirstHeader("Date");
          if (val != null)
          {
             dateHeader = DateUtil.parseDate(val);
@@ -142,13 +143,13 @@ public class HttpServletRequestImpl implements HttpServletRequest
    @Override
    public String getHeader(String name)
    {
-      return getHeaders().getFirst(name);
+      return getHeaders().getFirstHeader(name);
    }
 
    @Override
    public Enumeration<String> getHeaders(String name)
    {
-      final Iterator<String> it = getHeaders().get(name).iterator();
+      final Iterator<String> it = getHeaders().getHeaderValues(name).iterator();
       return new Enumeration<String>()
       {
          @Override
@@ -168,7 +169,7 @@ public class HttpServletRequestImpl implements HttpServletRequest
    @Override
    public Enumeration<String> getHeaderNames()
    {
-      final Iterator<String> it = getHeaders().keySet().iterator();
+      final Iterator<String> it = getHeaders().getHeaderNames().iterator();
       return new Enumeration<String>()
       {
          @Override
@@ -188,7 +189,7 @@ public class HttpServletRequestImpl implements HttpServletRequest
    @Override
    public int getIntHeader(String name)
    {
-      String val = getHeaders().getFirst(name);
+      String val = getHeaders().getFirstHeader(name);
       if (val == null) return -1;
       return Integer.parseInt(val);
    }
@@ -276,7 +277,7 @@ public class HttpServletRequestImpl implements HttpServletRequest
       StringBuilder builder = new StringBuilder();
       if (connection.isSecure()) builder.append("https://");
       else builder.append("http://");
-      String host = getHeaders().getFirst("Host");
+      String host = getHeaders().getFirstHeader("Host");
       if (host == null)
       {
          host = connection.getLocalAddress().getHostName();

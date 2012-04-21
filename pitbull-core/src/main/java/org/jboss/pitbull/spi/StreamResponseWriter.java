@@ -8,8 +8,8 @@ public interface StreamResponseWriter extends ResponseWriter
 {
 
    /**
-    * Called if the response has a body.  Flushes status, status message, and headers to the client.
-    * Returns an OutputStream so that you can write the response body.
+    * Called if the response has a body.  Will flush status, status message, and headers when OutputStream is first
+    * written to.
     *
     * @param status
     * @param statusMessage
