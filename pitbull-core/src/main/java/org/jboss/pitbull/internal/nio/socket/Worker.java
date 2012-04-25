@@ -18,14 +18,20 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class Worker implements Runnable
 {
+   interface Event
+   {
+      void execute();
+   }
+
    protected Selector selector;
    protected volatile boolean shutdown;
    protected volatile boolean idle;
    protected CountDownLatch shutdownLatch = new CountDownLatch(1);
-   protected Queue<ManagedChannel> registrationQueue = new ArrayDeque<ManagedChannel>(10);
+   protected Queue<Event> eventQueue = new ArrayDeque<Event>(10);
    protected static final Logger logger = Logger.getLogger(Worker.class);
    protected static final AtomicInteger counter = new AtomicInteger();
    protected long numRegistered;
+   protected Thread workerThread;
 
    public Worker() throws IOException
    {
@@ -42,21 +48,51 @@ public class Worker implements Runnable
       numRegistered = 0;
    }
 
-   public void register(ManagedChannel channel) throws Exception
+   public boolean inWorkerThread()
    {
-      synchronized (registrationQueue)
+      if (workerThread == null) return false;
+      return workerThread == Thread.currentThread();
+   }
+
+   protected void queueEvent(Event event)
+   {
+      synchronized (eventQueue)
       {
+         eventQueue.add(event);
          if (idle)
          {
-            executeRegistration(channel);
-            registrationQueue.notify();
+            eventQueue.notify();
          }
          else
          {
-            registrationQueue.add(channel);
             selector.wakeup();
          }
       }
+   }
+
+   public void queueRegistration(final ManagedChannel channel)
+   {
+      queueEvent( new Event()
+      {
+         @Override
+         public void execute()
+         {
+            executeRegistration(channel);
+         }
+      });
+   }
+
+   public void queueResumeReads(final ManagedChannel channel)
+   {
+      queueEvent( new Event()
+      {
+         @Override
+         public void execute()
+         {
+            // should call as we'll be in same thread
+            channel.resumeReads();
+         }
+      });
    }
 
    protected void executeRegistration(ManagedChannel channel)
@@ -67,27 +103,13 @@ public class Worker implements Runnable
          numRegistered++;
          channel.getChannel().configureBlocking(false);
          SelectionKey key = channel.getChannel().register(selector, SelectionKey.OP_READ);
-         channel.bindSelectionKey(key);
+         channel.bindSelectionKey(this, key);
          key.attach(channel);
       }
       catch (Exception e)
       {
          logger.error("Failed to execute socket registration", e);
          try { channel.close(); } catch (Exception ignored) {}
-      }
-   }
-
-   protected void processRegistrations()
-   {
-      for (; ; )
-      {
-         ManagedChannel channel = null;
-         synchronized (registrationQueue)
-         {
-            channel = registrationQueue.poll();
-         }
-         if (channel == null) break;
-         executeRegistration(channel);
       }
    }
 
@@ -108,7 +130,7 @@ public class Worker implements Runnable
             }
             catch (Exception e)
             {
-               logger.error("Error reading channel: ", e);
+               logger.debug("Error reading channel: ", e);
                channel.close();
             }
             if (!channel.getChannel().isOpen())
@@ -119,12 +141,17 @@ public class Worker implements Runnable
       }
    }
 
+   public boolean isShutdown()
+   {
+      return shutdown;
+   }
+
    public void shutdown()
    {
-      synchronized (registrationQueue)
+      synchronized (eventQueue)
       {
          shutdown = true;
-         registrationQueue.notify();
+         eventQueue.notify();
       }
       selector.wakeup();
       try
@@ -142,6 +169,7 @@ public class Worker implements Runnable
    {
       String oldName = Thread.currentThread().getName();
       Thread.currentThread().setName("Pitbull Worker Thread: " + counter.incrementAndGet());
+      workerThread = Thread.currentThread();
       try
       {
          for (; ; )
@@ -151,18 +179,24 @@ public class Worker implements Runnable
             {
                SelectorUtil.select(selector);
                if (shutdown) break;
-               processRegistrations();
-               processReads();
 
-               synchronized (registrationQueue)
+               synchronized (eventQueue)
                {
+                  // Empty all events
+                  for (Event event = eventQueue.poll(); event != null; event = eventQueue.poll())
+                  {
+                     event.execute();
+                  }
+
+                  processReads();
+
                   if (selector.keys().isEmpty())
                   {
                      // go to sleep if not managing any more connections
                      idle = true;
                      try
                      {
-                        registrationQueue.wait();
+                        eventQueue.wait();
                         if (shutdown) break;
                      }
                      catch (InterruptedException e)

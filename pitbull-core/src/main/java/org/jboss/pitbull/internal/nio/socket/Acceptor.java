@@ -52,7 +52,7 @@ public class Acceptor implements Runnable
       Worker worker = nextWorker();
       try
       {
-         worker.register(channelFactory.create(accepted));
+         worker.queueRegistration(channelFactory.create(accepted));
       }
       catch (Exception e)
       {

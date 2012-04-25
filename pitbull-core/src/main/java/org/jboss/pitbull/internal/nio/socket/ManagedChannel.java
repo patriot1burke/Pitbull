@@ -6,6 +6,7 @@ import javax.net.ssl.SSLSession;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
+import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
 import java.util.concurrent.TimeUnit;
 
@@ -16,6 +17,7 @@ import java.util.concurrent.TimeUnit;
 public class ManagedChannel
 {
    protected SocketChannel channel;
+   protected Worker worker;
    protected SelectionKey key;
    protected EventHandler handler;
    protected boolean closed;
@@ -28,8 +30,9 @@ public class ManagedChannel
       this.handler = handler;
    }
 
-   public void bindSelectionKey(SelectionKey key)
+   public void bindSelectionKey(Worker worker, SelectionKey key)
    {
+      this.worker = worker;
       this.key = key;
    }
 
@@ -94,13 +97,27 @@ public class ManagedChannel
 
    public void suspendReads()
    {
+      if (!worker.inWorkerThread()) throw new IllegalStateException("Can only be called within worker thread at this time");
       key.interestOps(0);
    }
 
    public void resumeReads()
    {
-      key.interestOps(SelectionKey.OP_READ);
-      key.selector().wakeup();
+      if (worker.inWorkerThread())
+      {
+         key.interestOps(SelectionKey.OP_READ);
+         try
+         {
+            key.selector().selectNow();
+         }
+         catch (IOException e)
+         {
+         }
+      }
+      else
+      {
+        worker.queueResumeReads(this);
+      }
    }
 
    public void shutdown()
@@ -122,6 +139,8 @@ public class ManagedChannel
       { channel.close(); }
       catch (Throwable ignored)
       {}
+
+      try { key.cancel(); } catch (Exception ignored) {}
    }
 
 }

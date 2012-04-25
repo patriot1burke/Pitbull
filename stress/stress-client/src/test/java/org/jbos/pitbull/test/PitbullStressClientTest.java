@@ -57,8 +57,8 @@ public class PitbullStressClientTest
             System.out.print(dist[j]+ ", ");
          }
          System.out.println();
+         http.clearMetrics();
       }
-      http.clearMetrics();
    }
 
 }
