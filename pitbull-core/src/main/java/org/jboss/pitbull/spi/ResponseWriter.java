@@ -10,7 +10,7 @@ import java.util.Map;
 public interface ResponseWriter
 {
    /**
-    * Ends the request, flushing the status, statusMessage, and headers to client.
+    * Ends the request, flushing the status, statusMessage, and headers to client if it has not been called already.
     * This method can be called more than once, but will only execute flushes the first time.
     *
     * @param status
@@ -18,5 +18,12 @@ public interface ResponseWriter
     * @param headers
     */
    void end(ResponseHeader responseHeader);
+
+   /**
+    * Was the response sent?
+    *
+    * @return
+    */
+   boolean isEnded();
 
 }

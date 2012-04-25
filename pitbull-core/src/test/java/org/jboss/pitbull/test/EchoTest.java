@@ -56,6 +56,7 @@ public class EchoTest
       @Override
       public void service(Connection connection, RequestHeader requestHeader, InputStream is, StreamedResponse response) throws IOException
       {
+         System.out.println(requestHeader.getMethod() + " " + requestHeader.getUri());
          response.setStatus(200);
          response.setStatusMessage("Ok");
          response.getHeaders().addHeader("Content-Type", "text/plain");

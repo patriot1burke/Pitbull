@@ -1,5 +1,6 @@
 package org.jboss.pitbull.initiators;
 
+import org.jboss.pitbull.internal.logging.Logger;
 import org.jboss.pitbull.spi.Connection;
 import org.jboss.pitbull.spi.RequestHandler;
 import org.jboss.pitbull.spi.RequestHeader;
@@ -18,6 +19,8 @@ import java.io.InputStream;
  */
 public abstract class StreamedRequestInitiator implements RequestInitiator
 {
+   protected static final Logger logger = Logger.getLogger(StreamedRequestInitiator.class);
+
    public boolean canExecuteInWorkerThread()
    {
       return false;
@@ -61,16 +64,21 @@ public abstract class StreamedRequestInitiator implements RequestInitiator
             }
             catch (Exception e)
             {
-               if (writer.getAllocatedStream() == null || !writer.getAllocatedStream().isCommitted())
+               if (!writer.isEnded() && (writer.getAllocatedStream() == null || !writer.getAllocatedStream().isCommitted()))
                {
+                  logger.error("Failed to execute", e);
+                  if (writer.getAllocatedStream() != null) writer.getAllocatedStream().reset();
                   res.getHeaders().clear();
                   res.setStatus(500);
                   res.setStatusMessage("Internal Server Error");
                }
-
-               throw new RuntimeException(e);
+               else
+               {
+                  throw new RuntimeException(e);
+               }
             }
             writer.end(res.delegator);
+
          }
 
          @Override

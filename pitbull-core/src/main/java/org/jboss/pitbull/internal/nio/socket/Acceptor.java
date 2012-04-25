@@ -24,11 +24,12 @@ public class Acceptor implements Runnable
    protected ServerSocketChannel channel;
    protected CountDownLatch shutdownLatch = new CountDownLatch(1);
    protected volatile boolean shutdown;
-   protected final AtomicInteger workerIndex = new AtomicInteger();
+   protected int workerIndex = 0;
    protected ManagedChannelFactory channelFactory;
    protected Worker[] workers;
    protected static final Logger logger = Logger.getLogger(Acceptor.class);
    protected static final AtomicInteger counter = new AtomicInteger();
+   protected long acceptCount;
 
    public Acceptor(ServerSocketChannel channel, ManagedChannelFactory channelFactory, Worker[] workers) throws IOException
    {
@@ -42,7 +43,7 @@ public class Acceptor implements Runnable
    protected Worker nextWorker()
    {
       return workers[Math.abs(
-              workerIndex.getAndIncrement() % workers.length)];
+              workerIndex++ % workers.length)];
    }
 
    protected void registerAcceptedChannel(SocketChannel accepted) throws IOException
@@ -65,6 +66,16 @@ public class Acceptor implements Runnable
 
          }
       }
+   }
+
+   public void clearMetrics()
+   {
+      acceptCount = 0;
+   }
+
+   public long getAcceptCount()
+   {
+      return acceptCount;
    }
 
    public void shutdown()
@@ -108,6 +119,7 @@ public class Acceptor implements Runnable
                SocketChannel acceptedSocket = channel.accept();
                if (acceptedSocket != null)
                {
+                  acceptCount++;
                   registerAcceptedChannel(acceptedSocket);
                }
             }

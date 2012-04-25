@@ -17,7 +17,6 @@ import java.nio.ByteBuffer;
  */
 public class NioStreamResponseWriter implements StreamResponseWriter
 {
-   protected boolean keepAlive;
    protected ManagedChannel channel;
    protected ContentOutputStream stream;
    protected RequestHeader requestHeader;
@@ -25,12 +24,17 @@ public class NioStreamResponseWriter implements StreamResponseWriter
    protected boolean ended;
    protected static final Logger log = Logger.getLogger(NioStreamResponseWriter.class);
 
-   public NioStreamResponseWriter(ManagedChannel channel, RequestHeader requestHeader, ContentInputStream is, boolean keepAlive)
+   public NioStreamResponseWriter(ManagedChannel channel, RequestHeader requestHeader, ContentInputStream is)
    {
       this.channel = channel;
       this.requestHeader = requestHeader;
-      this.keepAlive = keepAlive;
       this.is = is;
+   }
+
+   @Override
+   public boolean isEnded()
+   {
+      return ended;
    }
 
    @Override
@@ -49,7 +53,11 @@ public class NioStreamResponseWriter implements StreamResponseWriter
    @Override
    public void end(ResponseHeader responseHeader)
    {
-      if (ended) return;
+      if (ended)
+      {
+         log.error("StreamResponseWriter.end() called twice");
+         return;
+      }
       ended = true;
       try
       {
@@ -61,20 +69,13 @@ public class NioStreamResponseWriter implements StreamResponseWriter
       }
       if (stream == null)
       {
+         // stream was closed
          HttpResponse response = new HttpResponse(responseHeader);
          try
          {
             response.prepareEmptyBody(requestHeader);
             byte[] bytes = response.responseBytes();
             channel.writeBlocking(ByteBuffer.wrap(bytes));
-            if (keepAlive)
-            {
-               channel.resumeReads();
-            }
-            else
-            {
-               channel.close();
-            }
             return;
          }
          catch (IOException e)
@@ -83,25 +84,20 @@ public class NioStreamResponseWriter implements StreamResponseWriter
 
          }
       }
-
-      // stream was open
-
-      try
+      else
       {
-         stream.close();
-         if (keepAlive)
+         // stream was open
+         try
          {
-            channel.resumeReads();
+            stream.close();
          }
-         else
+         catch (IOException e)
          {
-            channel.close();
+            throw new NotImplementedYetException(e);
          }
+
       }
-      catch (IOException e)
-      {
-         throw new NotImplementedYetException(e);
-      }
+
 
    }
 }

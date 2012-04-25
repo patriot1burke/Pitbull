@@ -34,23 +34,39 @@ public class StreamExecutor implements Runnable
       try
       {
          ContentInputStream is = ContentInputStream.create(channel, buffer, requestHeader);
-         NioStreamResponseWriter writer = new NioStreamResponseWriter(channel, requestHeader, is, true); // todo handle keepalive setting
+         NioStreamResponseWriter writer = new NioStreamResponseWriter(channel, requestHeader, is); // todo handle keepalive setting
          handler.setInputStream(is);
          handler.setWriter(writer);
          handler.execute(requestHeader);
-         channel.resumeReads();
       }
       catch (Exception ex)
       {
-         log.error("Failed", ex);
+         log.error("Failed to execute", ex);
          try
          { channel.close(); }
          catch (Throwable t)
          {}
+         return;
       }
       finally
       {
          //log.debug("End Stream Executor: " + (System.currentTimeMillis() - start));
       }
+
+      // todo keep-alive logic, right now everything kept alive
+      try
+      {
+         channel.resumeReads();
+      }
+      catch (Exception ex)
+      {
+         log.error("Failed to resumeReads", ex);
+         try
+         { channel.close(); }
+         catch (Throwable t)
+         {}
+         return;
+      }
+
    }
 }

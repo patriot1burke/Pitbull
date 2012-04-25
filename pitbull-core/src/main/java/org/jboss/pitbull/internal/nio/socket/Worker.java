@@ -25,10 +25,21 @@ public class Worker implements Runnable
    protected Queue<ManagedChannel> registrationQueue = new ArrayDeque<ManagedChannel>(10);
    protected static final Logger logger = Logger.getLogger(Worker.class);
    protected static final AtomicInteger counter = new AtomicInteger();
+   protected long numRegistered;
 
    public Worker() throws IOException
    {
       this.selector = Selector.open();
+   }
+
+   public long getNumRegistered()
+   {
+      return numRegistered;
+   }
+
+   public void clearMetrics()
+   {
+      numRegistered = 0;
    }
 
    public void register(ManagedChannel channel) throws Exception
@@ -53,6 +64,7 @@ public class Worker implements Runnable
       try
       {
          logger.trace("Registered channel.");
+         numRegistered++;
          channel.getChannel().configureBlocking(false);
          SelectionKey key = channel.getChannel().register(selector, SelectionKey.OP_READ);
          channel.bindSelectionKey(key);

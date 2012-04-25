@@ -57,6 +57,16 @@ public class HttpConnector
       this.port = port;
    }
 
+   public long getAcceptCount()
+   {
+      return acceptor.getAcceptCount();
+   }
+
+   public void clearMetrics()
+   {
+      acceptor.clearMetrics();
+   }
+
 
 
    public void start(Worker[] workers, ExecutorService acceptorExecutor, ExecutorService requestExecutor) throws Exception
@@ -81,12 +91,12 @@ public class HttpConnector
 
    public void shutdownAcceptor() throws Exception
    {
-      acceptor.shutdown();
+      if (acceptor != null) acceptor.shutdown();
    }
 
    public void shutdownChannel() throws Exception
    {
-      channel.close();
+      if (channel != null) channel.close();
    }
 
 

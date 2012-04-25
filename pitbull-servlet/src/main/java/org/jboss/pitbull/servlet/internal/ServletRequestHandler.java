@@ -72,6 +72,10 @@ public class ServletRequestHandler implements StreamHandler
             response.reset();
             response.setStatus(500);
          }
+         else
+         {
+            throw new RuntimeException(e);
+         }
       }
       writer.end(response);
    }

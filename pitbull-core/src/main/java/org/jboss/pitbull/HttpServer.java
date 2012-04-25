@@ -27,6 +27,55 @@ public class HttpServer
    protected int numWorkers;
    protected List<HttpConnector> connectors = new ArrayList<HttpConnector>();
 
+   /**
+    * Metrics of accepted connections
+    *
+    * @return
+    */
+   public long getAcceptCount()
+   {
+      long count = 0;
+      for (HttpConnector connector : connectors)
+      {
+         count += connector.getAcceptCount();
+      }
+      return count;
+   }
+
+   /**
+    * Metric of accepted connection distribution onto workers
+    *
+    * @return
+    */
+   public long[] getWorkerRegistrationDistribution()
+   {
+      long[] dist = new long[workers.length];
+      for (int i = 0; i < dist.length; i++)
+      {
+         dist[i] = workers[i].getNumRegistered();
+      }
+      return dist;
+   }
+
+   /**
+    *
+    *
+    * @return
+    */
+   public void clearMetrics()
+   {
+      for (HttpConnector connector : connectors)
+      {
+        connector.clearMetrics();
+      }
+
+      for (Worker worker : workers)
+      {
+         worker.clearMetrics();
+      }
+
+   }
+
    public List<HttpConnector> getConnectors()
    {
       return connectors;
