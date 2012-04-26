@@ -127,17 +127,9 @@ public class PitbullSSLStressClientTest
 
 
    @Test
-   public void testClientStress() throws Exception
-   {
-
-      StressClient.stress(1, 3, factory);
-      http.clearMetrics();
-   }
-
-   @Test
    public void testClientStressMultiple() throws Exception
    {
-      for (int i = 0; i < 20; i++)
+      for (int i = 5; i < 21; i+= 5)
       {
          System.out.println();
          System.out.println();
