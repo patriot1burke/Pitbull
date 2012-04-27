@@ -36,6 +36,9 @@ public class PitbullStressClientTest
    @Test
    public void testClientStressMultiple() throws Exception
    {
+      System.out.println("************************");
+      System.out.println(" Vanilla Socket Stress");
+      System.out.println("************************");
       for (int i = 5; i < 21; i+= 5)
       {
          System.out.println();

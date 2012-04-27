@@ -116,7 +116,14 @@ public class ManagedChannel
       }
       else
       {
-        worker.queueResumeReads(this);
+        worker.queueEvent(new Runnable()
+        {
+           @Override
+           public void run()
+           {
+              ManagedChannel.this.resumeReads();
+           }
+        });
       }
    }
 

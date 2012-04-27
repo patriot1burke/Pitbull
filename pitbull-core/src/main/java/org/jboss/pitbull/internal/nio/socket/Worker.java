@@ -10,6 +10,8 @@ import java.util.Iterator;
 import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Future;
+import java.util.concurrent.FutureTask;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -27,7 +29,7 @@ public class Worker implements Runnable
    protected volatile boolean shutdown;
    protected volatile boolean idle;
    protected CountDownLatch shutdownLatch = new CountDownLatch(1);
-   protected Queue<Event> eventQueue = new ArrayDeque<Event>(10);
+   protected Queue<FutureTask> eventQueue = new ArrayDeque<FutureTask>(10);
    protected static final Logger logger = Logger.getLogger(Worker.class);
    protected static final AtomicInteger counter = new AtomicInteger();
    protected long numRegistered;
@@ -54,11 +56,12 @@ public class Worker implements Runnable
       return workerThread == Thread.currentThread();
    }
 
-   protected void queueEvent(Event event)
+   public Future queueEvent(final Runnable runnable)
    {
+      FutureTask futureTask = new FutureTask(runnable, null);
       synchronized (eventQueue)
       {
-         eventQueue.add(event);
+         eventQueue.add(futureTask);
          if (idle)
          {
             eventQueue.notify();
@@ -68,31 +71,22 @@ public class Worker implements Runnable
             selector.wakeup();
          }
       }
+      return futureTask;
    }
+
+
 
    public void queueRegistration(final ManagedChannel channel)
    {
-      queueEvent( new Event()
+      Runnable runnable = new Runnable()
       {
          @Override
-         public void execute()
+         public void run()
          {
             executeRegistration(channel);
          }
-      });
-   }
-
-   public void queueResumeReads(final ManagedChannel channel)
-   {
-      queueEvent( new Event()
-      {
-         @Override
-         public void execute()
-         {
-            // should call as we'll be in same thread
-            channel.resumeReads();
-         }
-      });
+      };
+      queueEvent(runnable);
    }
 
    protected void executeRegistration(ManagedChannel channel)
@@ -183,12 +177,16 @@ public class Worker implements Runnable
                synchronized (eventQueue)
                {
                   // Empty all events
-                  for (Event event = eventQueue.poll(); event != null; event = eventQueue.poll())
+                  for (FutureTask event = eventQueue.poll(); event != null; event = eventQueue.poll())
                   {
-                     event.execute();
+                     event.run();
                   }
 
+                  selector.selectNow(); // events may have changed selector status
+
                   processReads();
+
+                  selector.selectNow(); // reads may have changed selector status
 
                   if (selector.keys().isEmpty())
                   {
@@ -236,6 +234,19 @@ public class Worker implements Runnable
 
    public void close()
    {
+      try
+      {
+         for (FutureTask event = eventQueue.poll(); event != null; event = eventQueue.poll())
+         {
+            event.cancel(false);
+         }
+
+      }
+      catch (Exception ignore)
+      {
+
+      }
+
       Set<SelectionKey> keys = selector.keys();
       for (SelectionKey key : keys)
       {
