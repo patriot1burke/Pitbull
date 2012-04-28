@@ -172,7 +172,12 @@ public class HttpRequestDecoder
          currentState = States.SKIP_CONTROL_CHARS;
          return true;
       }
-      request.setMethod(split[0].trim().toUpperCase());
+      String method = split[0].trim().toUpperCase();
+      request.setMethod(method);
+      if (method.length() < 2)
+      {
+         throw new RuntimeException("Parsing request header failed on readInitial: " + line);
+      }
       request.setUri(split[1]);
       request.setHttpVersion(split[2].trim().toUpperCase());
       currentState = States.READ_HEADERS;

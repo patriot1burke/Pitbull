@@ -9,6 +9,7 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author <a href="mailto:bill@burkecentral.com">Bill Burke</a>
@@ -23,11 +24,19 @@ public class ManagedChannel
    protected boolean closed;
    private static final Logger log = Logger.getLogger(ManagedChannel.class);
    protected SSLSession sslSession;
+   protected static final AtomicInteger counter = new AtomicInteger();
+   protected String id;
 
    public ManagedChannel(SocketChannel channel, EventHandler handler)
    {
       this.channel = channel;
       this.handler = handler;
+      this.id = Integer.toString(counter.incrementAndGet());
+   }
+
+   public String getId()
+   {
+      return id;
    }
 
    public void bindSelectionKey(Worker worker, SelectionKey key)
@@ -106,13 +115,7 @@ public class ManagedChannel
       if (worker.inWorkerThread())
       {
          key.interestOps(SelectionKey.OP_READ);
-         try
-         {
-            key.selector().selectNow();
-         }
-         catch (IOException e)
-         {
-         }
+         // don't need to selectNow() because Worker loop should do this after processReads.
       }
       else
       {
@@ -141,6 +144,7 @@ public class ManagedChannel
    public void close()
    {
       if (closed) return;
+      log.trace("Channel closed: {0}", id);
       closed = true;
       try
       { channel.close(); }

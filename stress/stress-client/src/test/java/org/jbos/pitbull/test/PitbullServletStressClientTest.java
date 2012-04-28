@@ -1,11 +1,9 @@
 package org.jbos.pitbull.test;
 
-import Acme.Serve.Serve;
-import org.jboss.pitbull.HttpServer;
-import org.jboss.pitbull.HttpServerBuilder;
+import org.jboss.pitbull.servlet.DeploymentServletContext;
+import org.jboss.pitbull.servlet.EmbeddedServletContainer;
+import org.jboss.pitbull.servlet.EmbeddedServletContainerBuilder;
 import org.jboss.pitbull.stress.StressClient;
-import org.jboss.pitbull.stress.StressService;
-import org.jboss.resteasy.util.HttpServletRequestDelegate;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -17,17 +15,15 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Properties;
 
 /**
- * Stress against TJWS to compare
+ * Stress against PitbulServlet
  *
  * @author <a href="mailto:bill@burkecentral.com">Bill Burke</a>
  * @version $Revision: 1 $
  */
-public class TJWSStressClientTest
+public class PitbullServletStressClientTest
 {
-   public static Serve http;
 
    public static byte[] readFromStream(int bufferSize, InputStream entityStream)
            throws IOException
@@ -73,40 +69,36 @@ public class TJWSStressClientTest
       }
    }
 
+   protected static EmbeddedServletContainer server;
+   protected static int PORT = 8080;
+
    @BeforeClass
    public static void startup() throws Exception
    {
-      http = new Serve();
-      Properties props = new Properties();
-      props.put(Serve.ARG_PORT, "8080");
-      props.put(Serve.ARG_THREAD_POOL_SIZE, Integer.toString(100));
-      props.put(Serve.ARG_MAX_CONN_USE, Integer.toString(100));
-      props.put(Serve.ARG_KEEPALIVE, Boolean.toString(true));
-      props.put(Serve.ARG_KEEPALIVE_TIMEOUT, Long.toString(100000000));
-
-
-      http.addServlet("", new StressServlet());
-
-      http.runInBackground();
+      server = new EmbeddedServletContainerBuilder()
+              .connector().port(PORT).add()
+              .maxRequestThreads(4)
+              .workers(2)
+              .build();
+      DeploymentServletContext ctx = server.newDeployment("");
+      ctx.addServlet("stress", new StressServlet()).addMapping("/*");
+      server.start();
 
    }
 
    @AfterClass
    public static void shutdown() throws Exception
    {
-      http.stopBackground();
+      server.stop();
    }
 
    @Test
-   public void testClientStress() throws Exception
-   {
-      StressClient.stress(1, 2);
-   }
-
-   //@Test
    public void testClientStressMultiple() throws Exception
    {
-      for (int i = 0; i < 20; i++)
+      System.out.println("************************");
+      System.out.println(" Pitbull Servlet Stress");
+      System.out.println("************************");
+      for (int i = 5; i < 21; i+= 5)
       {
          System.out.println();
          System.out.println();

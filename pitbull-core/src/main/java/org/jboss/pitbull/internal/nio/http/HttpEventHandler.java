@@ -52,7 +52,7 @@ public class HttpEventHandler implements EventHandler
    @Override
    public void handleRead(ManagedChannel channel)
    {
-      log.trace("handleRead()");
+      log.trace("handleRead() on channel {0}", channel.getId());
       try
       {
          if (buffer == null) buffer = ByteBuffer.allocate(BUFFER_SIZE);
@@ -109,11 +109,9 @@ public class HttpEventHandler implements EventHandler
          catch (NotFoundException e1)
          {
          }
-         channel.suspendReads();
-         log.trace("suspended reads");
          if (requestHandler == null)
          {
-            log.trace("requestHandler was null, returning 404");
+            log.trace("requestHandler was null, returning 404: {0} ", requestHeader);
             try
             {
                error(channel, 404, requestHeader);
@@ -123,7 +121,6 @@ public class HttpEventHandler implements EventHandler
                log.error("Failed to send error message to client, closing", e);
                channel.close();
             }
-            channel.resumeReads();
             return;
          }
 
@@ -144,7 +141,8 @@ public class HttpEventHandler implements EventHandler
             return;
          }
 
-         log.trace("Using StreamHandler");
+         log.trace("Using StreamHandler channel: {0}", channel.getId());
+         channel.suspendReads();
          StreamHandler streamHandler = (StreamHandler) requestHandler;
 
          ByteBuffer oldBuffer = buffer;
@@ -163,7 +161,7 @@ public class HttpEventHandler implements EventHandler
       }
       finally
       {
-         log.trace("<--- Exit handleRead()");
+         log.trace("<--- Exit handleRead() channel: {0}", channel.getId());
       }
    }
 

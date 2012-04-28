@@ -124,7 +124,7 @@ public class Worker implements Runnable
             }
             catch (Exception e)
             {
-               logger.debug("Error reading channel: ", e);
+               logger.trace("Error reading channel: ", e);
                channel.close();
             }
             if (!channel.getChannel().isOpen())

@@ -62,6 +62,10 @@ public class ContentLengthInputStream extends ContentInputStream
    @Override
    public void eat()
    {
+      if (remainingBytes > 0)
+      {
+         log.trace("Need to skip bytes: {0}", remainingBytes);
+      }
       while (remainingBytes > 0)
       {
          try

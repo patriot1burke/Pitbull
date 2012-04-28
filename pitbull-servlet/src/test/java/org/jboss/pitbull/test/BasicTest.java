@@ -1,5 +1,6 @@
 package org.jboss.pitbull.test;
 
+import org.jboss.pitbull.internal.logging.Logger;
 import org.jboss.pitbull.servlet.DeploymentServletContext;
 import org.jboss.pitbull.servlet.EmbeddedServletContainer;
 import org.jboss.pitbull.servlet.EmbeddedServletContainerBuilder;
@@ -33,6 +34,7 @@ public class BasicTest
 {
    protected static EmbeddedServletContainer server;
    protected static int PORT = 8080;
+   protected static final Logger log = Logger.getLogger(BasicTest.class);
 
 
    public static class FixedLengthServlet extends HttpServlet
@@ -76,6 +78,7 @@ public class BasicTest
          Assert.assertNotNull(req.getHeader("Transfer-Encoding"));
          ServletInputStream is = req.getInputStream();
          String val = Util.readString(is, null);
+         log.info("val: " + val);
          Assert.assertEquals("hello world, bonjeur, guten morgen, yo, goodbye, cheers", val);
          resp.setStatus(204);
 
@@ -200,6 +203,7 @@ public class BasicTest
    @Test
    public void testChunkedInput() throws Exception
    {
+      Thread.sleep(1000);
       URL postUrl = new URL("http://localhost:" + PORT + "/chunked");
       HttpURLConnection connection = (HttpURLConnection) postUrl.openConnection();
       connection.setChunkedStreamingMode(10);

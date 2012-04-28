@@ -1,5 +1,6 @@
 package org.jboss.pitbull.internal.nio.http;
 
+import org.jboss.pitbull.internal.logging.Logger;
 import org.jboss.pitbull.internal.nio.socket.ByteBuffers;
 import org.jboss.pitbull.internal.nio.socket.ManagedChannel;
 import org.jboss.pitbull.internal.nio.socket.ReadTimeoutException;
@@ -25,6 +26,7 @@ public class ChunkedInputStream extends ContentInputStream
    private boolean done;
    private long remainingChunkBytes = 0;
    private boolean initial = true;
+   protected static final Logger log = Logger.getLogger(ChunkedInputStream.class);
 
    /**
     * Construct a new instance.
@@ -43,6 +45,7 @@ public class ChunkedInputStream extends ContentInputStream
          throw new NullPointerException("buffer is null");
       }
       this.buffer = buffer;
+      log.trace("Buffer Remaing On Creation: {0}", buffer.remaining());
       this.channel = channel;
    }
 
@@ -96,6 +99,7 @@ public class ChunkedInputStream extends ContentInputStream
                long currentChunkSize = getChunkSize(hex);
                if (currentChunkSize > 0)
                {
+                  log.trace("Chunk size: {0}", currentChunkSize);
                   return currentChunkSize;
                }
                break READ_SIZE;
