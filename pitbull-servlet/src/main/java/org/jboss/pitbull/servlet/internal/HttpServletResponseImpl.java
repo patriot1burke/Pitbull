@@ -4,6 +4,7 @@ import org.jboss.pitbull.NotImplementedYetException;
 import org.jboss.pitbull.spi.ContentOutputStream;
 import org.jboss.pitbull.spi.OrderedHeaders;
 import org.jboss.pitbull.spi.ResponseHeader;
+import org.jboss.pitbull.spi.StatusCode;
 import org.jboss.pitbull.spi.StreamResponseWriter;
 import org.jboss.pitbull.util.CaseInsensitiveMap;
 import org.jboss.pitbull.util.OrderedHeadersImpl;
@@ -26,8 +27,7 @@ import java.util.Map;
 public class HttpServletResponseImpl implements HttpServletResponse, ResponseHeader
 {
    protected OrderedHeaders headers = new OrderedHeadersImpl();
-   protected int status;
-   protected String statusMessage;
+   protected StatusCode status = StatusCode.INTERNAL_SERVER_ERROR;
    protected boolean committed;
    protected ContentOutputStream underlyingStream;
    protected StreamResponseWriter streamResponseWriter;
@@ -35,12 +35,6 @@ public class HttpServletResponseImpl implements HttpServletResponse, ResponseHea
    public HttpServletResponseImpl(StreamResponseWriter streamResponseWriter)
    {
       this.streamResponseWriter = streamResponseWriter;
-   }
-
-   @Override
-   public String getStatusMessage()
-   {
-      return statusMessage;
    }
 
    @Override
@@ -201,18 +195,27 @@ public class HttpServletResponseImpl implements HttpServletResponse, ResponseHea
    @Override
    public void setStatus(int sc)
    {
-      this.status = sc;
+      this.status = StatusCode.valueOf(sc);
+      if (this.status == null)
+      {
+         status = StatusCode.create(sc, "Undefined Code");
+      }
    }
 
    @Override
    public void setStatus(int sc, String sm)
    {
-      this.status = sc;
-      this.statusMessage = sm;
+      throw new NotImplementedYetException();
    }
 
    @Override
    public int getStatus()
+   {
+      return status.getCode();
+   }
+
+   @Override
+   public StatusCode getStatusCode()
    {
       return status;
    }

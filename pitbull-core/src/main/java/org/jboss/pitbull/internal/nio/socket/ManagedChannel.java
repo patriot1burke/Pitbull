@@ -25,13 +25,18 @@ public class ManagedChannel
    private static final Logger log = Logger.getLogger(ManagedChannel.class);
    protected SSLSession sslSession;
    protected static final AtomicInteger counter = new AtomicInteger();
+   protected static final String ID_PREFIX = Long.toString(System.currentTimeMillis());
    protected String id;
 
    public ManagedChannel(SocketChannel channel, EventHandler handler)
    {
       this.channel = channel;
       this.handler = handler;
-      this.id = Integer.toString(counter.incrementAndGet());
+   }
+
+   protected void generatedId()
+   {
+      this.id = new StringBuilder(ID_PREFIX).append("-").append(counter.incrementAndGet()).toString();
    }
 
    public String getId()

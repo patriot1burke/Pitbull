@@ -3,6 +3,7 @@ package org.jboss.pitbull.initiators;
 import org.jboss.pitbull.spi.ContentOutputStream;
 import org.jboss.pitbull.spi.OrderedHeaders;
 import org.jboss.pitbull.spi.ResponseHeader;
+import org.jboss.pitbull.spi.StatusCode;
 import org.jboss.pitbull.spi.StreamResponseWriter;
 import org.jboss.pitbull.util.OrderedHeadersImpl;
 
@@ -14,22 +15,15 @@ import java.io.OutputStream;
  */
 public class StreamedResponse
 {
-   protected int status;
-   protected String statusMessage;
+   protected StatusCode status;
    protected OrderedHeaders headers = new OrderedHeadersImpl();
    protected StreamResponseWriter writer;
    protected ResponseHeader delegator = new ResponseHeader()
    {
       @Override
-      public int getStatus()
+      public StatusCode getStatusCode()
       {
          return status;
-      }
-
-      @Override
-      public String getStatusMessage()
-      {
-         return statusMessage;
       }
 
       @Override
@@ -44,14 +38,9 @@ public class StreamedResponse
       this.writer = writer;
    }
 
-   public void setStatus(int status)
+   public void setStatus(StatusCode status)
    {
       this.status = status;
-   }
-
-   public void setStatusMessage(String statusMessage)
-   {
-      this.statusMessage = statusMessage;
    }
 
    public void setHeaders(OrderedHeaders headers)
@@ -64,14 +53,9 @@ public class StreamedResponse
       return writer.getStream(delegator);
    }
 
-   public int getStatus()
+   public StatusCode getStatus()
    {
       return status;
-   }
-
-   public String getStatusMessage()
-   {
-      return statusMessage;
    }
 
    public OrderedHeaders getHeaders()

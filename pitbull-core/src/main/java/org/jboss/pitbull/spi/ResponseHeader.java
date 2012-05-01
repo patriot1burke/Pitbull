@@ -11,7 +11,6 @@ import java.util.Map;
  */
 public interface ResponseHeader
 {
-   int getStatus();
-   String getStatusMessage();
+   StatusCode getStatusCode();
    OrderedHeaders getHeaders();
 }

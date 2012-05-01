@@ -3,11 +3,9 @@ package org.jboss.pitbull.internal.nio.http;
 import org.jboss.pitbull.spi.OrderedHeaders;
 import org.jboss.pitbull.spi.RequestHeader;
 import org.jboss.pitbull.spi.ResponseHeader;
+import org.jboss.pitbull.spi.StatusCode;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -16,31 +14,23 @@ import java.util.Map;
  */
 public class HttpResponse
 {
-   protected int status;
-   protected String statusMessage;
+   protected StatusCode status;
    protected OrderedHeaders headers;
 
-   public HttpResponse(int status, String statusMessage)
+   public HttpResponse(StatusCode status)
    {
       this.status = status;
-      this.statusMessage = statusMessage;
    }
 
    public HttpResponse(ResponseHeader response)
    {
-      this.status = response.getStatus();
-      this.statusMessage = response.getStatusMessage();
+      this.status = response.getStatusCode();
       this.headers = response.getHeaders();
    }
 
-   public int getStatus()
+   public StatusCode getStatus()
    {
       return status;
-   }
-
-   public String getStatusMessage()
-   {
-      return statusMessage;
    }
 
    public OrderedHeaders getHeaders()
@@ -55,7 +45,7 @@ public class HttpResponse
     */
    public void prepareEmptyBody(RequestHeader request)
    {
-      if (status < 200 || status == 204 || status == 304)
+      if (status.getCode() < 200 || status.getCode() == 204 || status.getCode() == 304)
       {
          return;
       }
@@ -68,17 +58,11 @@ public class HttpResponse
 
    public byte[] responseBytes() throws IOException
    {
-      String statusMessage = getStatusMessage();
-      if (statusMessage == null)
-      {
-         HttpResponseStatus status = HttpResponseStatus.valueOf(getStatus());
-         statusMessage = status.getReasonPhrase();
-      }
       StringBuilder builder = new StringBuilder(100);
       builder.append("HTTP/1.1 ");
-      builder.append(getStatus());
+      builder.append(status.getCode());
       builder.append(' ');
-      builder.append(statusMessage);
+      builder.append(status.getStatusMessage());
       builder.append("\r\n");
       if (getHeaders() != null)
       {

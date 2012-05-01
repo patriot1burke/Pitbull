@@ -6,6 +6,7 @@ import org.jboss.pitbull.initiators.StreamedRequestInitiator;
 import org.jboss.pitbull.initiators.StreamedResponse;
 import org.jboss.pitbull.spi.Connection;
 import org.jboss.pitbull.spi.RequestHeader;
+import org.jboss.pitbull.spi.StatusCode;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -54,8 +55,7 @@ public class StressService extends StreamedRequestInitiator
 
    public void doGet(Connection connection, RequestHeader requestHeader, StreamedResponse response) throws IOException
    {
-      response.setStatus(200);
-      response.setStatusMessage("Ok");
+      response.setStatus(StatusCode.OK);
       response.getHeaders().addHeader("Content-Type", "text/plain");
       response.getStream().write("DO GET".getBytes());
 
@@ -63,14 +63,12 @@ public class StressService extends StreamedRequestInitiator
 
    public void doPut(Connection connection, RequestHeader requestHeader, InputStream requestBody, StreamedResponse response) throws IOException
    {
-      response.setStatus(204);
-      response.setStatusMessage("No Content");
+      response.setStatus(StatusCode.NO_CONTENT);
    }
 
    public void doPost(Connection connection, RequestHeader requestHeader, InputStream requestBody, StreamedResponse response) throws IOException
    {
-      response.setStatus(200);
-      response.setStatusMessage("Ok");
+      response.setStatus(StatusCode.OK);
       response.getHeaders().addHeader("Content-Type", "text/plain");
       byte[] bytes = readFromStream(1024, requestBody);
       response.getStream().write(bytes);

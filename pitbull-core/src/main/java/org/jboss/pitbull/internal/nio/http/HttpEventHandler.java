@@ -6,6 +6,7 @@ import org.jboss.pitbull.internal.nio.socket.ManagedChannel;
 import org.jboss.pitbull.spi.Connection;
 import org.jboss.pitbull.spi.RequestHandler;
 import org.jboss.pitbull.spi.RequestInitiator;
+import org.jboss.pitbull.spi.StatusCode;
 import org.jboss.pitbull.spi.StreamHandler;
 import org.jboss.pitbull.util.registry.NotFoundException;
 import org.jboss.pitbull.util.registry.UriRegistry;
@@ -36,13 +37,13 @@ public class HttpEventHandler implements EventHandler
       this.registry = registry;
    }
 
-   protected void error(ManagedChannel channel, int code, HttpRequestHeader requestHeader) throws IOException
+   protected void error(ManagedChannel channel, StatusCode code, HttpRequestHeader requestHeader) throws IOException
    {
-      log.trace("Error returning with code: {0}", code);
+      log.trace("Error returning with code: {0}", code.toString());
       ContentInputStream is = ContentInputStream.create(channel, buffer, requestHeader);
       if (is != null) is.eat();
       log.trace("ate stream");
-      HttpResponse response = new HttpResponse(code, null);
+      HttpResponse response = new HttpResponse(code);
       byte[] bytes = response.responseBytes();
       log.trace("writing error");
       channel.writeBlocking(ByteBuffer.wrap(bytes));
@@ -114,7 +115,7 @@ public class HttpEventHandler implements EventHandler
             log.trace("requestHandler was null, returning 404: {0} ", requestHeader);
             try
             {
-               error(channel, 404, requestHeader);
+               error(channel, StatusCode.NOT_FOUND, requestHeader);
             }
             catch (IOException e)
             {
@@ -131,7 +132,7 @@ public class HttpEventHandler implements EventHandler
             requestHandler.unsupportedHandler();
             try
             {
-               error(channel, 500, requestHeader);
+               error(channel, StatusCode.INTERNAL_SERVER_ERROR, requestHeader);
             }
             catch (IOException e)
             {

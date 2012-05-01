@@ -20,6 +20,7 @@ import org.jboss.pitbull.spi.RequestHandler;
 import org.jboss.pitbull.spi.RequestHeader;
 import org.jboss.pitbull.spi.RequestInitiator;
 import org.jboss.pitbull.spi.ResponseHeader;
+import org.jboss.pitbull.spi.StatusCode;
 import org.jboss.pitbull.spi.StreamHandler;
 import org.jboss.pitbull.spi.StreamResponseWriter;
 import org.jboss.pitbull.util.OrderedHeadersImpl;
@@ -76,8 +77,7 @@ public class SslEchoTest
       @Override
       public void service(Connection connection, RequestHeader requestHeader, InputStream is, StreamedResponse response) throws IOException
       {
-         response.setStatus(200);
-         response.setStatusMessage("Ok");
+         response.setStatus(StatusCode.OK);
          response.getHeaders().addHeader("Content-Type", "text/plain");
 
          if (requestHeader.getMethod().equalsIgnoreCase("POST"))

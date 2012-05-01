@@ -5,6 +5,7 @@ import org.jboss.pitbull.spi.Connection;
 import org.jboss.pitbull.spi.RequestHandler;
 import org.jboss.pitbull.spi.RequestHeader;
 import org.jboss.pitbull.spi.RequestInitiator;
+import org.jboss.pitbull.spi.StatusCode;
 import org.jboss.pitbull.spi.StreamHandler;
 import org.jboss.pitbull.spi.StreamResponseWriter;
 
@@ -54,8 +55,7 @@ public abstract class StreamedRequestInitiator implements RequestInitiator
                   logger.error("Failed to execute", e);
                   if (writer.getAllocatedStream() != null) writer.getAllocatedStream().reset();
                   res.getHeaders().clear();
-                  res.setStatus(500);
-                  res.setStatusMessage("Internal Server Error");
+                  res.setStatus(StatusCode.INTERNAL_SERVER_ERROR);
                }
                else
                {
