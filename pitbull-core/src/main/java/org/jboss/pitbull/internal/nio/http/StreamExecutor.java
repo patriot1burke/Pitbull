@@ -2,6 +2,7 @@ package org.jboss.pitbull.internal.nio.http;
 
 import org.jboss.pitbull.internal.logging.Logger;
 import org.jboss.pitbull.internal.nio.socket.ManagedChannel;
+import org.jboss.pitbull.spi.Connection;
 import org.jboss.pitbull.spi.StreamHandler;
 
 import java.nio.ByteBuffer;
@@ -16,10 +17,12 @@ public class StreamExecutor implements Runnable
    protected StreamHandler handler;
    protected ByteBuffer buffer;
    protected HttpRequestHeader requestHeader;
+   protected Connection connection;
    protected static final Logger log = Logger.getLogger(StreamExecutor.class);
 
-   public StreamExecutor(ManagedChannel channel, StreamHandler handler, ByteBuffer buffer, HttpRequestHeader requestHeader)
+   public StreamExecutor(Connection connection, ManagedChannel channel, StreamHandler handler, ByteBuffer buffer, HttpRequestHeader requestHeader)
    {
+      this.connection = connection;
       this.channel = channel;
       this.handler = handler;
       this.buffer = buffer;
@@ -35,9 +38,7 @@ public class StreamExecutor implements Runnable
       {
          ContentInputStream is = ContentInputStream.create(channel, buffer, requestHeader);
          NioStreamResponseWriter writer = new NioStreamResponseWriter(channel, requestHeader, is); // todo handle keepalive setting
-         handler.setInputStream(is);
-         handler.setWriter(writer);
-         handler.execute(requestHeader);
+         handler.execute(connection, requestHeader, is, writer);
       }
       catch (Exception ex)
       {

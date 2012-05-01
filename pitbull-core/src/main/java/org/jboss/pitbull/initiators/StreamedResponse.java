@@ -1,6 +1,5 @@
 package org.jboss.pitbull.initiators;
 
-import com.sun.org.apache.xpath.internal.operations.Or;
 import org.jboss.pitbull.spi.ContentOutputStream;
 import org.jboss.pitbull.spi.OrderedHeaders;
 import org.jboss.pitbull.spi.ResponseHeader;

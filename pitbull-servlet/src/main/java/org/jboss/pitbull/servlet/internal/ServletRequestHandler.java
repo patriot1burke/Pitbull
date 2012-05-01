@@ -17,34 +17,18 @@ import java.io.InputStream;
  */
 public class ServletRequestHandler implements StreamHandler
 {
-   protected InputStream input;
-   protected StreamResponseWriter writer;
-   protected Connection connection;
    protected DeploymentServletRegistration servlet;
    protected DeploymentServletContext context;
    protected static final Logger log = Logger.getLogger(ServletRequestHandler.class);
 
-   public ServletRequestHandler(Connection connection, DeploymentServletRegistration servlet, DeploymentServletContext context)
+   public ServletRequestHandler(DeploymentServletRegistration servlet, DeploymentServletContext context)
    {
-      this.connection = connection;
       this.servlet = servlet;
       this.context = context;
    }
 
    @Override
-   public void setInputStream(InputStream input)
-   {
-      this.input = input;
-   }
-
-   @Override
-   public void setWriter(StreamResponseWriter writer)
-   {
-      this.writer = writer;
-   }
-
-   @Override
-   public void execute(RequestHeader requestHeader)
+   public void execute(Connection connection, RequestHeader requestHeader, InputStream input, StreamResponseWriter writer)
    {
       HttpServletRequestImpl request = new HttpServletRequestImpl();
       request.setConnection(connection);

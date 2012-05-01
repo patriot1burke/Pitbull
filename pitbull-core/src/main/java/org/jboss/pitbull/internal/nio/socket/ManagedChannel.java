@@ -151,7 +151,7 @@ public class ManagedChannel
       catch (Throwable ignored)
       {}
 
-      try { key.cancel(); } catch (Exception ignored) {}
+      try { if (key != null) key.cancel(); } catch (Exception ignored) {}
    }
 
 }

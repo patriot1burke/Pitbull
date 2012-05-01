@@ -33,21 +33,6 @@ public abstract class StreamedRequestInitiator implements RequestInitiator
    {
       return new StreamHandler()
       {
-         protected InputStream is;
-         protected StreamResponseWriter writer;
-
-         @Override
-         public void setInputStream(InputStream input)
-         {
-            is = input;
-         }
-
-         @Override
-         public void setWriter(StreamResponseWriter writer)
-         {
-            this.writer = writer;
-         }
-
          @Override
          public boolean canExecuteInWorkerThread()
          {
@@ -55,7 +40,7 @@ public abstract class StreamedRequestInitiator implements RequestInitiator
          }
 
          @Override
-         public void execute(RequestHeader requestHeader)
+         public void execute(Connection connection, RequestHeader requestHeader, InputStream is, StreamResponseWriter writer)
          {
             StreamedResponse res = new StreamedResponse(writer);
             try

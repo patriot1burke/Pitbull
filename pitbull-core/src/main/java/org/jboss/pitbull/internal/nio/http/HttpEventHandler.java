@@ -148,9 +148,9 @@ public class HttpEventHandler implements EventHandler
          ByteBuffer oldBuffer = buffer;
          buffer = null;
 
-         StreamExecutor task = new StreamExecutor(channel, streamHandler, oldBuffer, requestHeader);
+         StreamExecutor task = new StreamExecutor(connection, channel, streamHandler, oldBuffer, requestHeader);
 
-         if (requestHandler.canExecuteInWorkerThread())
+         if (streamHandler.canExecuteInWorkerThread())
          {
             task.run();
          }

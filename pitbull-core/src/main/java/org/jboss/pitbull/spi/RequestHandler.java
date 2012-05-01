@@ -10,16 +10,6 @@ package org.jboss.pitbull.spi;
  */
 public interface RequestHandler
 {
-   /**
-    * Whether or not the request handler can be run within the reader thread.  There is no guarantee that PitBull
-    * will run the request in the same thread as the reader.  If this method returns true, the reader will assume
-    * that the operation can be executed quickly and that no blocking occurs.
-    *
-    * @return
-    */
-   boolean canExecuteInWorkerThread();
-
-   void execute(RequestHeader requestHeader);
 
    /**
     * Callback to tell handler that its type is not supported by PitBull
