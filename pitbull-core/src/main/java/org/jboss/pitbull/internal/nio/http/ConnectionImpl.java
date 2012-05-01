@@ -6,7 +6,6 @@ import javax.net.ssl.SSLSession;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author <a href="mailto:bill@burkecentral.com">Bill Burke</a>
@@ -19,7 +18,6 @@ public class ConnectionImpl implements Connection
    private InetSocketAddress remoteAddress;
    private SSLSession sslSession;
    private boolean secure;
-   private static final AtomicInteger counter = new AtomicInteger();
 
 
    public ConnectionImpl(SocketAddress localAddress, SocketAddress remoteAddress, SSLSession sslSession, boolean secure)

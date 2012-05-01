@@ -6,7 +6,6 @@ import org.jboss.pitbull.spi.OrderedHeaders;
 import org.jboss.pitbull.spi.ResponseHeader;
 import org.jboss.pitbull.spi.StatusCode;
 import org.jboss.pitbull.spi.StreamResponseWriter;
-import org.jboss.pitbull.util.CaseInsensitiveMap;
 import org.jboss.pitbull.util.OrderedHeadersImpl;
 
 import javax.servlet.ServletOutputStream;
@@ -14,9 +13,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 

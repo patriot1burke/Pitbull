@@ -1,8 +1,5 @@
 package org.jboss.pitbull.spi;
 
-import java.util.List;
-import java.util.Map;
-
 /**
  * SPI to underlying subsystems holding of status and headers.
  *
@@ -12,5 +9,6 @@ import java.util.Map;
 public interface ResponseHeader
 {
    StatusCode getStatusCode();
+
    OrderedHeaders getHeaders();
 }

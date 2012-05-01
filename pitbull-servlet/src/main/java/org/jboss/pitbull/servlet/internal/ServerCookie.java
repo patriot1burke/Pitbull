@@ -240,10 +240,11 @@ public class ServerCookie implements Serializable
          buf.append("; Secure");
       }
 
-        // HttpOnly
-        if (isHttpOnly) {
-            buf.append("; HttpOnly");
-        }
+      // HttpOnly
+      if (isHttpOnly)
+      {
+         buf.append("; HttpOnly");
+      }
       headerBuf.append(buf);
    }
 

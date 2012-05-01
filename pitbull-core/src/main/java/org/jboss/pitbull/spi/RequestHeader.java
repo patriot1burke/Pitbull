@@ -1,7 +1,5 @@
 package org.jboss.pitbull.spi;
 
-import org.jboss.pitbull.util.CaseInsensitiveMap;
-
 /**
  * SPI that allows transport to lazily parse headers received from the network buffer.
  *

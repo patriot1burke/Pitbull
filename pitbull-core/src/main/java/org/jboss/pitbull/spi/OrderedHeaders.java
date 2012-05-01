@@ -15,6 +15,7 @@ public interface OrderedHeaders
 {
    /**
     * Immutable list of header entries
+    *
     * @return
     */
    List<Map.Entry<String, String>> getHeaderList();

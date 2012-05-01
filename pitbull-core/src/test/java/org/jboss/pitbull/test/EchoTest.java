@@ -5,16 +5,8 @@ import org.jboss.pitbull.HttpServerBuilder;
 import org.jboss.pitbull.initiators.StreamedRequestInitiator;
 import org.jboss.pitbull.initiators.StreamedResponse;
 import org.jboss.pitbull.spi.Connection;
-import org.jboss.pitbull.spi.ContentOutputStream;
-import org.jboss.pitbull.spi.OrderedHeaders;
-import org.jboss.pitbull.spi.RequestHandler;
 import org.jboss.pitbull.spi.RequestHeader;
-import org.jboss.pitbull.spi.RequestInitiator;
-import org.jboss.pitbull.spi.ResponseHeader;
 import org.jboss.pitbull.spi.StatusCode;
-import org.jboss.pitbull.spi.StreamHandler;
-import org.jboss.pitbull.spi.StreamResponseWriter;
-import org.jboss.pitbull.util.OrderedHeadersImpl;
 import org.jboss.resteasy.client.ClientRequest;
 import org.jboss.resteasy.client.ClientResponse;
 import org.jboss.resteasy.util.ReadFromStream;
@@ -25,9 +17,6 @@ import org.junit.Test;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 /**
  * @author <a href="mailto:bill@burkecentral.com">Bill Burke</a>
@@ -42,7 +31,7 @@ public class EchoTest
    {
       http = new HttpServerBuilder().connector().add()
               .workers(1)
-               .maxRequestThreads(1).build();
+              .maxRequestThreads(1).build();
       http.start();
    }
 
@@ -72,7 +61,6 @@ public class EchoTest
          }
       }
    }
-
 
 
    @Test

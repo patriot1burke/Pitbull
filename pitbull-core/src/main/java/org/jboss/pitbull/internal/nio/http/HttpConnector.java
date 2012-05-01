@@ -68,7 +68,6 @@ public class HttpConnector
    }
 
 
-
    public void start(Worker[] workers, ExecutorService acceptorExecutor, ExecutorService requestExecutor) throws Exception
    {
       ManagedChannelFactory factory = null;

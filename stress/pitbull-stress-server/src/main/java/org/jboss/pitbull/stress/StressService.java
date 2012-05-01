@@ -47,8 +47,10 @@ public class StressService extends StreamedRequestInitiator
    {
       hits.incrementAndGet();
       if (requestHeader.getMethod().equalsIgnoreCase("GET")) doGet(connection, requestHeader, response);
-      else if (requestHeader.getMethod().equalsIgnoreCase("PUT")) doPut(connection, requestHeader, requestBody, response);
-      else if (requestHeader.getMethod().equalsIgnoreCase("POST")) doPost(connection, requestHeader, requestBody, response);
+      else if (requestHeader.getMethod().equalsIgnoreCase("PUT"))
+         doPut(connection, requestHeader, requestBody, response);
+      else if (requestHeader.getMethod().equalsIgnoreCase("POST"))
+         doPost(connection, requestHeader, requestBody, response);
       else throw new RuntimeException("Unkown Method");
       success.incrementAndGet();
    }
@@ -77,14 +79,16 @@ public class StressService extends StreamedRequestInitiator
 
    public static void main(String[] args) throws Exception
    {
-      Runtime.getRuntime().addShutdownHook(new Thread() {
-          public void run() {
-             System.out.println();
-             System.out.println("-- Server shutdown --");
-             System.out.println("Total hits: " + hits.longValue());
-             System.out.println("Total success: " + success.longValue());
-          }
-       });
+      Runtime.getRuntime().addShutdownHook(new Thread()
+      {
+         public void run()
+         {
+            System.out.println();
+            System.out.println("-- Server shutdown --");
+            System.out.println("Total hits: " + hits.longValue());
+            System.out.println("Total success: " + success.longValue());
+         }
+      });
 
       int workers = 4;
       int requestThreads = 100;
@@ -126,14 +130,15 @@ public class StressService extends StreamedRequestInitiator
       }
       start(workers, requestThreads);
 
-      synchronized(lock) { lock.wait(); }
+      synchronized (lock)
+      { lock.wait(); }
    }
 
    public static HttpServer start(int workers, int requestThreads) throws Exception
    {
       HttpServer http = new HttpServerBuilder().connector().add()
               .workers(workers)
-               .maxRequestThreads(requestThreads).build();
+              .maxRequestThreads(requestThreads).build();
       http.start();
       http.getRegistry().add("/{.*}", new StressService());
       return http;

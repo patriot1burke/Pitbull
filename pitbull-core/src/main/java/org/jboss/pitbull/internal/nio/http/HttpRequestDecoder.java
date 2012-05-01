@@ -55,7 +55,6 @@ public class HttpRequestDecoder
    static final byte DOUBLE_QUOTE = '"';
 
 
-
    interface State
    {
       boolean process(HttpRequestDecoder decoder, ByteBuffer buffer);

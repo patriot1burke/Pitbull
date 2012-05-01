@@ -75,7 +75,6 @@ public class Worker implements Runnable
    }
 
 
-
    public void queueRegistration(final ManagedChannel channel)
    {
       Runnable runnable = new Runnable()
@@ -103,7 +102,10 @@ public class Worker implements Runnable
       catch (Exception e)
       {
          logger.error("Failed to execute socket registration", e);
-         try { channel.close(); } catch (Exception ignored) {}
+         try
+         { channel.close(); }
+         catch (Exception ignored)
+         {}
       }
    }
 

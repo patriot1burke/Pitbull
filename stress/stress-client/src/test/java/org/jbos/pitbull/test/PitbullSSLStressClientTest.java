@@ -39,7 +39,7 @@ public class PitbullSSLStressClientTest
    {
       http = new HttpServerBuilder().connector().https().add()
               .workers(2)
-               .maxRequestThreads(4).build();
+              .maxRequestThreads(4).build();
       http.start();
       http.getRegistry().add("/{.*}", new StressService());
       factory = new StressClient.ExecutorFactory()
@@ -129,7 +129,7 @@ public class PitbullSSLStressClientTest
    @Test
    public void testClientStressMultiple() throws Exception
    {
-      for (int i = 5; i < 21; i+= 5)
+      for (int i = 5; i < 21; i += 5)
       {
          System.out.println();
          System.out.println();
@@ -140,7 +140,7 @@ public class PitbullSSLStressClientTest
          long[] dist = http.getWorkerRegistrationDistribution();
          for (int j = 0; j < dist.length; j++)
          {
-            System.out.print(dist[j]+ ", ");
+            System.out.print(dist[j] + ", ");
          }
          System.out.println();
          http.clearMetrics();

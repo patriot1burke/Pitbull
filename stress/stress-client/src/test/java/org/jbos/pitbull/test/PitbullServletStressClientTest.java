@@ -98,7 +98,7 @@ public class PitbullServletStressClientTest
       System.out.println("************************");
       System.out.println(" Pitbull Servlet Stress");
       System.out.println("************************");
-      for (int i = 5; i < 21; i+= 5)
+      for (int i = 5; i < 21; i += 5)
       {
          System.out.println();
          System.out.println();

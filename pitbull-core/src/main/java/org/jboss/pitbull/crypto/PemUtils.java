@@ -23,6 +23,7 @@ public class PemUtils
    {
       BouncyIntegration.init();
    }
+
    public static X509Certificate decodeCertificate(InputStream is) throws Exception
    {
       byte[] der = pemToDer(is);

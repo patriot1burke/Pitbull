@@ -14,16 +14,8 @@ import org.jboss.pitbull.HttpServerBuilder;
 import org.jboss.pitbull.initiators.StreamedRequestInitiator;
 import org.jboss.pitbull.initiators.StreamedResponse;
 import org.jboss.pitbull.spi.Connection;
-import org.jboss.pitbull.spi.ContentOutputStream;
-import org.jboss.pitbull.spi.OrderedHeaders;
-import org.jboss.pitbull.spi.RequestHandler;
 import org.jboss.pitbull.spi.RequestHeader;
-import org.jboss.pitbull.spi.RequestInitiator;
-import org.jboss.pitbull.spi.ResponseHeader;
 import org.jboss.pitbull.spi.StatusCode;
-import org.jboss.pitbull.spi.StreamHandler;
-import org.jboss.pitbull.spi.StreamResponseWriter;
-import org.jboss.pitbull.util.OrderedHeadersImpl;
 import org.jboss.resteasy.client.ClientRequest;
 import org.jboss.resteasy.client.ClientResponse;
 import org.jboss.resteasy.client.core.executors.ApacheHttpClient4Executor;
@@ -41,11 +33,6 @@ import java.io.InputStream;
 import java.security.SecureRandom;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * @author <a href="mailto:bill@burkecentral.com">Bill Burke</a>
@@ -61,7 +48,7 @@ public class SslEchoTest
       http = new HttpServerBuilder()
               .connector().https().add()
               .workers(1)
-               .maxRequestThreads(1).build();
+              .maxRequestThreads(1).build();
       http.start();
    }
 

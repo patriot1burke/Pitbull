@@ -4,15 +4,10 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
 import org.jboss.pitbull.stress.StressClient;
-import org.jboss.pitbull.stress.StressService;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 
@@ -88,7 +83,7 @@ public class HttpServerStressClientTest
       System.out.println("************************");
       System.out.println(" HttpServer Socket Stress");
       System.out.println("************************");
-      for (int i = 5; i < 21; i+= 5)
+      for (int i = 5; i < 21; i += 5)
       {
          System.out.println();
          System.out.println();

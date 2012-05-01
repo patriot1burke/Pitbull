@@ -58,15 +58,13 @@ public class HttpServer
    }
 
    /**
-    *
-    *
     * @return
     */
    public void clearMetrics()
    {
       for (HttpConnector connector : connectors)
       {
-        connector.clearMetrics();
+         connector.clearMetrics();
       }
 
       for (Worker worker : workers)

@@ -6,10 +6,9 @@ import javax.net.ssl.SSLSession;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
-import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author <a href="mailto:bill@burkecentral.com">Bill Burke</a>
@@ -24,19 +23,12 @@ public class ManagedChannel
    protected boolean closed;
    private static final Logger log = Logger.getLogger(ManagedChannel.class);
    protected SSLSession sslSession;
-   protected static final AtomicInteger counter = new AtomicInteger();
-   protected static final String ID_PREFIX = Long.toString(System.currentTimeMillis());
-   protected String id;
+   protected String id = UUID.randomUUID().toString();
 
    public ManagedChannel(SocketChannel channel, EventHandler handler)
    {
       this.channel = channel;
       this.handler = handler;
-   }
-
-   protected void generatedId()
-   {
-      this.id = new StringBuilder(ID_PREFIX).append("-").append(counter.incrementAndGet()).toString();
    }
 
    public String getId()
@@ -111,7 +103,8 @@ public class ManagedChannel
 
    public void suspendReads()
    {
-      if (!worker.inWorkerThread()) throw new IllegalStateException("Can only be called within worker thread at this time");
+      if (!worker.inWorkerThread())
+         throw new IllegalStateException("Can only be called within worker thread at this time");
       key.interestOps(0);
    }
 
@@ -124,14 +117,14 @@ public class ManagedChannel
       }
       else
       {
-        worker.queueEvent(new Runnable()
-        {
-           @Override
-           public void run()
-           {
-              ManagedChannel.this.resumeReads();
-           }
-        });
+         worker.queueEvent(new Runnable()
+         {
+            @Override
+            public void run()
+            {
+               ManagedChannel.this.resumeReads();
+            }
+         });
       }
    }
 
@@ -156,7 +149,10 @@ public class ManagedChannel
       catch (Throwable ignored)
       {}
 
-      try { if (key != null) key.cancel(); } catch (Exception ignored) {}
+      try
+      { if (key != null) key.cancel(); }
+      catch (Exception ignored)
+      {}
    }
 
 }

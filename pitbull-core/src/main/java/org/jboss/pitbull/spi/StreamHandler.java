@@ -18,5 +18,6 @@ public interface StreamHandler extends RequestHandler
     * @return
     */
    boolean canExecuteInWorkerThread();
+
    void execute(Connection connection, RequestHeader requestHeader, InputStream requestStream, StreamResponseWriter writer);
 }

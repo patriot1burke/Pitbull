@@ -7,8 +7,6 @@ import org.jboss.pitbull.spi.StatusCode;
 import org.jboss.pitbull.spi.StreamResponseWriter;
 import org.jboss.pitbull.util.OrderedHeadersImpl;
 
-import java.io.OutputStream;
-
 /**
  * @author <a href="mailto:bill@burkecentral.com">Bill Burke</a>
  * @version $Revision: 1 $

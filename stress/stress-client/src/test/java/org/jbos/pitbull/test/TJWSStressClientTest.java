@@ -1,11 +1,7 @@
 package org.jbos.pitbull.test;
 
 import Acme.Serve.Serve;
-import org.jboss.pitbull.HttpServer;
-import org.jboss.pitbull.HttpServerBuilder;
 import org.jboss.pitbull.stress.StressClient;
-import org.jboss.pitbull.stress.StressService;
-import org.jboss.resteasy.util.HttpServletRequestDelegate;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;

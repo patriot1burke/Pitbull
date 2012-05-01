@@ -21,6 +21,7 @@ public abstract class ParentSegment<T> extends Segment<T>
 
    /**
     * returns a copied list of all child segments
+    *
     * @return
     */
    public List<Segment> getChildren()

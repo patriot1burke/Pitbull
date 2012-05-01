@@ -13,7 +13,7 @@ public interface RequestInitiator
     * one or more RequestHandler sub-interfaces.
     *
     * @param connection
-    * @param header method, uri, and request headers
+    * @param header     method, uri, and request headers
     * @return
     */
    RequestHandler begin(Connection connection, RequestHeader requestHeader);

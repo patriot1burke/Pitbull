@@ -28,7 +28,6 @@ public class DefaultHttpSession implements HttpSession, Serializable
    }
 
 
-
    void checkInvalidation()
    {
       if (invalidated) throw new IllegalStateException("HttpSession was invalidated.");

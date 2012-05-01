@@ -19,7 +19,6 @@ public interface StreamResponseWriter extends ResponseWriter
    ContentOutputStream getStream(ResponseHeader responseHeader);
 
    /**
-    *
     * @return null of getStream() was never called
     */
    ContentOutputStream getAllocatedStream();

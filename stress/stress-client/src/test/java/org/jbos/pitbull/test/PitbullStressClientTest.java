@@ -5,7 +5,6 @@ import org.jboss.pitbull.HttpServerBuilder;
 import org.jboss.pitbull.stress.StressClient;
 import org.jboss.pitbull.stress.StressService;
 import org.junit.AfterClass;
-import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -22,7 +21,7 @@ public class PitbullStressClientTest
    {
       http = new HttpServerBuilder().connector().add()
               .workers(2)
-               .maxRequestThreads(4).build();
+              .maxRequestThreads(4).build();
       http.start();
       http.getRegistry().add("/{.*}", new StressService());
    }
@@ -39,7 +38,7 @@ public class PitbullStressClientTest
       System.out.println("************************");
       System.out.println(" Vanilla Socket Stress");
       System.out.println("************************");
-      for (int i = 5; i < 21; i+= 5)
+      for (int i = 5; i < 21; i += 5)
       {
          System.out.println();
          System.out.println();
@@ -50,7 +49,7 @@ public class PitbullStressClientTest
          long[] dist = http.getWorkerRegistrationDistribution();
          for (int j = 0; j < dist.length; j++)
          {
-            System.out.print(dist[j]+ ", ");
+            System.out.print(dist[j] + ", ");
          }
          System.out.println();
          http.clearMetrics();

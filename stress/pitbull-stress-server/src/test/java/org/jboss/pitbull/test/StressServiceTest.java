@@ -23,7 +23,7 @@ public class StressServiceTest
    {
       http = new HttpServerBuilder().connector().add()
               .workers(1)
-               .maxRequestThreads(1).build();
+              .maxRequestThreads(1).build();
       http.start();
       http.getRegistry().add("/{.*}", new StressService());
    }

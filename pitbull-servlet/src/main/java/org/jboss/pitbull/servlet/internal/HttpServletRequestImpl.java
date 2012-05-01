@@ -7,7 +7,6 @@ import org.jboss.pitbull.servlet.DeploymentServletContext;
 import org.jboss.pitbull.spi.Connection;
 import org.jboss.pitbull.spi.OrderedHeaders;
 import org.jboss.pitbull.spi.RequestHeader;
-import org.jboss.pitbull.util.CaseInsensitiveMap;
 
 import javax.servlet.AsyncContext;
 import javax.servlet.DispatcherType;
