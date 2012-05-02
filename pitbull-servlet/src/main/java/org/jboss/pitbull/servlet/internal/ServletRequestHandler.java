@@ -1,21 +1,23 @@
 package org.jboss.pitbull.servlet.internal;
 
+import org.jboss.pitbull.Connection;
+import org.jboss.pitbull.RequestHeader;
 import org.jboss.pitbull.internal.logging.Logger;
 import org.jboss.pitbull.servlet.DeploymentServletContext;
 import org.jboss.pitbull.servlet.DeploymentServletRegistration;
-import org.jboss.pitbull.spi.Connection;
-import org.jboss.pitbull.spi.RequestHeader;
-import org.jboss.pitbull.spi.StreamHandler;
+import org.jboss.pitbull.spi.StreamRequestHandler;
 import org.jboss.pitbull.spi.StreamedResponse;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
+import java.io.IOException;
 import java.io.InputStream;
 
 /**
  * @author <a href="mailto:bill@burkecentral.com">Bill Burke</a>
  * @version $Revision: 1 $
  */
-public class ServletRequestHandler implements StreamHandler
+public class ServletRequestHandler implements StreamRequestHandler
 {
    protected DeploymentServletRegistration servlet;
    protected DeploymentServletContext context;
@@ -28,7 +30,7 @@ public class ServletRequestHandler implements StreamHandler
    }
 
    @Override
-   public void execute(Connection connection, RequestHeader requestHeader, InputStream input, StreamedResponse writer)
+   public void execute(Connection connection, RequestHeader requestHeader, InputStream input, StreamedResponse writer) throws IOException
    {
       HttpServletRequestImpl request = new HttpServletRequestImpl();
       request.setConnection(connection);
@@ -48,25 +50,18 @@ public class ServletRequestHandler implements StreamHandler
             servlet.endRequest();
          }
       }
-      catch (Throwable e)
+      catch (IOException e)
       {
-         log.error("Failure executing servlet", e);
-         if (!writer.isEnded() && !writer.isCommitted())
-         {
-            response.reset();
-            response.setStatus(500);
-         }
-         else
-         {
-            throw new RuntimeException(e);
-         }
+         throw e;
       }
-      writer.end();
+      catch (RuntimeException e)
+      {
+         throw e;
+      }
+      catch (Exception e)
+      {
+         throw new RuntimeException(e);
+      }
    }
 
-   @Override
-   public void unsupportedHandler()
-   {
-
-   }
 }

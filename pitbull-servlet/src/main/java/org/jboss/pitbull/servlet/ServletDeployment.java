@@ -1,9 +1,9 @@
 package org.jboss.pitbull.servlet;
 
+import org.jboss.pitbull.Connection;
+import org.jboss.pitbull.RequestHeader;
 import org.jboss.pitbull.servlet.internal.ServletRequestHandler;
-import org.jboss.pitbull.spi.Connection;
 import org.jboss.pitbull.spi.RequestHandler;
-import org.jboss.pitbull.spi.RequestHeader;
 import org.jboss.pitbull.spi.RequestInitiator;
 import org.jboss.pitbull.util.registry.UriRegistry;
 
@@ -70,7 +70,12 @@ public class ServletDeployment implements RequestInitiator
       ctx.setInitialized();
    }
 
+   @Override
+   public void illegalHandler(RequestHandler handler)
+   {
+   }
 
+   @Override
    public RequestHandler begin(Connection connection, RequestHeader headers)
    {
       List<DeploymentServletRegistration> servlets = null;

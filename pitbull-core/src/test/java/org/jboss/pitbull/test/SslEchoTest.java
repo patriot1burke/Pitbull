@@ -9,13 +9,13 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.conn.SingleClientConnManager;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpParams;
+import org.jboss.pitbull.Connection;
 import org.jboss.pitbull.HttpServer;
 import org.jboss.pitbull.HttpServerBuilder;
-import org.jboss.pitbull.initiators.StreamedRequestInitiator;
+import org.jboss.pitbull.RequestHeader;
+import org.jboss.pitbull.StatusCode;
+import org.jboss.pitbull.spi.StreamRequestHandler;
 import org.jboss.pitbull.spi.StreamedResponse;
-import org.jboss.pitbull.spi.Connection;
-import org.jboss.pitbull.spi.RequestHeader;
-import org.jboss.pitbull.spi.StatusCode;
 import org.jboss.resteasy.client.ClientRequest;
 import org.jboss.resteasy.client.ClientResponse;
 import org.jboss.resteasy.client.core.executors.ApacheHttpClient4Executor;
@@ -59,10 +59,10 @@ public class SslEchoTest
    }
 
 
-   public static class Initiator extends StreamedRequestInitiator
+   public static class Initiator implements StreamRequestHandler
    {
       @Override
-      public void service(Connection connection, RequestHeader requestHeader, InputStream is, StreamedResponse response) throws IOException
+      public void execute(Connection connection, RequestHeader requestHeader, InputStream is, StreamedResponse response) throws IOException
       {
          response.setStatus(StatusCode.OK);
          response.getHeaders().addHeader("Content-Type", "text/plain");

@@ -1,5 +1,8 @@
 package org.jboss.pitbull.spi;
 
+import org.jboss.pitbull.ResponseHeader;
+import org.jboss.pitbull.StatusCode;
+
 /**
  * @author <a href="mailto:bill@burkecentral.com">Bill Burke</a>
  * @version $Revision: 1 $
@@ -18,9 +21,35 @@ public interface StreamedResponse extends ResponseHeader
 
    boolean isEnded();
 
+   /**
+    * Flushes status code, response headers, and OutputStream if they haven't been flushed already.
+    *
+    * If the connection is keepalive, then control of underlying channel is returned to PitBull.  Connection may
+    * be closed automatically if an internal error condition is met.
+    *
+    */
    void end();
 
    void setStatus(StatusCode status);
 
-   void reset();
+   /**
+    * Convenience function that resets the stream and clears all headers.
+    *
+    * @throws IllegalArgumentException if stream is committed
+    */
+   void reset() throws IllegalArgumentException;
+
+   /**
+    * Whether or not the response is managed by Pitbull
+    *
+    * @return
+    */
+   boolean isDetached();
+
+   /**
+    * Calling this method will detach
+    * the StreamedResponse and it will -not- be automatically ended when the RequestHandler returns.
+    *
+    */
+   void detach();
 }

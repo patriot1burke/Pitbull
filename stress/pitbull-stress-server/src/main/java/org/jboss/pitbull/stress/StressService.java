@@ -1,12 +1,12 @@
 package org.jboss.pitbull.stress;
 
+import org.jboss.pitbull.Connection;
 import org.jboss.pitbull.HttpServer;
 import org.jboss.pitbull.HttpServerBuilder;
-import org.jboss.pitbull.initiators.StreamedRequestInitiator;
+import org.jboss.pitbull.RequestHeader;
+import org.jboss.pitbull.StatusCode;
+import org.jboss.pitbull.spi.StreamRequestHandler;
 import org.jboss.pitbull.spi.StreamedResponse;
-import org.jboss.pitbull.spi.Connection;
-import org.jboss.pitbull.spi.RequestHeader;
-import org.jboss.pitbull.spi.StatusCode;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -17,7 +17,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * @author <a href="mailto:bill@burkecentral.com">Bill Burke</a>
  * @version $Revision: 1 $
  */
-public class StressService extends StreamedRequestInitiator
+public class StressService implements StreamRequestHandler
 {
    public static byte[] readFromStream(int bufferSize, InputStream entityStream)
            throws IOException
@@ -43,7 +43,7 @@ public class StressService extends StreamedRequestInitiator
 
 
    @Override
-   public void service(Connection connection, RequestHeader requestHeader, InputStream requestBody, StreamedResponse response) throws IOException
+   public void execute(Connection connection, RequestHeader requestHeader, InputStream requestBody, StreamedResponse response) throws IOException
    {
       hits.incrementAndGet();
       if (requestHeader.getMethod().equalsIgnoreCase("GET")) doGet(connection, requestHeader, response);

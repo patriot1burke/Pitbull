@@ -1,4 +1,4 @@
-package org.jboss.pitbull.spi;
+package org.jboss.pitbull;
 
 import java.util.List;
 import java.util.Map;

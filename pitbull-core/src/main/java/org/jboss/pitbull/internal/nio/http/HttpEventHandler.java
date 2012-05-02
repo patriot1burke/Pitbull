@@ -1,13 +1,13 @@
 package org.jboss.pitbull.internal.nio.http;
 
+import org.jboss.pitbull.Connection;
+import org.jboss.pitbull.StatusCode;
 import org.jboss.pitbull.internal.logging.Logger;
 import org.jboss.pitbull.internal.nio.socket.EventHandler;
 import org.jboss.pitbull.internal.nio.socket.ManagedChannel;
-import org.jboss.pitbull.spi.Connection;
 import org.jboss.pitbull.spi.RequestHandler;
 import org.jboss.pitbull.spi.RequestInitiator;
-import org.jboss.pitbull.spi.StatusCode;
-import org.jboss.pitbull.spi.StreamHandler;
+import org.jboss.pitbull.spi.StreamRequestHandler;
 import org.jboss.pitbull.util.registry.NotFoundException;
 import org.jboss.pitbull.util.registry.UriRegistry;
 
@@ -26,12 +26,12 @@ public class HttpEventHandler implements EventHandler
    protected HttpRequestDecoder decoder;
    protected ByteBuffer buffer = ByteBuffer.allocate(BUFFER_SIZE);
    protected Connection connection;
-   protected UriRegistry<RequestInitiator> registry;
+   protected UriRegistry<Object> registry;
    protected ExecutorService executor;
    protected static final Logger log = Logger.getLogger(HttpEventHandler.class);
    protected long count;
 
-   public HttpEventHandler(ExecutorService executor, UriRegistry<RequestInitiator> registry)
+   public HttpEventHandler(ExecutorService executor, UriRegistry<Object> registry)
    {
       this.executor = executor;
       this.registry = registry;
@@ -97,13 +97,22 @@ public class HttpEventHandler implements EventHandler
          log.trace("-- Http request: {0}", requestHeader);
          decoder = null;
 
+         RequestInitiator initiator = null;
          RequestHandler requestHandler = null;
          try
          {
-            List<RequestInitiator> initiators = registry.match(requestHeader.getUri());
-            for (RequestInitiator initiator : initiators)
+            List<Object> matches = registry.match(requestHeader.getUri());
+            for (Object match : matches)
             {
-               requestHandler = initiator.begin(connection, requestHeader);
+               if (match instanceof RequestInitiator)
+               {
+                  initiator = (RequestInitiator)match;
+                  requestHandler = initiator.begin(connection, requestHeader);
+               }
+               else if (match instanceof RequestHandler)
+               {
+                  requestHandler = (RequestHandler)match;
+               }
                if (requestHandler != null) break;
             }
          }
@@ -112,12 +121,12 @@ public class HttpEventHandler implements EventHandler
          }
          if (requestHandler == null)
          {
-            log.trace("requestHandler was null, returning 404: {0} ", requestHeader);
+            log.trace("Could not find a requestHandler, returning 404: {0} ", requestHeader);
             try
             {
                error(channel, StatusCode.NOT_FOUND, requestHeader);
             }
-            catch (IOException e)
+            catch (Throwable e)
             {
                log.error("Failed to send error message to client, closing", e);
                channel.close();
@@ -126,15 +135,18 @@ public class HttpEventHandler implements EventHandler
          }
 
 
-         if (!(requestHandler instanceof StreamHandler))
+         if (!(requestHandler instanceof StreamRequestHandler))
          {
             log.error("Unsupported requestHandler type: " + requestHandler.getClass().getName());
-            requestHandler.unsupportedHandler();
+            if (initiator != null)
+            {
+               try { initiator.illegalHandler(requestHandler); } catch (Throwable ignored) {}
+            }
             try
             {
                error(channel, StatusCode.INTERNAL_SERVER_ERROR, requestHeader);
             }
-            catch (IOException e)
+            catch (Throwable e)
             {
                log.error("Failed to send error message to client, closing", e);
                channel.close();
@@ -144,7 +156,7 @@ public class HttpEventHandler implements EventHandler
 
          log.trace("Using StreamHandler channel: {0}", channel.getId());
          channel.suspendReads();
-         StreamHandler streamHandler = (StreamHandler) requestHandler;
+         StreamRequestHandler streamHandler = (StreamRequestHandler) requestHandler;
 
          ByteBuffer oldBuffer = buffer;
          buffer = null;

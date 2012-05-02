@@ -1,7 +1,7 @@
 package org.jboss.pitbull.internal.nio.http;
 
-import org.jboss.pitbull.spi.OrderedHeaders;
-import org.jboss.pitbull.spi.RequestHeader;
+import org.jboss.pitbull.OrderedHeaders;
+import org.jboss.pitbull.RequestHeader;
 import org.jboss.pitbull.util.OrderedHeadersImpl;
 
 /**

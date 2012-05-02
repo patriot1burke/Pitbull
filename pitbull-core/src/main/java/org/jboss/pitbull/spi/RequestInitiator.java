@@ -1,5 +1,8 @@
 package org.jboss.pitbull.spi;
 
+import org.jboss.pitbull.Connection;
+import org.jboss.pitbull.RequestHeader;
+
 /**
  * Responsible for initiating request processing with the container.
  *
@@ -17,4 +20,11 @@ public interface RequestInitiator
     * @return
     */
    RequestHandler begin(Connection connection, RequestHeader requestHeader);
+
+   /**
+    * Called if Pitbull doesn't know how to interact with a specific handler returned from begin()
+    *
+    * @param handler
+    */
+   void illegalHandler(RequestHandler handler);
 }

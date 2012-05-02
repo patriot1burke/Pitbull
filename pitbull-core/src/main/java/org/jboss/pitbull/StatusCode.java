@@ -1,4 +1,4 @@
-package org.jboss.pitbull.spi;
+package org.jboss.pitbull;
 
 /**
  * Response status code representation.  Works as much as possible like an enum so that you can perform simple address

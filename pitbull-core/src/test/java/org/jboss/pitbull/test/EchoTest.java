@@ -1,12 +1,12 @@
 package org.jboss.pitbull.test;
 
+import org.jboss.pitbull.Connection;
 import org.jboss.pitbull.HttpServer;
 import org.jboss.pitbull.HttpServerBuilder;
-import org.jboss.pitbull.initiators.StreamedRequestInitiator;
+import org.jboss.pitbull.RequestHeader;
+import org.jboss.pitbull.StatusCode;
+import org.jboss.pitbull.spi.StreamRequestHandler;
 import org.jboss.pitbull.spi.StreamedResponse;
-import org.jboss.pitbull.spi.Connection;
-import org.jboss.pitbull.spi.RequestHeader;
-import org.jboss.pitbull.spi.StatusCode;
 import org.jboss.resteasy.client.ClientRequest;
 import org.jboss.resteasy.client.ClientResponse;
 import org.jboss.resteasy.util.ReadFromStream;
@@ -41,10 +41,10 @@ public class EchoTest
       http.stop();
    }
 
-   public static class Initiator extends StreamedRequestInitiator
+   public static class Initiator implements StreamRequestHandler
    {
       @Override
-      public void service(Connection connection, RequestHeader requestHeader, InputStream is, StreamedResponse response) throws IOException
+      public void execute(Connection connection, RequestHeader requestHeader, InputStream is, StreamedResponse response) throws IOException
       {
          System.out.println(requestHeader.getMethod() + " " + requestHeader.getUri());
          response.setStatus(StatusCode.OK);

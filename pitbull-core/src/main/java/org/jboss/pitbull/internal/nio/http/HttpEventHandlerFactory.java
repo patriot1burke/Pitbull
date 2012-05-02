@@ -14,9 +14,9 @@ import java.util.concurrent.ExecutorService;
 public class HttpEventHandlerFactory implements EventHandlerFactory
 {
    protected ExecutorService executor;
-   protected UriRegistry<RequestInitiator> registry;
+   protected UriRegistry<Object> registry;
 
-   public HttpEventHandlerFactory(ExecutorService executor, UriRegistry<RequestInitiator> registry)
+   public HttpEventHandlerFactory(ExecutorService executor, UriRegistry<Object> registry)
    {
       this.executor = executor;
       this.registry = registry;

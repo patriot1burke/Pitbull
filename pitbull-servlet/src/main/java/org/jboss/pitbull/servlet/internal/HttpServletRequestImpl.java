@@ -1,12 +1,12 @@
 package org.jboss.pitbull.servlet.internal;
 
+import org.jboss.pitbull.Connection;
+import org.jboss.pitbull.OrderedHeaders;
+import org.jboss.pitbull.RequestHeader;
 import org.jboss.pitbull.internal.NotImplementedYetException;
 import org.jboss.pitbull.internal.util.ContentType;
 import org.jboss.pitbull.internal.util.DateUtil;
 import org.jboss.pitbull.servlet.DeploymentServletContext;
-import org.jboss.pitbull.spi.Connection;
-import org.jboss.pitbull.spi.OrderedHeaders;
-import org.jboss.pitbull.spi.RequestHeader;
 
 import javax.servlet.AsyncContext;
 import javax.servlet.DispatcherType;

@@ -1,8 +1,8 @@
 package org.jboss.pitbull.servlet.internal;
 
+import org.jboss.pitbull.StatusCode;
 import org.jboss.pitbull.internal.NotImplementedYetException;
 import org.jboss.pitbull.spi.ContentOutputStream;
-import org.jboss.pitbull.spi.StatusCode;
 import org.jboss.pitbull.spi.StreamedResponse;
 
 import javax.servlet.ServletOutputStream;

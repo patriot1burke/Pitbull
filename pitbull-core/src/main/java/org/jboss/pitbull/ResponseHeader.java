@@ -1,4 +1,4 @@
-package org.jboss.pitbull.spi;
+package org.jboss.pitbull;
 
 /**
  * SPI to underlying subsystems holding of status and headers.

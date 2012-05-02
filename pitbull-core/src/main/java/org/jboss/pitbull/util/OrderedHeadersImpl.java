@@ -1,6 +1,6 @@
 package org.jboss.pitbull.util;
 
-import org.jboss.pitbull.spi.OrderedHeaders;
+import org.jboss.pitbull.OrderedHeaders;
 
 import java.util.ArrayList;
 import java.util.List;

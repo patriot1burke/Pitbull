@@ -17,7 +17,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class HttpServer
 {
-   protected UriRegistry<RequestInitiator> registry = new UriRegistry<RequestInitiator>();
+   protected UriRegistry<Object> registry = new UriRegistry<Object>();
    protected static final Logger logger = Logger.getLogger(HttpServer.class);
    protected ExecutorService acceptorExecutor;
    protected ExecutorService requestExecutor;
@@ -79,12 +79,12 @@ public class HttpServer
       return connectors;
    }
 
-   public UriRegistry<RequestInitiator> getRegistry()
+   public UriRegistry<Object> getRegistry()
    {
       return registry;
    }
 
-   public void setRegistry(UriRegistry<RequestInitiator> registry)
+   public void setRegistry(UriRegistry<Object> registry)
    {
       this.registry = registry;
    }

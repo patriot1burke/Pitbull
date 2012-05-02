@@ -1,12 +1,12 @@
 package org.jboss.pitbull.internal.nio.http;
 
+import org.jboss.pitbull.OrderedHeaders;
+import org.jboss.pitbull.RequestHeader;
+import org.jboss.pitbull.StatusCode;
 import org.jboss.pitbull.internal.NotImplementedYetException;
 import org.jboss.pitbull.internal.logging.Logger;
 import org.jboss.pitbull.internal.nio.socket.ManagedChannel;
 import org.jboss.pitbull.spi.ContentOutputStream;
-import org.jboss.pitbull.spi.OrderedHeaders;
-import org.jboss.pitbull.spi.RequestHeader;
-import org.jboss.pitbull.spi.StatusCode;
 import org.jboss.pitbull.spi.StreamedResponse;
 import org.jboss.pitbull.util.OrderedHeadersImpl;
 
@@ -26,6 +26,7 @@ public class NioStreamedResponse implements StreamedResponse
    protected RequestHeader requestHeader;
    protected ContentInputStream is;
    protected boolean ended;
+   protected boolean detached;
    protected static final Logger log = Logger.getLogger(NioStreamedResponse.class);
 
    public NioStreamedResponse(ManagedChannel channel, RequestHeader requestHeader, ContentInputStream is)
@@ -33,6 +34,18 @@ public class NioStreamedResponse implements StreamedResponse
       this.channel = channel;
       this.requestHeader = requestHeader;
       this.is = is;
+   }
+
+   @Override
+   public boolean isDetached()
+   {
+      return detached;
+   }
+
+   @Override
+   public void detach()
+   {
+      this.detached = true;
    }
 
    @Override
@@ -70,6 +83,7 @@ public class NioStreamedResponse implements StreamedResponse
    public void reset()
    {
       if (isEnded() || isCommitted()) throw new IllegalStateException("Response is committed");
+      headers.clear();
       if (stream != null)
       {
          stream.reset();
@@ -83,6 +97,29 @@ public class NioStreamedResponse implements StreamedResponse
       return stream;
    }
 
+   protected void resumeWorker()
+   {
+      // todo keep-alive logic, right now everything kept alive
+      try
+      {
+         channel.resumeReads();
+      }
+      catch (Exception ex)
+      {
+         log.error("Failed to resume worker", ex);
+         closeChannel();
+         return;
+      }
+   }
+
+   protected void closeChannel()
+   {
+      try
+      { channel.close(); }
+      catch (Throwable t)
+      {}
+   }
+
    @Override
    public void end()
    {
@@ -92,14 +129,20 @@ public class NioStreamedResponse implements StreamedResponse
          return;
       }
       ended = true;
+
+      boolean mustClose = false;
+
       try
       {
          is.eat();  // eat the input stream
       }
-      catch (IOException e)
+      catch (Throwable e)
       {
          log.warn("Exception while eating", e);
+         mustClose = true;
       }
+
+
       if (stream == null)
       {
          HttpResponse response = new HttpResponse(this);
@@ -108,12 +151,11 @@ public class NioStreamedResponse implements StreamedResponse
             response.prepareEmptyBody(requestHeader);
             byte[] bytes = response.responseBytes();
             channel.writeBlocking(ByteBuffer.wrap(bytes));
-            return;
          }
-         catch (IOException e)
+         catch (Throwable e)
          {
-            throw new NotImplementedYetException(e);
-
+            log.error("Failed writing response", e);
+            mustClose = true;
          }
       }
       else
@@ -123,11 +165,20 @@ public class NioStreamedResponse implements StreamedResponse
          {
             stream.close();
          }
-         catch (IOException e)
+         catch (Throwable e)
          {
-            throw new NotImplementedYetException(e);
+            log.error("Failed writing response", e);
+            mustClose = true;
          }
+      }
 
+      if (mustClose)
+      {
+         closeChannel();
+      }
+      else
+      {
+         resumeWorker();
       }
    }
 }

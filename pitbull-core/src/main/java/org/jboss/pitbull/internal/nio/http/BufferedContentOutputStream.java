@@ -1,9 +1,9 @@
 package org.jboss.pitbull.internal.nio.http;
 
+import org.jboss.pitbull.RequestHeader;
+import org.jboss.pitbull.ResponseHeader;
 import org.jboss.pitbull.internal.nio.socket.ManagedChannel;
 import org.jboss.pitbull.spi.ContentOutputStream;
-import org.jboss.pitbull.spi.RequestHeader;
-import org.jboss.pitbull.spi.ResponseHeader;
 
 import java.io.IOException;
 import java.io.InterruptedIOException;

@@ -1,4 +1,4 @@
-package org.jboss.pitbull.spi;
+package org.jboss.pitbull;
 
 /**
  * SPI that allows transport to lazily parse headers received from the network buffer.

@@ -1,4 +1,4 @@
-package org.jboss.pitbull.spi;
+package org.jboss.pitbull;
 
 import javax.net.ssl.SSLSession;
 import java.net.InetSocketAddress;

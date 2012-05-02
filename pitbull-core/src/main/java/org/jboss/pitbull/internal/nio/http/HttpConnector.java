@@ -21,7 +21,7 @@ public class HttpConnector
 {
    protected SSLContext sslContext;
    protected int port = -1;
-   protected UriRegistry<RequestInitiator> registry;
+   protected UriRegistry<Object> registry;
    protected Acceptor acceptor;
    protected ServerSocketChannel channel;
    protected static final Logger logger = Logger.getLogger(HttpConnector.class);
@@ -37,12 +37,12 @@ public class HttpConnector
       this.sslContext = sslContext;
    }
 
-   public UriRegistry<RequestInitiator> getRegistry()
+   public UriRegistry<Object> getRegistry()
    {
       return registry;
    }
 
-   public void setRegistry(UriRegistry<RequestInitiator> registry)
+   public void setRegistry(UriRegistry<Object> registry)
    {
       this.registry = registry;
    }
