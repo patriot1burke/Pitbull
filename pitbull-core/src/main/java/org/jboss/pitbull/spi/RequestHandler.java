@@ -1,7 +1,7 @@
 package org.jboss.pitbull.spi;
 
 /**
- * Responsible for processing a request
+ * Registerable handler that handles execution of HTTP requests.
  *
  * @author <a href="mailto:bill@burkecentral.com">Bill Burke</a>
  * @version $Revision: 1 $

@@ -4,7 +4,10 @@ import org.jboss.pitbull.Connection;
 import org.jboss.pitbull.RequestHeader;
 
 /**
- * Responsible for initiating request processing with the container.
+ * RequestInitiators exist so that a subsystem can pick different types of handlers to use based on properties
+ * (path, request headers, etc.) of the
+ * incoming request.  i.e. The subsystem may want a deep copy request handler for static content stored on disk.
+ * For dynamic content, the subsystem may want a StreamRequestHandler.  For web sockets, a web socket handler.
  *
  * @author <a href="mailto:bill@burkecentral.com">Bill Burke</a>
  * @version $Revision: 1 $
