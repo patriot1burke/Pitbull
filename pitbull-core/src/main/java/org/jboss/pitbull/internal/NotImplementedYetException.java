@@ -1,4 +1,4 @@
-package org.jboss.pitbull;
+package org.jboss.pitbull.internal;
 
 /**
  * @author <a href="mailto:bill@burkecentral.com">Bill Burke</a>

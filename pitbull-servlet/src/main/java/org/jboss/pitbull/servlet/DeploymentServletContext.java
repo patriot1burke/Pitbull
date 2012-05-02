@@ -1,6 +1,6 @@
 package org.jboss.pitbull.servlet;
 
-import org.jboss.pitbull.NotImplementedYetException;
+import org.jboss.pitbull.internal.NotImplementedYetException;
 import org.jboss.pitbull.internal.logging.Logger;
 
 import javax.servlet.Filter;

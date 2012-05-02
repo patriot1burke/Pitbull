@@ -1,6 +1,6 @@
 package org.jboss.pitbull.internal.nio.http;
 
-import org.jboss.pitbull.NotImplementedYetException;
+import org.jboss.pitbull.internal.NotImplementedYetException;
 import org.jboss.pitbull.internal.logging.Logger;
 import org.jboss.pitbull.internal.nio.socket.ManagedChannel;
 import org.jboss.pitbull.spi.ContentOutputStream;

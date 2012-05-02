@@ -16,11 +16,11 @@ public class UriRegistry<T> extends ParentSegment<T>
    Map<T, Segment> globalRegistry = new HashMap<T, Segment>();
 
    @Override
-   public void removeSegment()
+   protected void removeSegment()
    {
    }
 
-   public Segment remove(T resource)
+   public Segment unregister(T resource)
    {
       Segment segment = globalRegistry.remove(resource);
       if (segment != null)
@@ -30,7 +30,7 @@ public class UriRegistry<T> extends ParentSegment<T>
       return segment;
    }
 
-   public Segment add(String path, T resource)
+   public Segment register(String path, T resource)
    {
       if (path.startsWith("/")) path = path.substring(1);
 

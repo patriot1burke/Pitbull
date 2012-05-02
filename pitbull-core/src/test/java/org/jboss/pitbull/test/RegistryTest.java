@@ -19,10 +19,10 @@ public class RegistryTest
    {
       UriRegistry<String> registry = new UriRegistry<String>();
 
-      registry.add("/foo", "/foo");
-      registry.add("/foo/bar1", "/foo/bar1");
-      registry.add("/foo/bar2", "/foo/bar2");
-      registry.add("/foo/bar3", "/foo/bar3");
+      registry.register("/foo", "/foo");
+      registry.register("/foo/bar1", "/foo/bar1");
+      registry.register("/foo/bar2", "/foo/bar2");
+      registry.register("/foo/bar3", "/foo/bar3");
 
       List<String> match;
       match = registry.match("/foo");
@@ -59,9 +59,9 @@ public class RegistryTest
       UriRegistry<String> registry = new UriRegistry<String>();
 
       String star = "/*";
-      registry.add("/{.*}", star);
-      registry.add("/foo", "/foo");
-      registry.add("/foo/bar", "/foo/bar");
+      registry.register("/{.*}", star);
+      registry.register("/foo", "/foo");
+      registry.register("/foo/bar", "/foo/bar");
 
       List<String> match;
       match = registry.match("/foo");
@@ -80,7 +80,7 @@ public class RegistryTest
       Assert.assertEquals(1, match.size());
       Assert.assertEquals("/*", match.get(0));
 
-      registry.remove(star);
+      registry.unregister(star);
       try
       {
          match = registry.match("/x/y/z/p/d/q/bar2");
@@ -99,10 +99,10 @@ public class RegistryTest
       UriRegistry<String> registry = new UriRegistry<String>();
 
       String fstar = "/f*";
-      registry.add("/f{.*}", fstar);
-      registry.add("/foo", "/foo");
-      registry.add("/foo/bar", "/foo/bar");
-      registry.add("/z{.*}", "/z*");
+      registry.register("/f{.*}", fstar);
+      registry.register("/foo", "/foo");
+      registry.register("/foo/bar", "/foo/bar");
+      registry.register("/z{.*}", "/z*");
 
       List<String> match;
       match = registry.matchMulti("/foo");
@@ -123,7 +123,7 @@ public class RegistryTest
       Assert.assertEquals(1, match.size());
       Assert.assertTrue(match.contains("/z*"));
 
-      registry.remove(fstar);
+      registry.unregister(fstar);
       match = registry.matchMulti("/foo/bar2");
       Assert.assertEquals(0, match.size());
 

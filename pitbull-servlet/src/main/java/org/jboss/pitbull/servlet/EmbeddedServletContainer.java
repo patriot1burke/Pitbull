@@ -27,7 +27,7 @@ public class EmbeddedServletContainer extends HttpServer
          String path = deployment.getDeploymentServletContext().getContextPath();
          if (path == null) path = "";
          if ("/".equals(path.trim())) path = "";
-         registry.add(path + "/{.*}", deployment);
+         registry.register(path + "/{.*}", deployment);
       }
       for (ServletDeployment deployment : deployments)
       {

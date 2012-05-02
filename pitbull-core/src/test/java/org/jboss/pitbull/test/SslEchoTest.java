@@ -142,7 +142,7 @@ public class SslEchoTest
    public void testEcho() throws Exception
    {
       Initiator resource = new Initiator();
-      http.getRegistry().add("/echo{(/.*)*}", resource);
+      http.getRegistry().register("/echo{(/.*)*}", resource);
 
       HttpClient httpClient = createHttpClient(8443);
       ApacheHttpClient4Executor executor = new ApacheHttpClient4Executor(httpClient);
@@ -159,7 +159,7 @@ public class SslEchoTest
       }
       finally
       {
-         http.getRegistry().remove(resource);
+         http.getRegistry().unregister(resource);
 
       }
 

@@ -140,7 +140,7 @@ public class StressService extends StreamedRequestInitiator
               .workers(workers)
               .maxRequestThreads(requestThreads).build();
       http.start();
-      http.getRegistry().add("/{.*}", new StressService());
+      http.getRegistry().register("/{.*}", new StressService());
       return http;
    }
 }

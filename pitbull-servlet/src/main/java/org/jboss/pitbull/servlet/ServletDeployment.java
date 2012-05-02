@@ -64,7 +64,7 @@ public class ServletDeployment implements RequestInitiator
          for (String mapping : reg.getMappings())
          {
             mapping = mapping.replace("*", "{.*}");
-            servletRegistry.add(mapping, reg);
+            servletRegistry.register(mapping, reg);
          }
       }
       ctx.setInitialized();

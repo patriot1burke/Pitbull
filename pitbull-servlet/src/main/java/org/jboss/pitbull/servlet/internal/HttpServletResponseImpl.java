@@ -1,11 +1,9 @@
 package org.jboss.pitbull.servlet.internal;
 
-import org.jboss.pitbull.NotImplementedYetException;
+import org.jboss.pitbull.internal.NotImplementedYetException;
 import org.jboss.pitbull.spi.ContentOutputStream;
-import org.jboss.pitbull.spi.OrderedHeaders;
 import org.jboss.pitbull.spi.StatusCode;
 import org.jboss.pitbull.spi.StreamedResponse;
-import org.jboss.pitbull.util.OrderedHeadersImpl;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.Cookie;

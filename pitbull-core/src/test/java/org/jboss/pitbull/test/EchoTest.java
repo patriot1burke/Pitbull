@@ -75,7 +75,7 @@ public class EchoTest
    public void testEcho() throws Exception
    {
       Initiator resource = new Initiator();
-      http.getRegistry().add("/echo{(/.*)*}", resource);
+      http.getRegistry().register("/echo", resource);
 
       //Thread.sleep(100000000);
 
@@ -90,7 +90,7 @@ public class EchoTest
       }
       finally
       {
-         http.getRegistry().remove(resource);
+         http.getRegistry().unregister(resource);
 
       }
 
