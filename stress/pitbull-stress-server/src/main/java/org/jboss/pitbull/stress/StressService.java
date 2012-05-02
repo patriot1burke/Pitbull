@@ -3,7 +3,7 @@ package org.jboss.pitbull.stress;
 import org.jboss.pitbull.HttpServer;
 import org.jboss.pitbull.HttpServerBuilder;
 import org.jboss.pitbull.initiators.StreamedRequestInitiator;
-import org.jboss.pitbull.initiators.StreamedResponse;
+import org.jboss.pitbull.spi.StreamedResponse;
 import org.jboss.pitbull.spi.Connection;
 import org.jboss.pitbull.spi.RequestHeader;
 import org.jboss.pitbull.spi.StatusCode;
@@ -59,7 +59,7 @@ public class StressService extends StreamedRequestInitiator
    {
       response.setStatus(StatusCode.OK);
       response.getHeaders().addHeader("Content-Type", "text/plain");
-      response.getStream().write("DO GET".getBytes());
+      response.getOutputStream().write("DO GET".getBytes());
 
    }
 
@@ -73,7 +73,7 @@ public class StressService extends StreamedRequestInitiator
       response.setStatus(StatusCode.OK);
       response.getHeaders().addHeader("Content-Type", "text/plain");
       byte[] bytes = readFromStream(1024, requestBody);
-      response.getStream().write(bytes);
+      response.getOutputStream().write(bytes);
 
    }
 

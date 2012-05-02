@@ -4,9 +4,11 @@ import org.jboss.pitbull.NotImplementedYetException;
 import org.jboss.pitbull.internal.logging.Logger;
 import org.jboss.pitbull.internal.nio.socket.ManagedChannel;
 import org.jboss.pitbull.spi.ContentOutputStream;
+import org.jboss.pitbull.spi.OrderedHeaders;
 import org.jboss.pitbull.spi.RequestHeader;
-import org.jboss.pitbull.spi.ResponseHeader;
-import org.jboss.pitbull.spi.StreamResponseWriter;
+import org.jboss.pitbull.spi.StatusCode;
+import org.jboss.pitbull.spi.StreamedResponse;
+import org.jboss.pitbull.util.OrderedHeadersImpl;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -15,20 +17,47 @@ import java.nio.ByteBuffer;
  * @author <a href="mailto:bill@burkecentral.com">Bill Burke</a>
  * @version $Revision: 1 $
  */
-public class NioStreamResponseWriter implements StreamResponseWriter
+public class NioStreamedResponse implements StreamedResponse
 {
+   protected StatusCode status = StatusCode.INTERNAL_SERVER_ERROR;
+   protected OrderedHeaders headers = new OrderedHeadersImpl();
    protected ManagedChannel channel;
    protected ContentOutputStream stream;
    protected RequestHeader requestHeader;
    protected ContentInputStream is;
    protected boolean ended;
-   protected static final Logger log = Logger.getLogger(NioStreamResponseWriter.class);
+   protected static final Logger log = Logger.getLogger(NioStreamedResponse.class);
 
-   public NioStreamResponseWriter(ManagedChannel channel, RequestHeader requestHeader, ContentInputStream is)
+   public NioStreamedResponse(ManagedChannel channel, RequestHeader requestHeader, ContentInputStream is)
    {
       this.channel = channel;
       this.requestHeader = requestHeader;
       this.is = is;
+   }
+
+   @Override
+   public StatusCode getStatusCode()
+   {
+      return status;
+   }
+
+   @Override
+   public void setStatus(StatusCode status)
+   {
+      this.status = status;
+   }
+
+   @Override
+   public OrderedHeaders getHeaders()
+   {
+      return headers;
+   }
+
+   @Override
+   public boolean isCommitted()
+   {
+      if (stream == null) return false;
+      return stream.isCommitted();
    }
 
    @Override
@@ -38,20 +67,24 @@ public class NioStreamResponseWriter implements StreamResponseWriter
    }
 
    @Override
-   public ContentOutputStream getStream(ResponseHeader responseHeader)
+   public void reset()
    {
-      stream = new BufferedContentOutputStream(channel, requestHeader, responseHeader);
+      if (isEnded() || isCommitted()) throw new IllegalStateException("Response is committed");
+      if (stream != null)
+      {
+         stream.reset();
+      }
+   }
+
+   @Override
+   public ContentOutputStream getOutputStream()
+   {
+      if (stream == null) stream = new BufferedContentOutputStream(channel, requestHeader, this);
       return stream;
    }
 
    @Override
-   public ContentOutputStream getAllocatedStream()
-   {
-      return stream;
-   }
-
-   @Override
-   public void end(ResponseHeader responseHeader)
+   public void end()
    {
       if (ended)
       {
@@ -69,8 +102,7 @@ public class NioStreamResponseWriter implements StreamResponseWriter
       }
       if (stream == null)
       {
-         // stream was closed
-         HttpResponse response = new HttpResponse(responseHeader);
+         HttpResponse response = new HttpResponse(this);
          try
          {
             response.prepareEmptyBody(requestHeader);
@@ -97,7 +129,5 @@ public class NioStreamResponseWriter implements StreamResponseWriter
          }
 
       }
-
-
    }
 }

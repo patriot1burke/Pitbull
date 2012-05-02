@@ -37,7 +37,7 @@ public class StreamExecutor implements Runnable
       try
       {
          ContentInputStream is = ContentInputStream.create(channel, buffer, requestHeader);
-         NioStreamResponseWriter writer = new NioStreamResponseWriter(channel, requestHeader, is); // todo handle keepalive setting
+         NioStreamedResponse writer = new NioStreamedResponse(channel, requestHeader, is); // todo handle keepalive setting
          handler.execute(connection, requestHeader, is, writer);
       }
       catch (Exception ex)

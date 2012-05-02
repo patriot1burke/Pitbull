@@ -12,7 +12,7 @@ import org.apache.http.params.HttpParams;
 import org.jboss.pitbull.HttpServer;
 import org.jboss.pitbull.HttpServerBuilder;
 import org.jboss.pitbull.initiators.StreamedRequestInitiator;
-import org.jboss.pitbull.initiators.StreamedResponse;
+import org.jboss.pitbull.spi.StreamedResponse;
 import org.jboss.pitbull.spi.Connection;
 import org.jboss.pitbull.spi.RequestHeader;
 import org.jboss.pitbull.spi.StatusCode;
@@ -70,11 +70,11 @@ public class SslEchoTest
          if (requestHeader.getMethod().equalsIgnoreCase("POST"))
          {
             byte[] bytes = ReadFromStream.readFromStream(1024, is);
-            response.getStream().write(bytes);
+            response.getOutputStream().write(bytes);
          }
          else if (requestHeader.getMethod().equalsIgnoreCase("GET"))
          {
-            response.getStream().write("How are you".getBytes());
+            response.getOutputStream().write("How are you".getBytes());
          }
       }
    }

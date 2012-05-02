@@ -7,7 +7,7 @@ import org.jboss.pitbull.spi.RequestHeader;
 import org.jboss.pitbull.spi.RequestInitiator;
 import org.jboss.pitbull.spi.StatusCode;
 import org.jboss.pitbull.spi.StreamHandler;
-import org.jboss.pitbull.spi.StreamResponseWriter;
+import org.jboss.pitbull.spi.StreamedResponse;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -30,28 +30,27 @@ public abstract class StreamedRequestInitiator implements RequestInitiator
       return new StreamHandler()
       {
          @Override
-         public void execute(Connection connection, RequestHeader requestHeader, InputStream is, StreamResponseWriter writer)
+         public void execute(Connection connection, RequestHeader requestHeader, InputStream is, StreamedResponse writer)
          {
-            StreamedResponse res = new StreamedResponse(writer);
             try
             {
-               service(connection, requestHeader, is, res);
+               service(connection, requestHeader, is, writer);
             }
             catch (Exception e)
             {
-               if (!writer.isEnded() && (writer.getAllocatedStream() == null || !writer.getAllocatedStream().isCommitted()))
+               if (!writer.isEnded() && !writer.isCommitted())
                {
                   logger.error("Failed to execute", e);
-                  if (writer.getAllocatedStream() != null) writer.getAllocatedStream().reset();
-                  res.getHeaders().clear();
-                  res.setStatus(StatusCode.INTERNAL_SERVER_ERROR);
+                  writer.reset();
+                  writer.getHeaders().clear();
+                  writer.setStatus(StatusCode.INTERNAL_SERVER_ERROR);
                }
                else
                {
                   throw new RuntimeException(e);
                }
             }
-            writer.end(res.delegator);
+            writer.end();
 
          }
 

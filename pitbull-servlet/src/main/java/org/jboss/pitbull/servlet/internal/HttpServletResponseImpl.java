@@ -3,9 +3,8 @@ package org.jboss.pitbull.servlet.internal;
 import org.jboss.pitbull.NotImplementedYetException;
 import org.jboss.pitbull.spi.ContentOutputStream;
 import org.jboss.pitbull.spi.OrderedHeaders;
-import org.jboss.pitbull.spi.ResponseHeader;
 import org.jboss.pitbull.spi.StatusCode;
-import org.jboss.pitbull.spi.StreamResponseWriter;
+import org.jboss.pitbull.spi.StreamedResponse;
 import org.jboss.pitbull.util.OrderedHeadersImpl;
 
 import javax.servlet.ServletOutputStream;
@@ -21,23 +20,14 @@ import java.util.Map;
  * @author <a href="mailto:bill@burkecentral.com">Bill Burke</a>
  * @version $Revision: 1 $
  */
-public class HttpServletResponseImpl implements HttpServletResponse, ResponseHeader
+public class HttpServletResponseImpl implements HttpServletResponse
 {
-   protected OrderedHeaders headers = new OrderedHeadersImpl();
-   protected StatusCode status = StatusCode.INTERNAL_SERVER_ERROR;
    protected boolean committed;
-   protected ContentOutputStream underlyingStream;
-   protected StreamResponseWriter streamResponseWriter;
+   protected StreamedResponse streamedResponse;
 
-   public HttpServletResponseImpl(StreamResponseWriter streamResponseWriter)
+   public HttpServletResponseImpl(StreamedResponse streamResponseWriter)
    {
-      this.streamResponseWriter = streamResponseWriter;
-   }
-
-   @Override
-   public OrderedHeaders getHeaders()
-   {
-      return headers;
+      this.streamedResponse = streamResponseWriter;
    }
 
    @Override
@@ -52,7 +42,7 @@ public class HttpServletResponseImpl implements HttpServletResponse, ResponseHea
    @Override
    public boolean containsHeader(String name)
    {
-      return headers.containsHeader(name);
+      return streamedResponse.getHeaders().containsHeader(name);
    }
 
    @Override
@@ -87,7 +77,7 @@ public class HttpServletResponseImpl implements HttpServletResponse, ResponseHea
          throw new IllegalStateException("Response is committed");
       }
       setStatus(sc);
-      headers.clear();
+      streamedResponse.getHeaders().clear();
       setContentType("text/html");
       getUnderlyingStream().reset();
       StringBuilder builder = new StringBuilder("<html><body><h1>Server Error</h1>");
@@ -107,7 +97,7 @@ public class HttpServletResponseImpl implements HttpServletResponse, ResponseHea
          throw new IllegalStateException("Response is committed");
       }
       setStatus(sc);
-      headers.clear();
+      streamedResponse.getHeaders().clear();
       setContentType("text/html");
       getUnderlyingStream().reset();
       StringBuilder builder = new StringBuilder("<html><body><h1>Server Error</h1>");
@@ -137,7 +127,7 @@ public class HttpServletResponseImpl implements HttpServletResponse, ResponseHea
    @Override
    public void setHeader(String name, String value)
    {
-      headers.setHeader(name, value);
+      streamedResponse.getHeaders().setHeader(name, value);
    }
 
    private static class HeaderEntry implements Map.Entry<String, String>
@@ -173,7 +163,7 @@ public class HttpServletResponseImpl implements HttpServletResponse, ResponseHea
    @Override
    public void addHeader(String name, String value)
    {
-      headers.addHeader(name, value);
+      streamedResponse.getHeaders().addHeader(name, value);
    }
 
 
@@ -192,11 +182,12 @@ public class HttpServletResponseImpl implements HttpServletResponse, ResponseHea
    @Override
    public void setStatus(int sc)
    {
-      this.status = StatusCode.valueOf(sc);
-      if (this.status == null)
+      StatusCode code = StatusCode.valueOf(sc);
+      if (code == null)
       {
-         status = StatusCode.create(sc, "Undefined Code");
+         code = StatusCode.create(sc, "Undefined Code");
       }
+      streamedResponse.setStatus(code);
    }
 
    @Override
@@ -208,31 +199,25 @@ public class HttpServletResponseImpl implements HttpServletResponse, ResponseHea
    @Override
    public int getStatus()
    {
-      return status.getCode();
-   }
-
-   @Override
-   public StatusCode getStatusCode()
-   {
-      return status;
+      return streamedResponse.getStatusCode().getCode();
    }
 
    @Override
    public String getHeader(String name)
    {
-      return headers.getFirstHeader(name);
+      return streamedResponse.getHeaders().getFirstHeader(name);
    }
 
    @Override
    public Collection<String> getHeaders(String name)
    {
-      return headers.getHeaderValues(name);
+      return streamedResponse.getHeaders().getHeaderValues(name);
    }
 
    @Override
    public Collection<String> getHeaderNames()
    {
-      return headers.getHeaderNames();
+      return streamedResponse.getHeaders().getHeaderNames();
    }
 
    @Override
@@ -249,8 +234,7 @@ public class HttpServletResponseImpl implements HttpServletResponse, ResponseHea
 
    protected ContentOutputStream getUnderlyingStream()
    {
-      if (underlyingStream == null) underlyingStream = streamResponseWriter.getStream(this);
-      return underlyingStream;
+      return streamedResponse.getOutputStream();
    }
 
    @Override

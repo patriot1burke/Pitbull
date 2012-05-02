@@ -6,7 +6,7 @@ import org.jboss.pitbull.servlet.DeploymentServletRegistration;
 import org.jboss.pitbull.spi.Connection;
 import org.jboss.pitbull.spi.RequestHeader;
 import org.jboss.pitbull.spi.StreamHandler;
-import org.jboss.pitbull.spi.StreamResponseWriter;
+import org.jboss.pitbull.spi.StreamedResponse;
 
 import javax.servlet.http.HttpServlet;
 import java.io.InputStream;
@@ -28,7 +28,7 @@ public class ServletRequestHandler implements StreamHandler
    }
 
    @Override
-   public void execute(Connection connection, RequestHeader requestHeader, InputStream input, StreamResponseWriter writer)
+   public void execute(Connection connection, RequestHeader requestHeader, InputStream input, StreamedResponse writer)
    {
       HttpServletRequestImpl request = new HttpServletRequestImpl();
       request.setConnection(connection);
@@ -51,7 +51,7 @@ public class ServletRequestHandler implements StreamHandler
       catch (Throwable e)
       {
          log.error("Failure executing servlet", e);
-         if (writer.getAllocatedStream() == null || !writer.getAllocatedStream().isCommitted())
+         if (!writer.isEnded() && !writer.isCommitted())
          {
             response.reset();
             response.setStatus(500);
@@ -61,7 +61,7 @@ public class ServletRequestHandler implements StreamHandler
             throw new RuntimeException(e);
          }
       }
-      writer.end(response);
+      writer.end();
    }
 
    @Override

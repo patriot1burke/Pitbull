@@ -11,5 +11,5 @@ import java.io.InputStream;
 public interface StreamHandler extends RequestHandler
 {
 
-   void execute(Connection connection, RequestHeader requestHeader, InputStream requestStream, StreamResponseWriter writer);
+   void execute(Connection connection, RequestHeader requestHeader, InputStream requestStream, StreamedResponse writer);
 }
