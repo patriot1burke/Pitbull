@@ -3,7 +3,9 @@ package org.jboss.pitbull;
 import org.jboss.pitbull.internal.logging.Logger;
 import org.jboss.pitbull.internal.nio.http.HttpConnector;
 import org.jboss.pitbull.internal.nio.socket.Worker;
+import org.jboss.pitbull.spi.RequestHandler;
 import org.jboss.pitbull.spi.RequestInitiator;
+import org.jboss.pitbull.util.registry.Segment;
 import org.jboss.pitbull.util.registry.UriRegistry;
 
 import java.util.ArrayList;
@@ -79,16 +81,6 @@ public class HttpServer
       return connectors;
    }
 
-   public UriRegistry<Object> getRegistry()
-   {
-      return registry;
-   }
-
-   public void setRegistry(UriRegistry<Object> registry)
-   {
-      this.registry = registry;
-   }
-
    public ExecutorService getAcceptorExecutor()
    {
       return acceptorExecutor;
@@ -127,6 +119,26 @@ public class HttpServer
    public void setWorkerExecutor(ExecutorService workerExecutor)
    {
       this.workerExecutor = workerExecutor;
+   }
+
+   public void register(String mappingPattern, RequestHandler handler)
+   {
+      registry.register(mappingPattern, handler);
+   }
+
+   public void register(String mappingPattern, RequestInitiator initiator)
+   {
+      registry.register(mappingPattern, initiator);
+   }
+
+   public void unregister(RequestHandler handler)
+   {
+      registry.unregister(handler);
+   }
+
+   public void unregister(RequestInitiator initiator)
+   {
+      registry.unregister(initiator);
    }
 
    public void start() throws Exception

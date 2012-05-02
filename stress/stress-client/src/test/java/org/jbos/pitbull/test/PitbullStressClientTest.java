@@ -23,7 +23,7 @@ public class PitbullStressClientTest
               .workers(2)
               .maxRequestThreads(4).build();
       http.start();
-      http.getRegistry().register("/{.*}", new StressService());
+      http.register("/{.*}", new StressService());
    }
 
    @AfterClass

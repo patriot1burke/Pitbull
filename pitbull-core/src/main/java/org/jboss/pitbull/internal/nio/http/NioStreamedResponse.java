@@ -3,14 +3,12 @@ package org.jboss.pitbull.internal.nio.http;
 import org.jboss.pitbull.OrderedHeaders;
 import org.jboss.pitbull.RequestHeader;
 import org.jboss.pitbull.StatusCode;
-import org.jboss.pitbull.internal.NotImplementedYetException;
+import org.jboss.pitbull.handlers.stream.ContentOutputStream;
+import org.jboss.pitbull.handlers.stream.StreamedResponse;
 import org.jboss.pitbull.internal.logging.Logger;
 import org.jboss.pitbull.internal.nio.socket.ManagedChannel;
-import org.jboss.pitbull.spi.ContentOutputStream;
-import org.jboss.pitbull.spi.StreamedResponse;
 import org.jboss.pitbull.util.OrderedHeadersImpl;
 
-import java.io.IOException;
 import java.nio.ByteBuffer;
 
 /**

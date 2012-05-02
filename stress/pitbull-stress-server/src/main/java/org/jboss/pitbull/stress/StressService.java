@@ -5,8 +5,8 @@ import org.jboss.pitbull.HttpServer;
 import org.jboss.pitbull.HttpServerBuilder;
 import org.jboss.pitbull.RequestHeader;
 import org.jboss.pitbull.StatusCode;
-import org.jboss.pitbull.spi.StreamRequestHandler;
-import org.jboss.pitbull.spi.StreamedResponse;
+import org.jboss.pitbull.handlers.stream.StreamRequestHandler;
+import org.jboss.pitbull.handlers.stream.StreamedResponse;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -140,7 +140,7 @@ public class StressService implements StreamRequestHandler
               .workers(workers)
               .maxRequestThreads(requestThreads).build();
       http.start();
-      http.getRegistry().register("/{.*}", new StressService());
+      http.register("/{.*}", new StressService());
       return http;
    }
 }

@@ -25,7 +25,7 @@ public class StressServiceTest
               .workers(1)
               .maxRequestThreads(1).build();
       http.start();
-      http.getRegistry().register("/{.*}", new StressService());
+      http.register("/{.*}", new StressService());
    }
 
    @AfterClass

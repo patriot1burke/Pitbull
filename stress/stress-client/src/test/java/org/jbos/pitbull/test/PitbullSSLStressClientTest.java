@@ -41,7 +41,7 @@ public class PitbullSSLStressClientTest
               .workers(2)
               .maxRequestThreads(4).build();
       http.start();
-      http.getRegistry().register("/{.*}", new StressService());
+      http.register("/{.*}", new StressService());
       factory = new StressClient.ExecutorFactory()
       {
          @Override

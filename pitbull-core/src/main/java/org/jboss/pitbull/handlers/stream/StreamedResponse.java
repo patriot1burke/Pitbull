@@ -1,4 +1,4 @@
-package org.jboss.pitbull.spi;
+package org.jboss.pitbull.handlers.stream;
 
 import org.jboss.pitbull.ResponseHeader;
 import org.jboss.pitbull.StatusCode;

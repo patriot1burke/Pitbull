@@ -5,8 +5,8 @@ import org.jboss.pitbull.HttpServer;
 import org.jboss.pitbull.HttpServerBuilder;
 import org.jboss.pitbull.RequestHeader;
 import org.jboss.pitbull.StatusCode;
-import org.jboss.pitbull.spi.StreamRequestHandler;
-import org.jboss.pitbull.spi.StreamedResponse;
+import org.jboss.pitbull.handlers.stream.StreamRequestHandler;
+import org.jboss.pitbull.handlers.stream.StreamedResponse;
 import org.jboss.resteasy.client.ClientRequest;
 import org.jboss.resteasy.client.ClientResponse;
 import org.jboss.resteasy.util.ReadFromStream;
@@ -75,7 +75,7 @@ public class EchoTest
    public void testEcho() throws Exception
    {
       Initiator resource = new Initiator();
-      http.getRegistry().register("/echo", resource);
+      http.register("/echo", resource);
 
       //Thread.sleep(100000000);
 
@@ -90,7 +90,7 @@ public class EchoTest
       }
       finally
       {
-         http.getRegistry().unregister(resource);
+         http.unregister(resource);
 
       }
 

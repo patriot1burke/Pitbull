@@ -1,9 +1,9 @@
 package org.jboss.pitbull.servlet.internal;
 
 import org.jboss.pitbull.StatusCode;
+import org.jboss.pitbull.handlers.stream.ContentOutputStream;
+import org.jboss.pitbull.handlers.stream.StreamedResponse;
 import org.jboss.pitbull.internal.NotImplementedYetException;
-import org.jboss.pitbull.spi.ContentOutputStream;
-import org.jboss.pitbull.spi.StreamedResponse;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.Cookie;
