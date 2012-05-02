@@ -150,15 +150,7 @@ public class HttpEventHandler implements EventHandler
          buffer = null;
 
          StreamExecutor task = new StreamExecutor(connection, channel, streamHandler, oldBuffer, requestHeader);
-
-         if (streamHandler.canExecuteInWorkerThread())
-         {
-            task.run();
-         }
-         else
-         {
-            executor.execute(task);
-         }
+         executor.execute(task);
       }
       finally
       {

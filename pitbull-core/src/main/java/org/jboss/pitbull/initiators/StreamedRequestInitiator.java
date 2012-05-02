@@ -22,11 +22,6 @@ public abstract class StreamedRequestInitiator implements RequestInitiator
 {
    protected static final Logger logger = Logger.getLogger(StreamedRequestInitiator.class);
 
-   public boolean canExecuteInWorkerThread()
-   {
-      return false;
-   }
-
    public abstract void service(Connection connection, RequestHeader requestHeader, InputStream requestBody, StreamedResponse response) throws IOException;
 
    @Override
@@ -34,12 +29,6 @@ public abstract class StreamedRequestInitiator implements RequestInitiator
    {
       return new StreamHandler()
       {
-         @Override
-         public boolean canExecuteInWorkerThread()
-         {
-            return StreamedRequestInitiator.this.canExecuteInWorkerThread();
-         }
-
          @Override
          public void execute(Connection connection, RequestHeader requestHeader, InputStream is, StreamResponseWriter writer)
          {

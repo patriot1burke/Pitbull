@@ -65,12 +65,6 @@ public class ServletRequestHandler implements StreamHandler
    }
 
    @Override
-   public boolean canExecuteInWorkerThread()
-   {
-      return false;
-   }
-
-   @Override
    public void unsupportedHandler()
    {
 
