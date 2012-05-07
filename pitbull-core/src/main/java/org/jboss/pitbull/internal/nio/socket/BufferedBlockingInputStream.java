@@ -1,11 +1,10 @@
-package org.jboss.pitbull.internal.nio.http;
+package org.jboss.pitbull.internal.nio.socket;
 
 import org.jboss.pitbull.ReadTimeoutException;
 import org.jboss.pitbull.internal.logging.Logger;
-import org.jboss.pitbull.internal.nio.socket.ByteBuffers;
-import org.jboss.pitbull.internal.nio.socket.ManagedChannel;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InterruptedIOException;
 import java.nio.ByteBuffer;
 import java.util.concurrent.TimeUnit;
@@ -20,13 +19,12 @@ import static java.lang.Math.*;
  * @apiviz.exclude
  * @since 2.1
  */
-public class ContentLengthInputStream extends ContentInputStream
+public class BufferedBlockingInputStream extends InputStream
 {
    private final ManagedChannel channel;
    private final ByteBuffer buffer;
-   private long remainingBytes;
    private volatile boolean closed;
-   protected static final Logger log = Logger.getLogger(ContentLengthInputStream.class);
+   protected static final Logger log = Logger.getLogger(BufferedBlockingInputStream.class);
 
    /**
     * Construct a new instance.
@@ -34,7 +32,7 @@ public class ContentLengthInputStream extends ContentInputStream
     * @param channel    the channel to wrap
     * @param bufferSize the size of the internal buffer
     */
-   public ContentLengthInputStream(final ManagedChannel channel, ByteBuffer buffer, long contentLength)
+   public BufferedBlockingInputStream(final ManagedChannel channel, ByteBuffer buffer)
    {
       if (channel == null)
       {
@@ -46,37 +44,40 @@ public class ContentLengthInputStream extends ContentInputStream
       }
       this.buffer = buffer;
       this.channel = channel;
-      this.remainingBytes = contentLength;
+   }
+
+   protected volatile long timeout;
+
+   /**
+    * Get the read timeout.
+    *
+    * @param unit the time unit
+    * @return the timeout in the given unit
+    */
+   public long getReadTimeout(TimeUnit unit)
+   {
+      return unit.convert(timeout, TimeUnit.MILLISECONDS);
+   }
+
+   /**
+    * Set the read timeout.  Does not affect read operations in progress.
+    *
+    * @param timeout the read timeout, or 0 for none
+    * @param unit    the time unit
+    */
+   public void setReadTimeout(long timeout, TimeUnit unit)
+   {
+      if (timeout < 0L)
+      {
+         throw new IllegalArgumentException("Negative timeout");
+      }
+      final long calcTimeout = unit.toMillis(timeout);
+      this.timeout = timeout == 0L ? 0L : calcTimeout < 1L ? 1L : calcTimeout;
    }
 
    protected void resetBufferLimit()
    {
-      if (remainingBytes == 0)
-      {
-         log.trace("resetBufferLimit with 0 remaining bytes");
-      }
       buffer.clear();
-      if (buffer.capacity() > remainingBytes) buffer.limit((int) (remainingBytes));
-   }
-
-   @Override
-   public void eat()
-   {
-      if (remainingBytes > 0)
-      {
-         log.trace("Need to skip bytes: {0}", remainingBytes);
-      }
-      while (remainingBytes > 0)
-      {
-         try
-         {
-            skip(1000);
-         }
-         catch (IOException e)
-         {
-            throw new RuntimeException(e);
-         }
-      }
    }
 
    /**
@@ -88,17 +89,15 @@ public class ContentLengthInputStream extends ContentInputStream
    public int read() throws IOException
    {
       if (closed) return -1;
-      if (remainingBytes <= 0) return -1;
 
       final ByteBuffer buffer = this.buffer;
 
-      //final SocketChannel channel = this.channel.getChannel();
       final long timeout = this.timeout;
       if (timeout == 0L)
       {
          while (!buffer.hasRemaining())
          {
-            resetBufferLimit();
+            buffer.clear();
             final int res = channel.readBlocking(buffer);
             if (res == -1)
             {
@@ -129,7 +128,6 @@ public class ContentLengthInputStream extends ContentInputStream
             } while (!buffer.hasRemaining());
          }
       }
-      remainingBytes--;
       return buffer.get() & 0xff;
    }
 
@@ -145,14 +143,9 @@ public class ContentLengthInputStream extends ContentInputStream
    public int read(final byte[] b, int off, int len) throws IOException
    {
       if (closed) return -1;
-      if (remainingBytes <= 0) return -1;
       if (len < 1)
       {
          return 0;
-      }
-      if (len > remainingBytes)
-      {
-         len = (int) remainingBytes;
       }
       int total = 0;
       final ByteBuffer buffer = this.buffer;
@@ -163,7 +156,6 @@ public class ContentLengthInputStream extends ContentInputStream
          total += cnt;
          off += cnt;
          len -= cnt;
-         remainingBytes -= cnt;
       }
       if (closed) return -1;
       if (len <= 0) return total;
@@ -186,7 +178,6 @@ public class ContentLengthInputStream extends ContentInputStream
             }
             else
             {
-               remainingBytes -= res;
                total += res;
                return total;
             }
@@ -217,7 +208,6 @@ public class ContentLengthInputStream extends ContentInputStream
             }
             else
             {
-               remainingBytes -= res;
                total += res;
                return total;
             }
@@ -240,7 +230,6 @@ public class ContentLengthInputStream extends ContentInputStream
    public long skip(long n) throws IOException
    {
       if (closed) return 0L;
-      if (remainingBytes <= 0) return 0L;
       if (n < 1L)
       {
          return 0L;
@@ -251,17 +240,12 @@ public class ContentLengthInputStream extends ContentInputStream
       {
          final int cnt = (int) min(buffer.remaining(), n);
          ByteBuffers.skip(buffer, cnt);
-         remainingBytes -= cnt;
          total += cnt;
          n -= cnt;
       }
       if (closed)
       {
          return total;
-      }
-      if (n > remainingBytes)
-      {
-         n = remainingBytes;
       }
       if (n > 0L)
       {
@@ -277,7 +261,6 @@ public class ContentLengthInputStream extends ContentInputStream
                   return total;
                }
                total += (long) res;
-               remainingBytes -= res;
             }
          }
          finally
@@ -286,6 +269,11 @@ public class ContentLengthInputStream extends ContentInputStream
          }
       }
       return total;
+   }
+
+   public int bufferAvailable()
+   {
+      return buffer.remaining();
    }
 
    /**

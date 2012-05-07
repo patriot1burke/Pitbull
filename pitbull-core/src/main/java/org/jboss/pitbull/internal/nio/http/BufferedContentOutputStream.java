@@ -210,6 +210,7 @@ public class BufferedContentOutputStream extends ContentOutputStream
 
    public synchronized void close() throws IOException
    {
+      if (closed) return;
       closed = true;
       if (initialFlush)
       {
