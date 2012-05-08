@@ -1,7 +1,7 @@
 package org.jboss.pitbull.test;
 
-import org.jboss.pitbull.HttpServer;
-import org.jboss.pitbull.HttpServerBuilder;
+import org.jboss.pitbull.server.HttpServer;
+import org.jboss.pitbull.server.HttpServerBuilder;
 import org.jboss.pitbull.stress.StressService;
 import org.jboss.resteasy.client.ClientRequest;
 import org.jboss.resteasy.client.ClientResponse;

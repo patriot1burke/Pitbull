@@ -1,4 +1,4 @@
-package org.jboss.pitbull;
+package org.jboss.pitbull.server;
 
 import org.jboss.pitbull.crypto.KeyTools;
 import org.jboss.pitbull.internal.nio.http.HttpConnector;

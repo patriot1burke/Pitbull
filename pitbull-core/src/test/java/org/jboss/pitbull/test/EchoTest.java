@@ -1,15 +1,15 @@
 package org.jboss.pitbull.test;
 
 import org.jboss.pitbull.Connection;
-import org.jboss.pitbull.HttpServer;
-import org.jboss.pitbull.HttpServerBuilder;
+import org.jboss.pitbull.server.HttpServer;
+import org.jboss.pitbull.server.HttpServerBuilder;
 import org.jboss.pitbull.RequestHeader;
 import org.jboss.pitbull.StatusCode;
 import org.jboss.pitbull.client.ClientConnection;
 import org.jboss.pitbull.client.ClientConnectionFactory;
 import org.jboss.pitbull.client.ClientInvocation;
-import org.jboss.pitbull.handlers.stream.StreamRequestHandler;
-import org.jboss.pitbull.handlers.stream.StreamedResponse;
+import org.jboss.pitbull.server.handlers.stream.StreamRequestHandler;
+import org.jboss.pitbull.server.handlers.stream.StreamedResponse;
 import org.jboss.resteasy.client.ClientRequest;
 import org.jboss.resteasy.client.ClientResponse;
 import org.jboss.resteasy.util.ReadFromStream;
@@ -111,7 +111,7 @@ public class EchoTest
          try
          {
             ClientInvocation invocation = connection.request("/echo").get();
-            org.jboss.pitbull.client.ClientResponse response = invocation.response();
+            org.jboss.pitbull.client.ClientResponse response = invocation.invoke();
 
             Assert.assertEquals(StatusCode.OK, response.getStatus());
             InputStream is = response.getResponseBody();
@@ -121,7 +121,7 @@ public class EchoTest
 
             invocation = connection.request("/echo").post();
             invocation.getRequestBody().write("hello world".getBytes());
-            response = invocation.response();
+            response = invocation.invoke();
             Assert.assertEquals(StatusCode.OK, response.getStatus());
             is = response.getResponseBody();
             bytes = ReadFromStream.readFromStream(1024, is);

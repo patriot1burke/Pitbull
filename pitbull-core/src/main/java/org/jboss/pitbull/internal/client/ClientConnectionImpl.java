@@ -1,8 +1,8 @@
-package org.jboss.pitbull.client.internal;
+package org.jboss.pitbull.internal.client;
 
+import org.jboss.pitbull.PitbullChannel;
 import org.jboss.pitbull.client.ClientConnection;
 import org.jboss.pitbull.client.ClientInvocation;
-import org.jboss.pitbull.handlers.PitbullChannel;
 
 import javax.net.ssl.SSLSession;
 import java.io.IOException;

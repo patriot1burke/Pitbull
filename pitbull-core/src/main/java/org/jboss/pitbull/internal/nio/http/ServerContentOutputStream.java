@@ -1,12 +1,11 @@
 package org.jboss.pitbull.internal.nio.http;
 
 import org.jboss.pitbull.OrderedHeaders;
+import org.jboss.pitbull.PitbullChannel;
 import org.jboss.pitbull.RequestHeader;
 import org.jboss.pitbull.ResponseHeader;
-import org.jboss.pitbull.handlers.PitbullChannel;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 
 
 /**

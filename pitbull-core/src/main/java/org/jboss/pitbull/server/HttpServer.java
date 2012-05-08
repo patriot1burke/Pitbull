@@ -1,11 +1,10 @@
-package org.jboss.pitbull;
+package org.jboss.pitbull.server;
 
 import org.jboss.pitbull.internal.logging.Logger;
 import org.jboss.pitbull.internal.nio.http.HttpConnector;
 import org.jboss.pitbull.internal.nio.socket.Worker;
 import org.jboss.pitbull.spi.RequestHandler;
 import org.jboss.pitbull.spi.RequestInitiator;
-import org.jboss.pitbull.util.registry.Segment;
 import org.jboss.pitbull.util.registry.UriRegistry;
 
 import java.util.ArrayList;

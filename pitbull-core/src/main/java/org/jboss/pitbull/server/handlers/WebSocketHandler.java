@@ -1,6 +1,6 @@
-package org.jboss.pitbull.handlers.websocket;
+package org.jboss.pitbull.server.handlers;
 
-import org.jboss.pitbull.Connection;
+import org.jboss.pitbull.websocket.WebSocket;
 
 import java.io.IOException;
 

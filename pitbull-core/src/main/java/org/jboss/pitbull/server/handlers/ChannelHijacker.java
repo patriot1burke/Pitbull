@@ -1,5 +1,6 @@
-package org.jboss.pitbull.handlers;
+package org.jboss.pitbull.server.handlers;
 
+import org.jboss.pitbull.PitbullChannel;
 import org.jboss.pitbull.spi.RequestHandler;
 
 /**

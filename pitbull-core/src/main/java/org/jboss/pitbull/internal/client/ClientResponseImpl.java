@@ -1,10 +1,8 @@
-package org.jboss.pitbull.client.internal;
+package org.jboss.pitbull.internal.client;
 
 import org.jboss.pitbull.OrderedHeaders;
-import org.jboss.pitbull.ResponseHeader;
 import org.jboss.pitbull.StatusCode;
 import org.jboss.pitbull.client.ClientResponse;
-import org.jboss.pitbull.handlers.PitbullChannel;
 import org.jboss.pitbull.internal.nio.http.ContentInputStream;
 import org.jboss.pitbull.internal.nio.socket.Channels;
 import org.jboss.pitbull.util.OrderedHeadersImpl;

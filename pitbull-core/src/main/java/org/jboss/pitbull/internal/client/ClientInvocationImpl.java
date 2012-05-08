@@ -1,17 +1,12 @@
-package org.jboss.pitbull.client.internal;
+package org.jboss.pitbull.internal.client;
 
-import org.jboss.pitbull.client.ClientConnection;
+import org.jboss.pitbull.ContentOutputStream;
 import org.jboss.pitbull.client.ClientInvocation;
 import org.jboss.pitbull.client.ClientResponse;
-import org.jboss.pitbull.handlers.PitbullChannel;
-import org.jboss.pitbull.handlers.stream.ContentOutputStream;
+import org.jboss.pitbull.internal.NotImplementedYetException;
 import org.jboss.pitbull.internal.nio.http.HttpRequestHeader;
-import org.jboss.pitbull.internal.nio.socket.Channels;
 
 import java.io.IOException;
-import java.io.OutputStream;
-import java.nio.ByteBuffer;
-import java.nio.channels.ClosedChannelException;
 import java.util.concurrent.Future;
 
 /**
@@ -86,7 +81,7 @@ public class ClientInvocationImpl implements ClientInvocation
    }
 
    @Override
-   public ClientResponse response() throws IOException
+   public ClientResponse invoke() throws IOException
    {
       getRequestBody().close();
       ClientResponseImpl impl = new ClientResponseImpl(connection);
@@ -95,8 +90,8 @@ public class ClientInvocationImpl implements ClientInvocation
    }
 
    @Override
-   public Future<ClientResponse> asyncResponse()
+   public Future<ClientResponse> submit() throws IOException
    {
-      return null;
+      throw new NotImplementedYetException();
    }
 }

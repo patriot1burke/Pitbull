@@ -1,8 +1,7 @@
 package org.jboss.pitbull.internal.nio.http;
 
 import org.jboss.pitbull.OrderedHeaders;
-import org.jboss.pitbull.handlers.PitbullChannel;
-import org.jboss.pitbull.internal.nio.socket.ManagedChannel;
+import org.jboss.pitbull.PitbullChannel;
 
 import java.io.IOException;
 import java.io.InputStream;

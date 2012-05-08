@@ -1,13 +1,12 @@
 package org.jboss.pitbull.client;
 
-import org.jboss.pitbull.client.internal.ClientConnectionImpl;
-import org.jboss.pitbull.handlers.PitbullChannel;
+import org.jboss.pitbull.PitbullChannel;
+import org.jboss.pitbull.internal.client.ClientConnectionImpl;
 import org.jboss.pitbull.internal.nio.socket.FreeChannel;
 import org.jboss.pitbull.internal.nio.socket.SelectorUtil;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.net.SocketAddress;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
 import java.security.KeyStore;

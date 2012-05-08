@@ -1,6 +1,6 @@
 package org.jboss.pitbull.servlet;
 
-import org.jboss.pitbull.HttpServer;
+import org.jboss.pitbull.server.HttpServer;
 
 import java.util.ArrayList;
 import java.util.List;

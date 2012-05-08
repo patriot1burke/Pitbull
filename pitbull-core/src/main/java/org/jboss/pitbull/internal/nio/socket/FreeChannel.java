@@ -1,6 +1,6 @@
 package org.jboss.pitbull.internal.nio.socket;
 
-import org.jboss.pitbull.handlers.PitbullChannel;
+import org.jboss.pitbull.PitbullChannel;
 import org.jboss.pitbull.internal.logging.Logger;
 
 import javax.net.ssl.SSLSession;

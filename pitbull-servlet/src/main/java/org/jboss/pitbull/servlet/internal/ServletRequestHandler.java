@@ -2,8 +2,8 @@ package org.jboss.pitbull.servlet.internal;
 
 import org.jboss.pitbull.Connection;
 import org.jboss.pitbull.RequestHeader;
-import org.jboss.pitbull.handlers.stream.StreamRequestHandler;
-import org.jboss.pitbull.handlers.stream.StreamedResponse;
+import org.jboss.pitbull.server.handlers.stream.StreamRequestHandler;
+import org.jboss.pitbull.server.handlers.stream.StreamedResponse;
 import org.jboss.pitbull.internal.logging.Logger;
 import org.jboss.pitbull.servlet.DeploymentServletContext;
 import org.jboss.pitbull.servlet.DeploymentServletRegistration;

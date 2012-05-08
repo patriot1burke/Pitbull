@@ -1,4 +1,4 @@
-package org.jboss.pitbull.handlers.websocket;
+package org.jboss.pitbull.websocket;
 
 /**
  * @author <a href="mailto:bill@burkecentral.com">Bill Burke</a>

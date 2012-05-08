@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.jboss.pitbull.handlers.websocket;
+package org.jboss.pitbull.websocket;
 
 import org.jboss.pitbull.Connection;
 import org.jboss.pitbull.RequestHeader;

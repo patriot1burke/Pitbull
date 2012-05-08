@@ -1,12 +1,12 @@
 package org.jboss.pitbull.stress;
 
 import org.jboss.pitbull.Connection;
-import org.jboss.pitbull.HttpServer;
-import org.jboss.pitbull.HttpServerBuilder;
+import org.jboss.pitbull.server.HttpServer;
+import org.jboss.pitbull.server.HttpServerBuilder;
 import org.jboss.pitbull.RequestHeader;
 import org.jboss.pitbull.StatusCode;
-import org.jboss.pitbull.handlers.stream.StreamRequestHandler;
-import org.jboss.pitbull.handlers.stream.StreamedResponse;
+import org.jboss.pitbull.server.handlers.stream.StreamRequestHandler;
+import org.jboss.pitbull.server.handlers.stream.StreamedResponse;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

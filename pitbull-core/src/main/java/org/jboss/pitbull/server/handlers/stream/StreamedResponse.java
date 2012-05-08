@@ -1,5 +1,6 @@
-package org.jboss.pitbull.handlers.stream;
+package org.jboss.pitbull.server.handlers.stream;
 
+import org.jboss.pitbull.ContentOutputStream;
 import org.jboss.pitbull.ResponseHeader;
 import org.jboss.pitbull.StatusCode;
 

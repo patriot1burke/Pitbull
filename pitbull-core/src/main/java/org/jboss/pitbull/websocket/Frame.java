@@ -1,9 +1,9 @@
-package org.jboss.pitbull.handlers.websocket;
+package org.jboss.pitbull.websocket;
 
 /**
  * @author <a href="mailto:bill@burkecentral.com">Bill Burke</a>
  * @version $Revision: 1 $
  */
-public interface PongFrame extends Frame
+public interface Frame
 {
 }

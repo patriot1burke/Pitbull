@@ -1,10 +1,9 @@
 package org.jboss.pitbull.internal.nio.http;
 
+import org.jboss.pitbull.PitbullChannel;
 import org.jboss.pitbull.ReadTimeoutException;
-import org.jboss.pitbull.handlers.PitbullChannel;
 import org.jboss.pitbull.internal.logging.Logger;
 import org.jboss.pitbull.internal.nio.socket.ByteBuffers;
-import org.jboss.pitbull.internal.nio.socket.ManagedChannel;
 
 import java.io.IOException;
 import java.io.InterruptedIOException;

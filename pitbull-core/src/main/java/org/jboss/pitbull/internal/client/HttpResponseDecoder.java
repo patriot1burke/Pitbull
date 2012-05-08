@@ -1,10 +1,9 @@
-package org.jboss.pitbull.client.internal;
+package org.jboss.pitbull.internal.client;
 
 
 import org.jboss.pitbull.OrderedHeaders;
 import org.jboss.pitbull.StatusCode;
 import org.jboss.pitbull.internal.nio.http.HttpMessageDecoder;
-import org.jboss.pitbull.internal.nio.http.HttpRequestHeader;
 
 import java.nio.ByteBuffer;
 

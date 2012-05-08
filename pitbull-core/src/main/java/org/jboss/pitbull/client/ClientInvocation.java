@@ -1,10 +1,9 @@
 package org.jboss.pitbull.client;
 
 
-import org.jboss.pitbull.handlers.stream.ContentOutputStream;
+import org.jboss.pitbull.ContentOutputStream;
 
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.concurrent.Future;
 
 /**
@@ -35,14 +34,15 @@ public interface ClientInvocation
     *
     * @return
     */
-   ClientResponse response() throws IOException;
+   ClientResponse invoke() throws IOException;
 
    /**
-    * Like response() Future is not complete until at least the response code and headers are available for reading
+    * This does not spawn a thread, but instead allows you to do blocking and non-blocking waits for the response
+    * from the server.
     *
     * @return
     */
-   Future<ClientResponse> asyncResponse();
+   Future<ClientResponse> submit() throws IOException;
 
 
 

@@ -2,13 +2,13 @@ package org.jboss.pitbull.internal.nio.websocket;
 
 import org.jboss.pitbull.Connection;
 import org.jboss.pitbull.RequestHeader;
-import org.jboss.pitbull.handlers.websocket.BinaryFrame;
-import org.jboss.pitbull.handlers.websocket.CloseFrame;
-import org.jboss.pitbull.handlers.websocket.Frame;
-import org.jboss.pitbull.handlers.websocket.PingFrame;
-import org.jboss.pitbull.handlers.websocket.PongFrame;
-import org.jboss.pitbull.handlers.websocket.TextFrame;
-import org.jboss.pitbull.handlers.websocket.WebSocket;
+import org.jboss.pitbull.websocket.BinaryFrame;
+import org.jboss.pitbull.websocket.CloseFrame;
+import org.jboss.pitbull.websocket.Frame;
+import org.jboss.pitbull.websocket.PingFrame;
+import org.jboss.pitbull.websocket.PongFrame;
+import org.jboss.pitbull.websocket.TextFrame;
+import org.jboss.pitbull.websocket.WebSocket;
 import org.jboss.pitbull.internal.nio.websocket.impl.oio.OioWebSocket;
 
 import java.io.IOException;

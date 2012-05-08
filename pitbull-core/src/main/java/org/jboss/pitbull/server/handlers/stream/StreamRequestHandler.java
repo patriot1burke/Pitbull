@@ -1,4 +1,4 @@
-package org.jboss.pitbull.handlers.stream;
+package org.jboss.pitbull.server.handlers.stream;
 
 import org.jboss.pitbull.Connection;
 import org.jboss.pitbull.RequestHeader;

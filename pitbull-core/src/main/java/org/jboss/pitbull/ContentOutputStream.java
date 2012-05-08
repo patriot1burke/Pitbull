@@ -1,4 +1,4 @@
-package org.jboss.pitbull.handlers.stream;
+package org.jboss.pitbull;
 
 import java.io.OutputStream;
 

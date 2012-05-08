@@ -1,4 +1,4 @@
-package org.jboss.pitbull.handlers;
+package org.jboss.pitbull;
 
 import javax.net.ssl.SSLSession;
 import java.io.IOException;

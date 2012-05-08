@@ -1,7 +1,7 @@
 package org.jboss.pitbull.internal.nio.websocket;
 
-import org.jboss.pitbull.handlers.websocket.WebSocket;
-import org.jboss.pitbull.handlers.websocket.WebSocketHandler;
+import org.jboss.pitbull.server.handlers.WebSocketHandler;
+import org.jboss.pitbull.websocket.WebSocket;
 import org.jboss.pitbull.internal.logging.Logger;
 import org.jboss.pitbull.internal.nio.socket.BufferedBlockingInputStream;
 import org.jboss.pitbull.internal.nio.socket.ManagedChannel;
