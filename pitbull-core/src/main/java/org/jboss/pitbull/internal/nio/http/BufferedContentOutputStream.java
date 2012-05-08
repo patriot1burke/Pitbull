@@ -2,6 +2,7 @@ package org.jboss.pitbull.internal.nio.http;
 
 import org.jboss.pitbull.RequestHeader;
 import org.jboss.pitbull.ResponseHeader;
+import org.jboss.pitbull.handlers.PitbullChannel;
 import org.jboss.pitbull.handlers.stream.ContentOutputStream;
 import org.jboss.pitbull.internal.nio.socket.ManagedChannel;
 
@@ -22,7 +23,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class BufferedContentOutputStream extends ContentOutputStream
 {
-   protected ManagedChannel channel;
+   protected PitbullChannel channel;
    protected ByteBuffer buffer;
    protected boolean initialFlush = true;
    protected int size;
@@ -50,7 +51,7 @@ public class BufferedContentOutputStream extends ContentOutputStream
     *
     * @param out
     */
-   public BufferedContentOutputStream(ManagedChannel channel, RequestHeader requestHeader, ResponseHeader responseHeader)
+   public BufferedContentOutputStream(PitbullChannel channel, RequestHeader requestHeader, ResponseHeader responseHeader)
    {
       this(channel, requestHeader, responseHeader, 8192);
    }
@@ -61,7 +62,7 @@ public class BufferedContentOutputStream extends ContentOutputStream
     * @param out
     * @param size must be > 0
     */
-   public BufferedContentOutputStream(ManagedChannel channel, RequestHeader requestHeader, ResponseHeader responseHeader, int size)
+   public BufferedContentOutputStream(PitbullChannel channel, RequestHeader requestHeader, ResponseHeader responseHeader, int size)
    {
       this.channel = channel;
       this.requestHeader = requestHeader;

@@ -1,39 +1,29 @@
 package org.jboss.pitbull.internal.nio.socket;
 
-import org.jboss.pitbull.internal.logging.Logger;
+import org.jboss.pitbull.handlers.PitbullChannel;
 
 import javax.net.ssl.SSLSession;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
-import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 /**
  * @author <a href="mailto:bill@burkecentral.com">Bill Burke</a>
  * @version $Revision: 1 $
  */
-public class ManagedChannel
+public class ManagedChannel implements PitbullChannel
 {
-   protected SocketChannel channel;
    protected Worker worker;
    protected SelectionKey key;
    protected EventHandler handler;
-   protected boolean closed;
-   private static final Logger log = Logger.getLogger(ManagedChannel.class);
-   protected SSLSession sslSession;
-   protected String id = UUID.randomUUID().toString();
+   protected PitbullChannel freeChannel;
 
-   public ManagedChannel(SocketChannel channel, EventHandler handler)
+   public ManagedChannel(PitbullChannel channel, EventHandler handler)
    {
-      this.channel = channel;
+      this.freeChannel = channel;
       this.handler = handler;
-   }
-
-   public String getId()
-   {
-      return id;
    }
 
    public void bindSelectionKey(Worker worker, SelectionKey key)
@@ -42,63 +32,9 @@ public class ManagedChannel
       this.key = key;
    }
 
-   public SSLSession getSslSession()
-   {
-      return sslSession;
-   }
-
-   public SocketChannel getChannel()
-   {
-      return channel;
-   }
-
    public EventHandler getHandler()
    {
       return handler;
-   }
-
-   /**
-    * Non-blocking
-    *
-    * @param buf
-    * @return
-    * @throws IOException
-    */
-   public int read(ByteBuffer buf) throws IOException
-   {
-      return channel.read(buf);
-   }
-
-   public int readBlocking(ByteBuffer buf) throws IOException
-   {
-      return Channels.readBlocking(getChannel(), buf);
-   }
-
-   public int readBlocking(ByteBuffer buf, long time, TimeUnit unit) throws IOException
-   {
-      return Channels.readBlocking(getChannel(), buf, time, unit);
-   }
-
-   /**
-    * Non-blocking
-    *
-    * @param buf
-    * @return
-    * @throws IOException
-    */
-   public int write(ByteBuffer buf) throws IOException
-   {
-      return channel.write(buf);
-   }
-
-   public int writeBlocking(ByteBuffer buffer) throws IOException
-   {
-      return Channels.writeBlocking(getChannel(), buffer);
-   }
-
-   public int writeBlocking(ByteBuffer buffer, long time, TimeUnit unit) throws IOException
-   {
-      return Channels.writeBlocking(getChannel(), buffer, time, unit);
    }
 
    public void suspendReads()
@@ -128,31 +64,74 @@ public class ManagedChannel
       }
    }
 
-   public void shutdown()
+   public String getId()
    {
-      handler.shutdown();
-      close();
+      return freeChannel.getId();
+   }
+
+   public SSLSession getSslSession()
+   {
+      return freeChannel.getSslSession();
+   }
+
+   public SocketChannel getChannel()
+   {
+      return freeChannel.getChannel();
+   }
+
+   public PitbullChannel getFreeChannel()
+   {
+      return freeChannel;
+   }
+
+   public int read(ByteBuffer buf) throws IOException
+   {
+      return freeChannel.read(buf);
+   }
+
+   public int readBlocking(ByteBuffer buf) throws IOException
+   {
+      return freeChannel.readBlocking(buf);
+   }
+
+   public int readBlocking(ByteBuffer buf, long time, TimeUnit unit) throws IOException
+   {
+      return freeChannel.readBlocking(buf, time, unit);
+   }
+
+   public int write(ByteBuffer buf) throws IOException
+   {
+      return freeChannel.write(buf);
+   }
+
+   public int writeBlocking(ByteBuffer buffer) throws IOException
+   {
+      return freeChannel.writeBlocking(buffer);
+   }
+
+   public int writeBlocking(ByteBuffer buffer, long time, TimeUnit unit) throws IOException
+   {
+      return freeChannel.writeBlocking(buffer, time, unit);
    }
 
    public boolean isClosed()
    {
-      return closed;
+      return freeChannel.isClosed();
    }
 
    public void close()
    {
-      if (closed) return;
-      log.trace("Channel closed: {0}", id);
-      closed = true;
-      try
-      { channel.close(); }
-      catch (Throwable ignored)
-      {}
-
+      freeChannel.close();
       try
       { if (key != null) key.cancel(); }
       catch (Exception ignored)
       {}
+   }
+
+   public void shutdown()
+   {
+      handler.shutdown();
+      close();
    }
 
 }

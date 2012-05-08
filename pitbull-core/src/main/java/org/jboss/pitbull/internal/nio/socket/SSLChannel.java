@@ -14,7 +14,7 @@ import java.util.concurrent.TimeUnit;
  * @author <a href="mailto:bill@burkecentral.com">Bill Burke</a>
  * @version $Revision: 1 $
  */
-public class SSLManagedChannel extends ManagedChannel
+public class SSLChannel extends FreeChannel
 {
    protected SSLEngine engine;
    protected SSLSession sslSession;
@@ -25,11 +25,11 @@ public class SSLManagedChannel extends ManagedChannel
    protected SSLEngineResult.Status engineStatus = null;
    protected ByteBuffer dummy = ByteBuffer.allocate(0);
 
-   protected static final Logger log = Logger.getLogger(SSLManagedChannel.class);
+   protected static final Logger log = Logger.getLogger(SSLChannel.class);
 
-   public SSLManagedChannel(SocketChannel channel, EventHandler handler, SSLEngine engine) throws Exception
+   public SSLChannel(SocketChannel channel, SSLEngine engine) throws Exception
    {
-      super(channel, handler);
+      super(channel);
       this.engine = engine;
       this.sslSession = engine.getSession();
       int packetBufferSize = sslSession.getPacketBufferSize();

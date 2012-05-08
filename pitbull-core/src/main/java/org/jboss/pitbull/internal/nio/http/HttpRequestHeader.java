@@ -14,7 +14,6 @@ public class HttpRequestHeader implements RequestHeader
    protected String method;
    protected String uri;
    protected OrderedHeaders headers = new OrderedHeadersImpl();
-   protected boolean chunked;
 
    public String getHttpVersion()
    {

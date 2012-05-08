@@ -17,6 +17,6 @@ public class ManagedChannelFactory
 
    public ManagedChannel create(SocketChannel channel) throws Exception
    {
-      return new ManagedChannel(channel, eventHandlerFactory.create());
+      return new ManagedChannel(new FreeChannel(channel), eventHandlerFactory.create());
    }
 }
