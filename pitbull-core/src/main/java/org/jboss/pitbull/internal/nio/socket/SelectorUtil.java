@@ -35,7 +35,7 @@ import java.util.concurrent.TimeUnit;
  * @author <a href="http://gleamynode.net/">Trustin Lee</a>
  * @version $Rev: 2200 $, $Date: 2010-02-23 14:42:39 +0900 (Tue, 23 Feb 2010) $
  */
-final class SelectorUtil
+public final class SelectorUtil
 {
    protected static final Logger logger = Logger.getLogger(SelectorUtil.class);
 

@@ -1,6 +1,9 @@
 package org.jboss.pitbull.client;
 
 
+import org.jboss.pitbull.handlers.stream.ContentOutputStream;
+
+import java.io.IOException;
 import java.io.OutputStream;
 import java.util.concurrent.Future;
 
@@ -25,16 +28,14 @@ public interface ClientInvocation
     *
     * @return
     */
-   OutputStream getRequestBody();
-
-   OutputStream getRequestBody(int bufferSize);
+   ContentOutputStream getRequestBody();
 
    /**
     * Blocks until at least the response code and headers are available for reading.
     *
     * @return
     */
-   ClientResponse response();
+   ClientResponse response() throws IOException;
 
    /**
     * Like response() Future is not complete until at least the response code and headers are available for reading

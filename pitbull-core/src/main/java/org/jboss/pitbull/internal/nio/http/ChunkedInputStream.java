@@ -1,6 +1,7 @@
 package org.jboss.pitbull.internal.nio.http;
 
 import org.jboss.pitbull.ReadTimeoutException;
+import org.jboss.pitbull.handlers.PitbullChannel;
 import org.jboss.pitbull.internal.logging.Logger;
 import org.jboss.pitbull.internal.nio.socket.ByteBuffers;
 import org.jboss.pitbull.internal.nio.socket.ManagedChannel;
@@ -20,7 +21,7 @@ import static java.lang.Math.*;
  */
 public class ChunkedInputStream extends ContentInputStream
 {
-   private final ManagedChannel channel;
+   private final PitbullChannel channel;
    private final ByteBuffer buffer;
    private volatile boolean closed;
    private boolean done;
@@ -34,7 +35,7 @@ public class ChunkedInputStream extends ContentInputStream
     * @param channel    the channel to wrap
     * @param bufferSize the size of the internal buffer
     */
-   public ChunkedInputStream(final ManagedChannel channel, ByteBuffer buffer)
+   public ChunkedInputStream(final PitbullChannel channel, ByteBuffer buffer)
    {
       if (channel == null)
       {

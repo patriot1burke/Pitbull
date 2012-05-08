@@ -15,7 +15,7 @@ import java.util.Map;
 public class HttpResponse
 {
    protected StatusCode status;
-   protected OrderedHeaders headers;
+   protected ResponseHeader responseHeader;
 
    public HttpResponse(StatusCode status)
    {
@@ -24,18 +24,19 @@ public class HttpResponse
 
    public HttpResponse(ResponseHeader response)
    {
-      this.status = response.getStatusCode();
-      this.headers = response.getHeaders();
+      this.responseHeader = response;
    }
 
    public StatusCode getStatus()
    {
-      return status;
+      if (responseHeader == null) return status;
+      return responseHeader.getStatusCode();
    }
 
    public OrderedHeaders getHeaders()
    {
-      return headers;
+      if (responseHeader == null) return null;
+      return responseHeader.getHeaders();
    }
 
    /**
@@ -45,7 +46,7 @@ public class HttpResponse
     */
    public void prepareEmptyBody(RequestHeader request)
    {
-      if (status.getCode() < 200 || status.getCode() == 204 || status.getCode() == 304)
+      if (getStatus().getCode() < 200 || getStatus().getCode() == 204 || getStatus().getCode() == 304)
       {
          return;
       }
@@ -60,9 +61,9 @@ public class HttpResponse
    {
       StringBuilder builder = new StringBuilder(100);
       builder.append("HTTP/1.1 ");
-      builder.append(status.getCode());
+      builder.append(getStatus().getCode());
       builder.append(' ');
-      builder.append(status.getStatusMessage());
+      builder.append(getStatus().getStatusMessage());
       builder.append("\r\n");
       if (getHeaders() != null)
       {

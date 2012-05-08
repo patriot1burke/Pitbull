@@ -8,8 +8,7 @@ import org.jboss.pitbull.Connection;
  */
 public interface ClientConnection extends Connection
 {
-   public String getHost();
-   public int getPort();
+   public String getHostHeader();
 
    /**
     * @param uri relative URI minus host/port/protocol

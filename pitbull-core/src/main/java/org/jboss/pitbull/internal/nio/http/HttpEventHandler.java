@@ -40,7 +40,7 @@ public class HttpEventHandler implements EventHandler
    protected void error(ManagedChannel channel, StatusCode code, HttpRequestHeader requestHeader) throws IOException
    {
       log.trace("Error returning with code: {0}", code.toString());
-      ContentInputStream is = ContentInputStream.create(channel, buffer, requestHeader);
+      ContentInputStream is = ContentInputStream.create(channel, buffer, requestHeader.getHeaders());
       if (is != null) is.eat();
       log.trace("ate stream");
       HttpResponse response = new HttpResponse(code);

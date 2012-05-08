@@ -1,0 +1,104 @@
+package org.jboss.pitbull.client.internal;
+
+import org.jboss.pitbull.OrderedHeaders;
+import org.jboss.pitbull.ResponseHeader;
+import org.jboss.pitbull.StatusCode;
+import org.jboss.pitbull.client.ClientResponse;
+import org.jboss.pitbull.handlers.PitbullChannel;
+import org.jboss.pitbull.internal.nio.http.ContentInputStream;
+import org.jboss.pitbull.internal.nio.socket.Channels;
+import org.jboss.pitbull.util.OrderedHeadersImpl;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.ByteBuffer;
+import java.nio.channels.ClosedChannelException;
+
+/**
+ * @author <a href="mailto:bill@burkecentral.com">Bill Burke</a>
+ * @version $Revision: 1 $
+ */
+public class ClientResponseImpl implements ClientResponse
+{
+   protected ClientConnectionImpl connection;
+   protected String httpVersion;
+   protected StatusCode status;
+   protected OrderedHeaders headers = new OrderedHeadersImpl();
+   protected ByteBuffer buffer;
+   protected ContentInputStream is;
+   protected boolean closed;
+
+   public ClientResponseImpl(ClientConnectionImpl connection)
+   {
+      this.connection = connection;
+   }
+
+   public void awaitResponse() throws IOException
+   {
+      connection.setLast(this);
+      HttpResponseDecoder decoder = new HttpResponseDecoder(this);
+      buffer = ByteBuffer.allocate(8192);
+      do
+      {
+         int read = Channels.readBlocking(connection.channel.getChannel(), buffer);
+         if (read == -1)
+         {
+            connection.close();
+            throw new ClosedChannelException();
+         }
+         if (read > 0) buffer.flip();
+      } while (decoder.process(buffer) == false);
+      is = ContentInputStream.create(connection.channel, buffer, headers);
+   }
+
+   public void setStatus(StatusCode status)
+   {
+      this.status = status;
+   }
+
+   @Override
+   public String getHttpVersion()
+   {
+      return httpVersion;
+   }
+
+   public void setHttpVersion(String httpVersion)
+   {
+      this.httpVersion = httpVersion;
+   }
+
+   @Override
+   public StatusCode getStatus()
+   {
+      return status;
+   }
+
+   @Override
+   public OrderedHeaders getHeaders()
+   {
+      return headers;
+   }
+
+   @Override
+   public InputStream getResponseBody()
+   {
+      return is;
+   }
+
+   public boolean isClosed()
+   {
+      return closed;
+   }
+
+   public void close() throws IOException
+   {
+      if (closed) return;
+      closed = true;
+      if (is != null)
+      {
+         is.eat();
+         is.close();
+      }
+
+   }
+}

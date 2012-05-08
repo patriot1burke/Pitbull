@@ -35,7 +35,7 @@ public class StreamExecutor implements Runnable
    {
       //long start = System.currentTimeMillis();
       //log.debug("Start Stream Executor");
-      ContentInputStream is = ContentInputStream.create(channel, buffer, requestHeader);
+      ContentInputStream is = ContentInputStream.create(channel, buffer, requestHeader.getHeaders());
       NioStreamedResponse writer = new NioStreamedResponse(channel, requestHeader, is); // todo handle keepalive setting
       try
       {

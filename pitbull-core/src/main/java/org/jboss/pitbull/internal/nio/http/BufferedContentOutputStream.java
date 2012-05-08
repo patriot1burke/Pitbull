@@ -1,10 +1,8 @@
 package org.jboss.pitbull.internal.nio.http;
 
-import org.jboss.pitbull.RequestHeader;
-import org.jboss.pitbull.ResponseHeader;
+import org.jboss.pitbull.OrderedHeaders;
 import org.jboss.pitbull.handlers.PitbullChannel;
 import org.jboss.pitbull.handlers.stream.ContentOutputStream;
-import org.jboss.pitbull.internal.nio.socket.ManagedChannel;
 
 import java.io.IOException;
 import java.io.InterruptedIOException;
@@ -12,27 +10,15 @@ import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.util.concurrent.TimeUnit;
 
-
 /**
- * Works the same as BufferedOutputStream except it invokes a callback prior to:
- * - initial flush of buffer
- * - subsequent flush of buffer
- *
  * @author <a href="mailto:bill@burkecentral.com">Bill Burke</a>
  * @version $Revision: 1 $
  */
 public class BufferedContentOutputStream extends ContentOutputStream
 {
-   protected PitbullChannel channel;
-   protected ByteBuffer buffer;
-   protected boolean initialFlush = true;
-   protected int size;
-   protected RequestHeader requestHeader;
-   protected ResponseHeader responseHeader;
-   protected boolean closed;
-   protected long timeout;
    static final byte[] CRLF = new byte[]{HttpRequestDecoder.CR, HttpRequestDecoder.LF};
    static byte[] LAST_CHUNK;
+
 
    {
       try
@@ -45,28 +31,26 @@ public class BufferedContentOutputStream extends ContentOutputStream
       }
    }
 
-
-   /**
-    * delegate OutputStream can be null and set at another time (i.e. at initialFlush time)
-    *
-    * @param out
-    */
-   public BufferedContentOutputStream(PitbullChannel channel, RequestHeader requestHeader, ResponseHeader responseHeader)
+   public interface ContentMessage
    {
-      this(channel, requestHeader, responseHeader, 8192);
+      OrderedHeaders getHeaders();
+      byte[] getMessageBytes() throws IOException;
+      void prepareEmptyBody();
    }
 
-   /**
-    * delegate OutputStream can be null and set at another time (i.e. at initialFlush time)
-    *
-    * @param out
-    * @param size must be > 0
-    */
-   public BufferedContentOutputStream(PitbullChannel channel, RequestHeader requestHeader, ResponseHeader responseHeader, int size)
+
+   protected PitbullChannel channel;
+   protected ByteBuffer buffer;
+   protected boolean initialFlush = true;
+   protected int size;
+   protected ContentMessage contentMessage;
+   protected boolean closed;
+   protected long timeout;
+
+   public BufferedContentOutputStream(PitbullChannel channel, int bufferSize)
    {
       this.channel = channel;
-      this.requestHeader = requestHeader;
-      this.responseHeader = responseHeader;
+      this.size = bufferSize;
       setBufferSize(size);
    }
 
@@ -77,10 +61,9 @@ public class BufferedContentOutputStream extends ContentOutputStream
          if (buffer.position() > 0)
          {
             initialFlush = false;
-            HttpResponse response = new HttpResponse(responseHeader);
-            response.getHeaders().removeHeader("Content-Length");
-            response.getHeaders().addHeader("Transfer-Encoding", "chunked");
-            writeResponseHeader(response);
+            contentMessage.getHeaders().removeHeader("Content-Length");
+            contentMessage.getHeaders().addHeader("Transfer-Encoding", "chunked");
+            writeContentMessage();
             buffer.flip();
             writeChunk(buffer);
             buffer.clear();
@@ -112,9 +95,9 @@ public class BufferedContentOutputStream extends ContentOutputStream
       writeMessage(ByteBuffer.wrap(CRLF));
    }
 
-   private void writeResponseHeader(HttpResponse response) throws IOException
+   private void writeContentMessage() throws IOException
    {
-      byte[] bytes = response.responseBytes();
+      byte[] bytes = contentMessage.getMessageBytes();
       ByteBuffer tmp = ByteBuffer.wrap(bytes);
       writeMessage(tmp);
    }
@@ -142,7 +125,6 @@ public class BufferedContentOutputStream extends ContentOutputStream
       buffer = ByteBuffer.allocate(size);
    }
 
-
    public synchronized void write(int b) throws IOException
    {
       checkClosed();
@@ -152,7 +134,6 @@ public class BufferedContentOutputStream extends ContentOutputStream
       }
       buffer.put((byte) b);
    }
-
 
    public synchronized void write(byte b[], int off, int len) throws IOException
    {
@@ -202,7 +183,6 @@ public class BufferedContentOutputStream extends ContentOutputStream
       }
    }
 
-
    public synchronized void flush() throws IOException
    {
       checkClosed();
@@ -216,21 +196,20 @@ public class BufferedContentOutputStream extends ContentOutputStream
       if (initialFlush)
       {
          initialFlush = false;
-         HttpResponse response = new HttpResponse(responseHeader);
 
          if (buffer.position() > 0) // set content-length header and full content
          {
             buffer.flip();
-            response.getHeaders().removeHeader("Content-Length");
-            response.getHeaders().addHeader("Content-Length", Integer.toString(buffer.remaining()));
-            writeResponseHeader(response);
+            contentMessage.getHeaders().removeHeader("Content-Length");
+            contentMessage.getHeaders().addHeader("Content-Length", Integer.toString(buffer.remaining()));
+            writeContentMessage();
             writeMessage(buffer);
             buffer.clear();
          }
          else // we have nothing in buffer
          {
-            response.prepareEmptyBody(requestHeader);
-            writeResponseHeader(response);
+            contentMessage.prepareEmptyBody();
+            writeContentMessage();
          }
       }
       else
@@ -255,5 +234,5 @@ public class BufferedContentOutputStream extends ContentOutputStream
    {
       return !initialFlush;
    }
-}
 
+}

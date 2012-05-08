@@ -1,11 +1,17 @@
 package org.jboss.pitbull.client.internal;
 
+import org.jboss.pitbull.client.ClientConnection;
 import org.jboss.pitbull.client.ClientInvocation;
 import org.jboss.pitbull.client.ClientResponse;
 import org.jboss.pitbull.handlers.PitbullChannel;
+import org.jboss.pitbull.handlers.stream.ContentOutputStream;
 import org.jboss.pitbull.internal.nio.http.HttpRequestHeader;
+import org.jboss.pitbull.internal.nio.socket.Channels;
 
+import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.ByteBuffer;
+import java.nio.channels.ClosedChannelException;
 import java.util.concurrent.Future;
 
 /**
@@ -14,16 +20,17 @@ import java.util.concurrent.Future;
  */
 public class ClientInvocationImpl implements ClientInvocation
 {
-   protected PitbullChannel channel;
-   protected String host;
+   protected ClientConnectionImpl connection;
    protected HttpRequestHeader requestHeader = new HttpRequestHeader();
+   protected ClientContentOutputStream output;
 
 
-   public ClientInvocationImpl(PitbullChannel channel, String host)
+   public ClientInvocationImpl(ClientConnectionImpl connection, String path)
    {
-      this.channel = channel;
-      this.host = host;
-      requestHeader.getHeaders().setHeader("Host", host);
+      this.connection = connection;
+      requestHeader.getHeaders().setHeader("Host", connection.getHostHeader());
+      requestHeader.setUri(path);
+      requestHeader.setHttpVersion("HTTP/1.1");
    }
 
    @Override
@@ -69,21 +76,22 @@ public class ClientInvocationImpl implements ClientInvocation
    }
 
    @Override
-   public OutputStream getRequestBody()
+   public ContentOutputStream getRequestBody()
    {
-      return null;
+      if (output == null)
+      {
+         output = new ClientContentOutputStream(requestHeader, connection.channel, 8192);
+      }
+      return output;
    }
 
    @Override
-   public OutputStream getRequestBody(int bufferSize)
+   public ClientResponse response() throws IOException
    {
-      return null;
-   }
-
-   @Override
-   public ClientResponse response()
-   {
-      return null;
+      getRequestBody().close();
+      ClientResponseImpl impl = new ClientResponseImpl(connection);
+      impl.awaitResponse();
+      return impl;
    }
 
    @Override

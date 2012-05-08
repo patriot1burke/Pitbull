@@ -1,5 +1,7 @@
 package org.jboss.pitbull.internal.nio.http;
 
+import org.jboss.pitbull.OrderedHeaders;
+import org.jboss.pitbull.handlers.PitbullChannel;
 import org.jboss.pitbull.internal.nio.socket.ManagedChannel;
 
 import java.io.IOException;
@@ -47,15 +49,15 @@ public abstract class ContentInputStream extends InputStream
     */
    public abstract void eat() throws IOException;
 
-   public static ContentInputStream create(ManagedChannel channel, ByteBuffer initialBuffer, HttpRequestHeader header)
+   public static ContentInputStream create(PitbullChannel channel, ByteBuffer initialBuffer, OrderedHeaders headers)
    {
-      String cl = header.getHeaders().getFirstHeader("Content-Length");
+      String cl = headers.getFirstHeader("Content-Length");
       if (cl != null)
       {
          long contentLength = Long.parseLong(cl);
          return new ContentLengthInputStream(channel, initialBuffer, contentLength);
       }
-      String transferEncoding = header.getHeaders().getFirstHeader("Transfer-Encoding");
+      String transferEncoding = headers.getFirstHeader("Transfer-Encoding");
       if (transferEncoding != null)
       {
          return new ChunkedInputStream(channel, initialBuffer);

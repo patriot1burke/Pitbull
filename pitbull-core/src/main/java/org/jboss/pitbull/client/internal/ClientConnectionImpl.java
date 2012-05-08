@@ -5,6 +5,7 @@ import org.jboss.pitbull.client.ClientInvocation;
 import org.jboss.pitbull.handlers.PitbullChannel;
 
 import javax.net.ssl.SSLSession;
+import java.io.IOException;
 import java.net.InetSocketAddress;
 
 /**
@@ -15,71 +16,84 @@ public class ClientConnectionImpl implements ClientConnection
 {
    protected PitbullChannel channel;
    protected String host;
-   protected int port;
+   protected ClientResponseImpl last;
 
    public ClientConnectionImpl(PitbullChannel channel, String host, int port)
    {
       this.channel = channel;
-      this.host = host;
-      this.port = port;
+      this.host = host + (port == 80 ? "" : (":"+Integer.toString(port)));
+
+   }
+
+   public void setLast(ClientResponseImpl last)
+   {
+      this.last = last;
    }
 
    @Override
-   public String getHost()
+   public String getHostHeader()
    {
       return host;
    }
 
    @Override
-   public int getPort()
-   {
-      return port;
-   }
-
-   @Override
    public ClientInvocation request(String uri)
    {
-      return null;
+      if (last != null)
+      {
+         final ClientResponseImpl tmp = last;
+         last = null;
+         try
+         {
+            tmp.close();
+         }
+         catch (IOException e)
+         {
+            throw new RuntimeException(e);
+         }
+      }
+      return new ClientInvocationImpl(this, uri);
    }
 
    @Override
    public boolean isClosed()
    {
-      return false;
+      return channel.isClosed();
    }
 
    @Override
    public void close()
    {
+      channel.close();
    }
 
    @Override
    public String getId()
    {
-      return null;
+      return channel.getId();
    }
 
    @Override
    public InetSocketAddress getLocalAddress()
    {
-      return null;
+      return (InetSocketAddress)(channel.getChannel().socket().getLocalSocketAddress());
    }
 
    @Override
    public InetSocketAddress getRemoteAddress()
    {
-      return null;
+      return (InetSocketAddress)(channel.getChannel().socket().getRemoteSocketAddress());
    }
 
    @Override
    public SSLSession getSSLSession()
    {
-      return null;
+      return channel.getSslSession();
    }
 
    @Override
    public boolean isSecure()
    {
-      return false;
+      return channel.getSslSession() != null;
    }
 }

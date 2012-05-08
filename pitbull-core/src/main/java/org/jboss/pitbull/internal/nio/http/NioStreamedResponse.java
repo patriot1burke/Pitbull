@@ -91,7 +91,7 @@ public class NioStreamedResponse implements StreamedResponse
    @Override
    public ContentOutputStream getOutputStream()
    {
-      if (stream == null) stream = new BufferedContentOutputStream(channel, requestHeader, this);
+      if (stream == null) stream = new ServerContentOutputStream(channel, requestHeader, this);
       return stream;
    }
 

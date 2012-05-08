@@ -1,7 +1,10 @@
-package org.jboss.pitbull.internal.nio.http;
+package org.jboss.pitbull.client.internal;
 
 
 import org.jboss.pitbull.OrderedHeaders;
+import org.jboss.pitbull.StatusCode;
+import org.jboss.pitbull.internal.nio.http.HttpMessageDecoder;
+import org.jboss.pitbull.internal.nio.http.HttpRequestHeader;
 
 import java.nio.ByteBuffer;
 
@@ -11,19 +14,19 @@ import java.nio.ByteBuffer;
  * @author <a href="mailto:bill@burkecentral.com">Bill Burke</a>
  * @version $Revision: 1 $
  */
-public class HttpRequestDecoder extends HttpMessageDecoder
+public class HttpResponseDecoder extends HttpMessageDecoder
 {
-   protected HttpRequestHeader request = new HttpRequestHeader();
+   protected ClientResponseImpl response;
 
-   public HttpRequestHeader getRequest()
+   public HttpResponseDecoder(ClientResponseImpl response)
    {
-      return request;
+      this.response = response;
    }
 
    @Override
    protected OrderedHeaders getHeaders()
    {
-      return request.getHeaders();
+      return response.getHeaders();
    }
 
    @Override
@@ -37,14 +40,10 @@ public class HttpRequestDecoder extends HttpMessageDecoder
          currentState = States.SKIP_CONTROL_CHARS;
          return true;
       }
-      String method = split[0].trim().toUpperCase();
-      request.setMethod(method);
-      if (method.length() < 2)
-      {
-         throw new RuntimeException("Parsing request header failed on readInitial: " + line);
-      }
-      request.setUri(split[1]);
-      request.setHttpVersion(split[2].trim().toUpperCase());
+      String version = split[0].trim();
+      response.setHttpVersion(version);
+      int code = Integer.valueOf(split[1]);
+      response.setStatus(StatusCode.create(code, split[2].trim()));
       currentState = States.READ_HEADERS;
       return true;
    }

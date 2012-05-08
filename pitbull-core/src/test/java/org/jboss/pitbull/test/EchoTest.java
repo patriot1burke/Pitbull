@@ -5,6 +5,9 @@ import org.jboss.pitbull.HttpServer;
 import org.jboss.pitbull.HttpServerBuilder;
 import org.jboss.pitbull.RequestHeader;
 import org.jboss.pitbull.StatusCode;
+import org.jboss.pitbull.client.ClientConnection;
+import org.jboss.pitbull.client.ClientConnectionFactory;
+import org.jboss.pitbull.client.ClientInvocation;
 import org.jboss.pitbull.handlers.stream.StreamRequestHandler;
 import org.jboss.pitbull.handlers.stream.StreamedResponse;
 import org.jboss.resteasy.client.ClientRequest;
@@ -93,6 +96,49 @@ public class EchoTest
          http.unregister(resource);
 
       }
+
+   }
+
+   @Test
+   public void testPitbullClient() throws Exception
+   {
+      Initiator resource = new Initiator();
+      http.register("/echo", resource);
+
+      try
+      {
+         ClientConnection connection = ClientConnectionFactory.http("localhost", 8080);
+         try
+         {
+            ClientInvocation invocation = connection.request("/echo").get();
+            org.jboss.pitbull.client.ClientResponse response = invocation.response();
+
+            Assert.assertEquals(StatusCode.OK, response.getStatus());
+            InputStream is = response.getResponseBody();
+            byte[] bytes = ReadFromStream.readFromStream(1024, is);
+            String val = new String(bytes);
+            Assert.assertEquals("How are you", val);
+
+            invocation = connection.request("/echo").post();
+            invocation.getRequestBody().write("hello world".getBytes());
+            response = invocation.response();
+            Assert.assertEquals(StatusCode.OK, response.getStatus());
+            is = response.getResponseBody();
+            bytes = ReadFromStream.readFromStream(1024, is);
+            val = new String(bytes);
+            Assert.assertEquals("hello world", val);
+         }
+         finally
+         {
+            connection.close();
+         }
+      }
+      finally
+      {
+         http.unregister(resource);
+
+      }
+
 
    }
 

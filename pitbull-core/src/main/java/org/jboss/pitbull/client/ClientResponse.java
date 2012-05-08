@@ -1,6 +1,8 @@
 package org.jboss.pitbull.client;
 
+import org.jboss.pitbull.OrderedHeaders;
 import org.jboss.pitbull.ResponseHeader;
+import org.jboss.pitbull.StatusCode;
 
 import java.io.BufferedOutputStream;
 import java.io.InputStream;
@@ -12,6 +14,8 @@ import java.io.OutputStream;
  */
 public interface ClientResponse
 {
-   ResponseHeader getResponseHeader();
+   String getHttpVersion();
+   StatusCode getStatus();
+   OrderedHeaders getHeaders();
    InputStream getResponseBody();
 }

@@ -1,5 +1,15 @@
 package org.jboss.pitbull.client;
 
+import org.jboss.pitbull.client.internal.ClientConnectionImpl;
+import org.jboss.pitbull.handlers.PitbullChannel;
+import org.jboss.pitbull.internal.nio.socket.FreeChannel;
+import org.jboss.pitbull.internal.nio.socket.SelectorUtil;
+
+import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.net.SocketAddress;
+import java.nio.channels.SelectionKey;
+import java.nio.channels.SocketChannel;
 import java.security.KeyStore;
 import java.util.concurrent.TimeUnit;
 
@@ -9,14 +19,23 @@ import java.util.concurrent.TimeUnit;
  */
 public class ClientConnectionFactory
 {
-   public static ClientConnection http(String host)
+   public static ClientConnection http(String host) throws IOException
    {
-      return null;
+      return http(host, 80);
    }
 
-   public static ClientConnection http(String host, int port)
+   public static ClientConnection http(String host, int port) throws IOException
    {
-      return null;
+      SocketChannel channel = SocketChannel.open();
+      channel.configureBlocking(false);
+      channel.connect(new InetSocketAddress(host, port));
+      SelectorUtil.await(channel, SelectionKey.OP_CONNECT);
+      if (!channel.finishConnect())
+      {
+         throw new IOException("Failed to connect");
+      }
+      PitbullChannel pitbullChannel = new FreeChannel(channel);
+      return new ClientConnectionImpl(pitbullChannel, host, port);
    }
 
    public static ClientConnection http(String host, int port, long timeout, TimeUnit unit)
