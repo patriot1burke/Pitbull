@@ -1,7 +1,6 @@
 package org.jboss.pitbull.internal.nio.websocket;
 
 import org.jboss.pitbull.Connection;
-import org.jboss.pitbull.RequestHeader;
 import org.jboss.pitbull.websocket.BinaryFrame;
 import org.jboss.pitbull.websocket.CloseFrame;
 import org.jboss.pitbull.websocket.Frame;
@@ -34,6 +33,12 @@ public class WebSocketImpl implements WebSocket
    public Connection getConnection()
    {
       return connection;
+   }
+
+   @Override
+   public String getVersion()
+   {
+      return oioWebSocket.getVersion();
    }
 
    @Override

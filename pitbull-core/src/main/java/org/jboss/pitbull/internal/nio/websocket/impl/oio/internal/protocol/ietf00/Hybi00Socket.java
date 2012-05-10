@@ -38,11 +38,13 @@ public class Hybi00Socket extends AbstractWebSocket
   private final static int MAX_FRAME_SIZE = 1024 * 32; //32kb
 
 
-  protected Hybi00Socket(final URI uri,
+  protected Hybi00Socket(
+                       final String version,
+                       final URI uri,
                        final InputStream inputStream,
                        final OutputStream outputStream,
                        final ClosingStrategy closingStrategy) {
-    super(uri, inputStream, outputStream, closingStrategy);
+    super(version, uri, inputStream, outputStream, closingStrategy);
   }
 
   public void writeTextFrame(final String text) throws IOException {
@@ -81,6 +83,10 @@ public class Hybi00Socket extends AbstractWebSocket
   public void writeFrame(Frame frame) throws IOException {
     if (frame.getType() == FrameType.Text) {
       writeTextFrame(((TextFrame) frame).getText());
+    }
+     else
+    {
+       throw new IOException("unable to handle frame type: " + frame.getType());
     }
   }
 

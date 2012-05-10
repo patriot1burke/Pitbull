@@ -43,11 +43,12 @@ import java.net.URI;
 public class Hybi07Socket extends AbstractWebSocket
 {
 
-  public Hybi07Socket(final URI uri,
+  public Hybi07Socket(final String version,
+                      final URI uri,
           final InputStream inputStream,
                       final OutputStream outputStream,
                       final ClosingStrategy closingStrategy) {
-    super(uri, inputStream, outputStream, closingStrategy);
+    super(version, uri, inputStream, outputStream, closingStrategy);
 
   }
 
@@ -147,7 +148,7 @@ public class Hybi07Socket extends AbstractWebSocket
     int read = 0;
     if (frameMasked) {
       do {
-        buf[read] = (byte) ((inputStream.read() ^ frameMaskingKey[read % 4]) & 127);
+        buf[read] = (byte) ((inputStream.read() ^ frameMaskingKey[read % 4]));
       }
       while (++read < payloadLength);
     }

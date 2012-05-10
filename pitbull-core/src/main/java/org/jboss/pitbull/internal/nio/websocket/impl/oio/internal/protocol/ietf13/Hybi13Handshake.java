@@ -46,13 +46,13 @@ public class Hybi13Handshake extends Hybi07Handshake
                                          final HttpResponseBridge response,
                                          final ClosingStrategy closingStrategy) throws IOException {
 
-     return new Hybi13Socket(URI.create(getWebSocketLocation(request)), request.getInputStream(), response.getOutputStream(), closingStrategy, false);
+     return new Hybi13Socket(getVersion(), URI.create(getWebSocketLocation(request)), request.getInputStream(), response.getOutputStream(), closingStrategy, false);
   }
 
    @Override
    public OioWebSocket getClientWebSocket(URI uri, InputStream inputStream, OutputStream outputStream, ClosingStrategy closingStrategy) throws IOException
    {
-      return new Hybi13Socket(uri, inputStream, outputStream, closingStrategy, true);
+      return new Hybi13Socket(getVersion(), uri, inputStream, outputStream, closingStrategy, true);
    }
 
    @Override

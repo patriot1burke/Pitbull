@@ -36,6 +36,8 @@ public interface WebSocket
     * @return
     */
    public URI getUri();
+
+   public String getVersion();
    /**
     * Read a frame.  This may block.
     *

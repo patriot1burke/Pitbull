@@ -9,6 +9,7 @@ import org.jboss.pitbull.internal.nio.websocket.impl.frame.PongFrame;
 import org.jboss.pitbull.internal.nio.websocket.impl.frame.TextFrame;
 import org.jboss.pitbull.internal.nio.websocket.impl.oio.ClosingStrategy;
 import org.jboss.pitbull.internal.nio.websocket.impl.oio.internal.AbstractWebSocket;
+import org.jboss.pitbull.internal.nio.websocket.impl.oio.internal.util.Hash;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -21,20 +22,17 @@ import java.util.Random;
  */
 public class Hybi13Socket extends AbstractWebSocket
 {
-   final private Random random;
    final private boolean isMaskedWrites;
 
-   public Hybi13Socket(final URI uri,
+   public Hybi13Socket(final String version,
+                       final URI uri,
                        final InputStream inputStream,
                        final OutputStream outputStream,
                        final ClosingStrategy closingStrategy,
                        final boolean isMaskedWrites)
    {
-      super(uri, inputStream, outputStream, closingStrategy);
+      super(version, uri, inputStream, outputStream, closingStrategy);
       this.isMaskedWrites = isMaskedWrites;
-      if (isMaskedWrites) random = new Random();
-      else random = null;
-
    }
 
    private static final byte FRAME_OPCODE = 127;
@@ -226,7 +224,7 @@ public class Hybi13Socket extends AbstractWebSocket
       if (maskedWrites)
       {
          byte[] mask = new byte[4];
-         random.nextBytes(mask);
+         Hash.getRandomBytes(mask);
          outputStream.write(mask);
          int mod = 0;
          for (byte strByte : bytes)

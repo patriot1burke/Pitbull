@@ -22,6 +22,8 @@ public interface OioWebSocket
     */
    String getSocketID();
 
+   public String getVersion();
+
    /**
     * URI used to connect to this websocket
     *

@@ -31,34 +31,49 @@ import java.net.URI;
  */
 public abstract class AbstractWebSocket implements OioWebSocket
 {
-  protected final String webSocketId;
+   protected final String webSocketId;
    protected final URI uri;
-  protected final InputStream inputStream;
-  protected final OutputStream outputStream;
-  protected final ClosingStrategy closingStrategy;
+   protected final InputStream inputStream;
+   protected final OutputStream outputStream;
+   protected final ClosingStrategy closingStrategy;
+   protected final String webSocketVersion;
 
-  protected AbstractWebSocket(
-          final URI uri,
-          final InputStream inputStream,
-          final OutputStream outputStream,
-          final ClosingStrategy closingStrategy) {
-    this.uri = uri;
-    this.webSocketId = Hash.newUniqueHash();
-    this.inputStream = Assert.notNull(inputStream, "inputStream must NOT be null");
-    this.outputStream = Assert.notNull(outputStream, "outputStream must NOT be null");
-    this.closingStrategy = Assert.notNull(closingStrategy, "closingStrategy must NOT be null");
-  }
+   protected AbstractWebSocket(
+           final String version,
+           final URI uri,
+           final InputStream inputStream,
+           final OutputStream outputStream,
+           final ClosingStrategy closingStrategy)
+   {
+      this.webSocketVersion = version;
+      this.uri = uri;
+      this.webSocketId = Hash.newUniqueHash();
+      this.inputStream = Assert.notNull(inputStream, "inputStream must NOT be null");
+      this.outputStream = Assert.notNull(outputStream, "outputStream must NOT be null");
+      this.closingStrategy = Assert.notNull(closingStrategy, "closingStrategy must NOT be null");
+   }
 
+   @Override
    public URI getUri()
    {
       return uri;
    }
 
-   public final String getSocketID() {
-    return webSocketId;
-  }
+   @Override
+   public final String getSocketID()
+   {
+      return webSocketId;
+   }
 
-  public void closeSocket() throws IOException {
-    closingStrategy.doClose();
-  }
+   @Override
+   public void closeSocket() throws IOException
+   {
+      closingStrategy.doClose();
+   }
+
+   @Override
+   public String getVersion()
+   {
+      return webSocketVersion;
+   }
 }

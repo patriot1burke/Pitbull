@@ -23,62 +23,89 @@ import java.security.SecureRandom;
 /**
  * @author Mike Brock
  */
-public final class Hash {
-  private Hash() {
-  }
+public final class Hash
+{
+   private Hash()
+   {
+   }
 
-  final static String secureRandomAlgorithm = "SHA1PRNG";
-  final static String hashAlgorithm = "SHA1";
-  final static SecureRandom random;
+   final static String secureRandomAlgorithm = "SHA1PRNG";
+   final static String hashAlgorithm = "SHA1";
+   private final static ThreadLocal<SecureRandom> random = new ThreadLocal<SecureRandom>();
 
-  static {
-    try {
-      random = SecureRandom.getInstance(secureRandomAlgorithm);
-      random.setSeed(SecureRandom.getInstance(secureRandomAlgorithm).generateSeed(64));
-    }
-    catch (NoSuchAlgorithmException e) {
-      throw new RuntimeException("runtime does not support secure random algorithm: " + secureRandomAlgorithm);
-    }
-  }
-
-  public static void getRandomBytes(byte[] bytes) {
-    random.nextBytes(bytes);
-  }
-
-  public static String newUniqueHash() {
-    return nextSecureHash(hashAlgorithm, SecureRandom.getSeed(128));
-  }
-
-  private static String nextSecureHash(final String algorithm, final byte[] additionalSeed) {
-    try {
-      final MessageDigest md = MessageDigest.getInstance(algorithm);
-
-      md.update(String.valueOf(System.nanoTime()).getBytes());
-
-      if (additionalSeed != null) {
-        md.update(additionalSeed);
+   private static SecureRandom createRandom()
+   {
+      try
+      {
+         SecureRandom random = SecureRandom.getInstance(secureRandomAlgorithm);
+         random.setSeed(SecureRandom.getInstance(secureRandomAlgorithm).generateSeed(64));
+         return random;
       }
-
-      byte[] randBytes = new byte[64];
-      random.nextBytes(randBytes);
-
-      // 1,000 rounds.
-      for (int i = 0; i < 1000; i++) {
-        md.update(md.digest());
+      catch (NoSuchAlgorithmException e)
+      {
+         throw new RuntimeException("runtime does not support secure random algorithm: " + secureRandomAlgorithm);
       }
+   }
 
-      return hashToHexString(md.digest());
-    }
-    catch (Exception e) {
-      throw new RuntimeException("failed to generate session id hash", e);
-    }
-  }
+   private static SecureRandom getRandom()
+   {
+      SecureRandom r = random.get();
+      if (r == null)
+      {
+         r = createRandom();
+         random.set(r);
+      }
+      return r;
+   }
 
-  private static String hashToHexString(byte[] hash) {
-    final StringBuilder hexString = new StringBuilder(hash.length);
-    for (byte mdbyte : hash) {
-      hexString.append(Integer.toHexString(0xFF & mdbyte));
-    }
-    return hexString.toString();
-  }
+   public static void getRandomBytes(byte[] bytes)
+   {
+      getRandom().nextBytes(bytes);
+   }
+
+   public static String newUniqueHash()
+   {
+      return nextSecureHash(hashAlgorithm, SecureRandom.getSeed(128));
+   }
+
+   private static String nextSecureHash(final String algorithm, final byte[] additionalSeed)
+   {
+      try
+      {
+         final MessageDigest md = MessageDigest.getInstance(algorithm);
+
+         md.update(String.valueOf(System.nanoTime()).getBytes());
+
+         if (additionalSeed != null)
+         {
+            md.update(additionalSeed);
+         }
+
+         byte[] randBytes = new byte[64];
+         getRandom().nextBytes(randBytes);
+
+         // 1,000 rounds.
+         for (int i = 0; i < 1000; i++)
+         {
+            md.update(md.digest());
+         }
+
+         return hashToHexString(md.digest());
+      }
+      catch (Exception e)
+      {
+         throw new RuntimeException("failed to generate session id hash", e);
+      }
+   }
+
+   private static String hashToHexString(byte[] hash)
+   {
+      final StringBuilder hexString = new StringBuilder(hash.length);
+      for (byte mdbyte : hash)
+      {
+         hexString.append(Integer.toHexString(0xFF & mdbyte));
+      }
+      return hexString.toString();
+   }
+
 }

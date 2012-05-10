@@ -53,7 +53,7 @@ public class Hybi00Handshake extends Handshake
   public OioWebSocket getServerWebSocket(final HttpRequestBridge request,
                                          final HttpResponseBridge response,
                                          final ClosingStrategy closingStrategy) throws IOException {
-    return new Hybi00Socket(URI.create(getWebSocketLocation(request)), request.getInputStream(), response.getOutputStream(), closingStrategy);
+    return new Hybi00Socket("0", URI.create(getWebSocketLocation(request)), request.getInputStream(), response.getOutputStream(), closingStrategy);
   }
 
    @Override
