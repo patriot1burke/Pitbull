@@ -85,7 +85,7 @@ public class ClientInvocationImpl implements ClientInvocation
    {
       getRequestBody().close();
       ClientResponseImpl impl = new ClientResponseImpl(connection);
-      impl.awaitResponse();
+      impl.awaitHttpResponse();
       return impl;
    }
 

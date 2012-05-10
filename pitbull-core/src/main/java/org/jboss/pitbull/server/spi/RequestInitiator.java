@@ -1,4 +1,4 @@
-package org.jboss.pitbull.spi;
+package org.jboss.pitbull.server.spi;
 
 import org.jboss.pitbull.Connection;
 import org.jboss.pitbull.RequestHeader;

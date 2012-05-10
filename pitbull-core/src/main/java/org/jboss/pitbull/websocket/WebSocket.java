@@ -17,9 +17,9 @@
 package org.jboss.pitbull.websocket;
 
 import org.jboss.pitbull.Connection;
-import org.jboss.pitbull.RequestHeader;
 
 import java.io.IOException;
+import java.net.URI;
 
 /**
  * A blocking interface for reading and writing WebSocket frames.
@@ -29,7 +29,13 @@ import java.io.IOException;
 public interface WebSocket
 {
    public Connection getConnection();
-   public RequestHeader getRequestHeader();
+
+   /**
+    * URI used to connect to this websocket
+    *
+    * @return
+    */
+   public URI getUri();
    /**
     * Read a frame.  This may block.
     *

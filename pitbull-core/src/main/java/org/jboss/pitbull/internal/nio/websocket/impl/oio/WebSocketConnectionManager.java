@@ -72,7 +72,7 @@ public class WebSocketConnectionManager
              * Obtain an WebSocket instance from the handshaker.
              */
             final OioWebSocket webSocket
-                    = handshake.getWebSocket(request, response, closingStrategy);
+                    = handshake.getServerWebSocket(request, response, closingStrategy);
 
             //log.debug("Using WebSocket implementation: " + webSocket.getClass().getName());
 

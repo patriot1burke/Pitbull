@@ -15,8 +15,5 @@ public interface Connection
 
    InetSocketAddress getRemoteAddress();
 
-   SSLSession getSSLSession();
-
    boolean isSecure();
-
 }

@@ -3,8 +3,8 @@ package org.jboss.pitbull.servlet;
 import org.jboss.pitbull.Connection;
 import org.jboss.pitbull.RequestHeader;
 import org.jboss.pitbull.servlet.internal.ServletRequestHandler;
-import org.jboss.pitbull.spi.RequestHandler;
-import org.jboss.pitbull.spi.RequestInitiator;
+import org.jboss.pitbull.server.spi.RequestHandler;
+import org.jboss.pitbull.server.spi.RequestInitiator;
 import org.jboss.pitbull.util.registry.UriRegistry;
 
 import java.util.ArrayList;

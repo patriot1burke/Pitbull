@@ -31,20 +31,23 @@ public class WebSocketEventHandler implements EventHandler
 {
    protected WebSocketHandler handler;
    protected WebSocket webSocket;
-   protected ExecutorService executor;
+   protected ExecutorService executorService;
    protected Connection connection;
    protected ManagedChannel channel;
+   protected BufferedBlockingInputStream inputStream;
+   protected WebSocketExecutor webSocketExecutor;
 
-   public WebSocketEventHandler(Connection connection, ManagedChannel channel, ExecutorService executor)
+   public WebSocketEventHandler(Connection connection, ManagedChannel channel, ExecutorService executorService, WebSocketHandler handler)
    {
       this.connection = connection;
       this.channel = channel;
-      this.executor = executor;
+      this.executorService = executorService;
+      this.handler = handler;
    }
 
-   public void init(final WebSocketHandler handler, final RequestHeader requestHeader, final ByteBuffer leftOverBuffer) throws Exception
+   public void handshake(final RequestHeader requestHeader, final ByteBuffer leftOverBuffer) throws Exception
    {
-      final BufferedBlockingInputStream is = new BufferedBlockingInputStream(channel, leftOverBuffer);
+      inputStream = new BufferedBlockingInputStream(channel, leftOverBuffer);
       HttpRequestBridge requestBridge = new HttpRequestBridge()
       {
          @Override
@@ -62,7 +65,13 @@ public class WebSocketEventHandler implements EventHandler
          @Override
          public InputStream getInputStream()
          {
-            return is;
+            return inputStream;
+         }
+
+         @Override
+         public boolean isSecure()
+         {
+            return connection.isSecure();
          }
       };
 
@@ -124,7 +133,8 @@ public class WebSocketEventHandler implements EventHandler
       };
 
       OioWebSocket oioWebSocket = WebSocketConnectionManager.establish(handler.getProtocolName(), requestBridge, responseBridge, closingStrategy);
-      webSocket = new WebSocketImpl(connection, oioWebSocket, requestHeader);
+      webSocket = new WebSocketImpl(connection, oioWebSocket);
+      webSocketExecutor = new WebSocketExecutor(channel, webSocket, handler, inputStream, executorService);
    }
 
    @Override
@@ -132,7 +142,8 @@ public class WebSocketEventHandler implements EventHandler
    {
       try
       {
-         handler.onReceivedFrame(webSocket);
+         channel.suspendReads();
+         executorService.execute(webSocketExecutor);
       }
       catch (Exception e)
       {

@@ -1,7 +1,7 @@
 package org.jboss.pitbull.server.handlers;
 
 import org.jboss.pitbull.PitbullChannel;
-import org.jboss.pitbull.spi.RequestHandler;
+import org.jboss.pitbull.server.spi.RequestHandler;
 
 /**
  * A handler that allows the application to completely take over management of the socket.  Socket is unregistered

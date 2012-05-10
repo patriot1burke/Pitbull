@@ -1,4 +1,4 @@
-package org.jboss.pitbull.spi;
+package org.jboss.pitbull.server.spi;
 
 /**
  * Registerable handler that handles execution of HTTP requests.

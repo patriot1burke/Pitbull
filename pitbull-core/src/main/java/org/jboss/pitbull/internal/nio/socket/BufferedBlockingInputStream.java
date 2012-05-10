@@ -1,5 +1,6 @@
 package org.jboss.pitbull.internal.nio.socket;
 
+import org.jboss.pitbull.PitbullChannel;
 import org.jboss.pitbull.ReadTimeoutException;
 import org.jboss.pitbull.internal.logging.Logger;
 
@@ -21,7 +22,7 @@ import static java.lang.Math.*;
  */
 public class BufferedBlockingInputStream extends InputStream
 {
-   private final ManagedChannel channel;
+   private final PitbullChannel channel;
    private final ByteBuffer buffer;
    private volatile boolean closed;
    protected static final Logger log = Logger.getLogger(BufferedBlockingInputStream.class);
@@ -32,7 +33,7 @@ public class BufferedBlockingInputStream extends InputStream
     * @param channel    the channel to wrap
     * @param bufferSize the size of the internal buffer
     */
-   public BufferedBlockingInputStream(final ManagedChannel channel, ByteBuffer buffer)
+   public BufferedBlockingInputStream(final PitbullChannel channel, ByteBuffer buffer)
    {
       if (channel == null)
       {

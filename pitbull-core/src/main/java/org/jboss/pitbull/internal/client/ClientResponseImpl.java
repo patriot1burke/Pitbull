@@ -4,6 +4,7 @@ import org.jboss.pitbull.OrderedHeaders;
 import org.jboss.pitbull.StatusCode;
 import org.jboss.pitbull.client.ClientResponse;
 import org.jboss.pitbull.internal.nio.http.ContentInputStream;
+import org.jboss.pitbull.internal.nio.socket.BufferedBlockingInputStream;
 import org.jboss.pitbull.internal.nio.socket.Channels;
 import org.jboss.pitbull.util.OrderedHeadersImpl;
 
@@ -23,7 +24,7 @@ public class ClientResponseImpl implements ClientResponse
    protected StatusCode status;
    protected OrderedHeaders headers = new OrderedHeadersImpl();
    protected ByteBuffer buffer;
-   protected ContentInputStream is;
+   protected InputStream is;
    protected boolean closed;
 
    public ClientResponseImpl(ClientConnectionImpl connection)
@@ -31,7 +32,14 @@ public class ClientResponseImpl implements ClientResponse
       this.connection = connection;
    }
 
-   public void awaitResponse() throws IOException
+
+   public void awaitHttpResponse() throws IOException
+   {
+      pullResponse();
+      is = ContentInputStream.create(connection.channel, buffer, headers);
+   }
+
+   public void pullResponse() throws IOException
    {
       connection.setLast(this);
       HttpResponseDecoder decoder = new HttpResponseDecoder(this);
@@ -46,7 +54,11 @@ public class ClientResponseImpl implements ClientResponse
          }
          if (read > 0) buffer.flip();
       } while (decoder.process(buffer) == false);
-      is = ContentInputStream.create(connection.channel, buffer, headers);
+   }
+
+   public ByteBuffer getBuffer()
+   {
+      return buffer;
    }
 
    public void setStatus(StatusCode status)
@@ -92,9 +104,9 @@ public class ClientResponseImpl implements ClientResponse
    {
       if (closed) return;
       closed = true;
-      if (is != null)
+      if (is != null )
       {
-         is.eat();
+         if (is instanceof ContentInputStream) ((ContentInputStream)is).eat();
          is.close();
       }
 

@@ -24,6 +24,7 @@ import org.jboss.pitbull.internal.nio.websocket.impl.oio.internal.util.Hash;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URI;
 
 /**
  * @author Mike Brock
@@ -31,22 +32,29 @@ import java.io.OutputStream;
 public abstract class AbstractWebSocket implements OioWebSocket
 {
   protected final String webSocketId;
+   protected final URI uri;
   protected final InputStream inputStream;
   protected final OutputStream outputStream;
   protected final ClosingStrategy closingStrategy;
 
   protected AbstractWebSocket(
+          final URI uri,
           final InputStream inputStream,
           final OutputStream outputStream,
           final ClosingStrategy closingStrategy) {
-
+    this.uri = uri;
     this.webSocketId = Hash.newUniqueHash();
     this.inputStream = Assert.notNull(inputStream, "inputStream must NOT be null");
     this.outputStream = Assert.notNull(outputStream, "outputStream must NOT be null");
     this.closingStrategy = Assert.notNull(closingStrategy, "closingStrategy must NOT be null");
   }
 
-  public final String getSocketID() {
+   public URI getUri()
+   {
+      return uri;
+   }
+
+   public final String getSocketID() {
     return webSocketId;
   }
 

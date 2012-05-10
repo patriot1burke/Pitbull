@@ -16,22 +16,20 @@ public class ConnectionImpl implements Connection
    private String id;
    private InetSocketAddress localAddress;
    private InetSocketAddress remoteAddress;
-   private SSLSession sslSession;
    private boolean secure;
 
 
-   public ConnectionImpl(SocketAddress localAddress, SocketAddress remoteAddress, SSLSession sslSession, boolean secure)
+   public ConnectionImpl(SocketAddress localAddress, SocketAddress remoteAddress, boolean secure)
    {
-      this(UUID.randomUUID().toString(), localAddress, remoteAddress, sslSession, secure);
+      this(UUID.randomUUID().toString(), localAddress, remoteAddress, secure);
    }
 
 
-   public ConnectionImpl(String id, SocketAddress localAddress, SocketAddress remoteAddress, SSLSession sslSession, boolean secure)
+   public ConnectionImpl(String id, SocketAddress localAddress, SocketAddress remoteAddress, boolean secure)
    {
       this.id = id;
       this.localAddress = (InetSocketAddress) localAddress;
       this.remoteAddress = (InetSocketAddress) remoteAddress;
-      this.sslSession = sslSession;
       this.secure = secure;
    }
 
@@ -51,12 +49,6 @@ public class ConnectionImpl implements Connection
    public InetSocketAddress getRemoteAddress()
    {
       return remoteAddress;
-   }
-
-   @Override
-   public SSLSession getSSLSession()
-   {
-      return sslSession;
    }
 
    @Override

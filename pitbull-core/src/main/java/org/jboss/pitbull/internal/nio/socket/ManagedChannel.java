@@ -32,9 +32,19 @@ public class ManagedChannel implements PitbullChannel
       this.key = key;
    }
 
+   public Worker getWorker()
+   {
+      return worker;
+   }
+
    public EventHandler getHandler()
    {
       return handler;
+   }
+
+   public void setHandler(EventHandler handler)
+   {
+      this.handler = handler;
    }
 
    public void suspendReads()

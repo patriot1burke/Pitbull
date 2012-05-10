@@ -5,7 +5,6 @@ import org.jboss.pitbull.internal.nio.socket.Acceptor;
 import org.jboss.pitbull.internal.nio.socket.ManagedChannelFactory;
 import org.jboss.pitbull.internal.nio.socket.SSLChannelFactory;
 import org.jboss.pitbull.internal.nio.socket.Worker;
-import org.jboss.pitbull.spi.RequestInitiator;
 import org.jboss.pitbull.util.registry.UriRegistry;
 
 import javax.net.ssl.SSLContext;

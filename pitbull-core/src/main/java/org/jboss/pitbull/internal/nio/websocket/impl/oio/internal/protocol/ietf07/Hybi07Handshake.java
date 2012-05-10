@@ -17,6 +17,7 @@
 package org.jboss.pitbull.internal.nio.websocket.impl.oio.internal.protocol.ietf07;
 
 
+import org.jboss.pitbull.internal.NotImplementedYetException;
 import org.jboss.pitbull.internal.nio.websocket.impl.oio.ClosingStrategy;
 import org.jboss.pitbull.internal.nio.websocket.impl.oio.HttpRequestBridge;
 import org.jboss.pitbull.internal.nio.websocket.impl.oio.HttpResponseBridge;
@@ -26,7 +27,10 @@ import org.jboss.pitbull.internal.nio.websocket.impl.oio.internal.WebSocketHeade
 import org.jboss.pitbull.internal.nio.websocket.impl.oio.internal.util.Base64;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
+import java.net.URI;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
@@ -48,13 +52,19 @@ public class Hybi07Handshake extends Handshake
   }
 
   @Override
-  public OioWebSocket getWebSocket(final HttpRequestBridge request,
-                                 final HttpResponseBridge response,
-                                 final ClosingStrategy closingStrategy) throws IOException {
-    return Hybi07Socket.from(request, response, closingStrategy);
+  public OioWebSocket getServerWebSocket(final HttpRequestBridge request,
+                                         final HttpResponseBridge response,
+                                         final ClosingStrategy closingStrategy) throws IOException {
+    return new Hybi07Socket(URI.create(getWebSocketLocation(request)), request.getInputStream(), response.getOutputStream(), closingStrategy);
   }
 
-  @Override
+   @Override
+   public OioWebSocket getClientWebSocket(URI uri, InputStream inputStream, OutputStream outputStream, ClosingStrategy closingStrategy) throws IOException
+   {
+      throw new NotImplementedYetException();
+   }
+
+   @Override
   public boolean matches(final HttpRequestBridge request) {
     return (SEC_WEBSOCKET_KEY.isIn(request) && SEC_WEBSOCKET_VERSION.matches(request, getVersion()));
   }

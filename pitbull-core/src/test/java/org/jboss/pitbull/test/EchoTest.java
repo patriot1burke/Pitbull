@@ -6,7 +6,7 @@ import org.jboss.pitbull.server.HttpServerBuilder;
 import org.jboss.pitbull.RequestHeader;
 import org.jboss.pitbull.StatusCode;
 import org.jboss.pitbull.client.ClientConnection;
-import org.jboss.pitbull.client.ClientConnectionFactory;
+import org.jboss.pitbull.client.HttpConnectionFactory;
 import org.jboss.pitbull.client.ClientInvocation;
 import org.jboss.pitbull.server.handlers.stream.StreamRequestHandler;
 import org.jboss.pitbull.server.handlers.stream.StreamedResponse;
@@ -107,7 +107,7 @@ public class EchoTest
 
       try
       {
-         ClientConnection connection = ClientConnectionFactory.http("localhost", 8080);
+         ClientConnection connection = HttpConnectionFactory.http("localhost", 8080);
          try
          {
             ClientInvocation invocation = connection.request("/echo").get();

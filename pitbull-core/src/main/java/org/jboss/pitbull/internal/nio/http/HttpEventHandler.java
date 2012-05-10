@@ -1,13 +1,16 @@
 package org.jboss.pitbull.internal.nio.http;
 
 import org.jboss.pitbull.Connection;
+import org.jboss.pitbull.RequestHeader;
 import org.jboss.pitbull.StatusCode;
+import org.jboss.pitbull.internal.nio.websocket.WebSocketEventHandler;
+import org.jboss.pitbull.server.handlers.WebSocketHandler;
 import org.jboss.pitbull.server.handlers.stream.StreamRequestHandler;
 import org.jboss.pitbull.internal.logging.Logger;
 import org.jboss.pitbull.internal.nio.socket.EventHandler;
 import org.jboss.pitbull.internal.nio.socket.ManagedChannel;
-import org.jboss.pitbull.spi.RequestHandler;
-import org.jboss.pitbull.spi.RequestInitiator;
+import org.jboss.pitbull.server.spi.RequestHandler;
+import org.jboss.pitbull.server.spi.RequestInitiator;
 import org.jboss.pitbull.util.registry.NotFoundException;
 import org.jboss.pitbull.util.registry.UriRegistry;
 
@@ -80,7 +83,6 @@ public class HttpEventHandler implements EventHandler
             connection = new ConnectionImpl(
                     channel.getChannel().socket().getLocalSocketAddress(),
                     channel.getChannel().socket().getRemoteSocketAddress(),
-                    channel.getSslSession(),
                     channel.getSslSession() != null);
          }
 
@@ -134,8 +136,20 @@ public class HttpEventHandler implements EventHandler
             return;
          }
 
+         if (requestHandler instanceof StreamRequestHandler)
+         {
+            ByteBuffer oldBuffer = buffer;
+            buffer = null;
+            executeStreamRequestHandler(oldBuffer,  channel, requestHeader, (StreamRequestHandler) requestHandler);
+         }
+         else if (requestHandler instanceof WebSocketHandler)
+         {
+            ByteBuffer oldBuffer = buffer;
+            buffer = null;
+            executeWebSocketHandler(oldBuffer, channel, requestHeader, (WebSocketHandler) requestHandler);
 
-         if (!(requestHandler instanceof StreamRequestHandler))
+         }
+         else
          {
             log.error("Unsupported requestHandler type: " + requestHandler.getClass().getName());
             if (initiator != null)
@@ -154,20 +168,46 @@ public class HttpEventHandler implements EventHandler
             return;
          }
 
-         log.trace("Using StreamHandler channel: {0}", channel.getId());
-         channel.suspendReads();
-         StreamRequestHandler streamHandler = (StreamRequestHandler) requestHandler;
-
-         ByteBuffer oldBuffer = buffer;
-         buffer = null;
-
-         StreamExecutor task = new StreamExecutor(connection, channel, streamHandler, oldBuffer, requestHeader);
-         executor.execute(task);
       }
       finally
       {
          log.trace("<--- Exit handleRead() channel: {0}", channel.getId());
       }
+   }
+
+   protected void executeWebSocketHandler(final ByteBuffer buffer, final ManagedChannel channel, final RequestHeader requestHeader, final WebSocketHandler requestHandler)
+   {
+      log.trace("Using WebSocketHandler channel: {0}", channel.getId());
+      final WebSocketEventHandler webSocketEventHandler = new WebSocketEventHandler(connection, channel, executor, requestHandler);
+      channel.setHandler(webSocketEventHandler);
+      channel.suspendReads();
+
+      executor.execute( new Runnable()
+      {
+         @Override
+         public void run()
+         {
+            try
+            {
+               webSocketEventHandler.handshake(requestHeader, buffer);
+               channel.resumeReads();
+            }
+            catch (Exception e)
+            {
+               channel.close();
+            }
+         }
+      });
+   }
+
+   protected void executeStreamRequestHandler(ByteBuffer buffer, ManagedChannel channel, HttpRequestHeader requestHeader, StreamRequestHandler requestHandler)
+   {
+      log.trace("Using StreamHandler channel: {0}", channel.getId());
+      channel.suspendReads();
+      StreamRequestHandler streamHandler = (StreamRequestHandler) requestHandler;
+
+      StreamExecutor task = new StreamExecutor(connection, channel, streamHandler, buffer, requestHeader);
+      executor.execute(task);
    }
 
    @Override

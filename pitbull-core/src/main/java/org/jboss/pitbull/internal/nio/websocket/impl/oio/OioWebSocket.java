@@ -3,6 +3,7 @@ package org.jboss.pitbull.internal.nio.websocket.impl.oio;
 import org.jboss.pitbull.internal.nio.websocket.impl.Frame;
 
 import java.io.IOException;
+import java.net.URI;
 
 /**
  * A WebSocket that blocks when you readFrame or writeFrame.  Underneath, based on java.io.* a.k.a. Old IO (Oio).
@@ -20,6 +21,13 @@ public interface OioWebSocket
     * @return A hex string representing the unique ID of the socket.
     */
    String getSocketID();
+
+   /**
+    * URI used to connect to this websocket
+    *
+    * @return
+    */
+   public URI getUri();
 
    /**
     * Read a single frame from the socket.

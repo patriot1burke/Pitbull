@@ -1,9 +1,11 @@
 package org.jboss.pitbull.client;
 
 import org.jboss.pitbull.PitbullChannel;
+import org.jboss.pitbull.internal.NotImplementedYetException;
 import org.jboss.pitbull.internal.client.ClientConnectionImpl;
 import org.jboss.pitbull.internal.nio.socket.FreeChannel;
 import org.jboss.pitbull.internal.nio.socket.SelectorUtil;
+import org.jboss.pitbull.websocket.WebSocket;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -16,7 +18,7 @@ import java.util.concurrent.TimeUnit;
  * @author <a href="mailto:bill@burkecentral.com">Bill Burke</a>
  * @version $Revision: 1 $
  */
-public class ClientConnectionFactory
+public class HttpConnectionFactory
 {
    public static ClientConnection http(String host) throws IOException
    {
@@ -39,7 +41,7 @@ public class ClientConnectionFactory
 
    public static ClientConnection http(String host, int port, long timeout, TimeUnit unit)
    {
-      return null;
+      throw new NotImplementedYetException();
    }
 
    /**
@@ -50,7 +52,7 @@ public class ClientConnectionFactory
     */
    public static ClientConnection https(String host)
    {
-      return null;
+      throw new NotImplementedYetException();
    }
 
    /**
@@ -62,26 +64,27 @@ public class ClientConnectionFactory
     */
    public static ClientConnection https(String host, int port)
    {
-      return null;
+      throw new NotImplementedYetException();
    }
 
    public static ClientConnection https(String host, int port, long timeout, TimeUnit unit)
    {
-      return null;
+      throw new NotImplementedYetException();
    }
 
    public static ClientConnection https(String host, KeyStore trustStore)
    {
-      return null;
+      throw new NotImplementedYetException();
    }
 
    public static ClientConnection https(String host, int port, KeyStore trustStore)
    {
-      return null;
+      throw new NotImplementedYetException();
    }
 
    public static ClientConnection https(String host, int port, KeyStore trustStore, long timeout, TimeUnit unit)
    {
-      return null;
+      throw new NotImplementedYetException();
    }
+
 }

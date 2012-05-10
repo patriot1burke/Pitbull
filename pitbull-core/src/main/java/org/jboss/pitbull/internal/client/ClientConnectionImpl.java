@@ -25,6 +25,11 @@ public class ClientConnectionImpl implements ClientConnection
 
    }
 
+   public PitbullChannel getChannel()
+   {
+      return channel;
+   }
+
    public void setLast(ClientResponseImpl last)
    {
       this.last = last;
@@ -83,12 +88,6 @@ public class ClientConnectionImpl implements ClientConnection
    public InetSocketAddress getRemoteAddress()
    {
       return (InetSocketAddress)(channel.getChannel().socket().getRemoteSocketAddress());
-   }
-
-   @Override
-   public SSLSession getSSLSession()
-   {
-      return channel.getSslSession();
    }
 
    @Override

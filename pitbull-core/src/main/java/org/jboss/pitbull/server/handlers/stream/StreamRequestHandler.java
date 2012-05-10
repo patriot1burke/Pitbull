@@ -2,7 +2,7 @@ package org.jboss.pitbull.server.handlers.stream;
 
 import org.jboss.pitbull.Connection;
 import org.jboss.pitbull.RequestHeader;
-import org.jboss.pitbull.spi.RequestHandler;
+import org.jboss.pitbull.server.spi.RequestHandler;
 
 import java.io.IOException;
 import java.io.InputStream;

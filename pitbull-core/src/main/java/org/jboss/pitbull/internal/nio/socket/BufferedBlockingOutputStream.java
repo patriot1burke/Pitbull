@@ -1,5 +1,7 @@
 package org.jboss.pitbull.internal.nio.socket;
 
+import org.jboss.pitbull.PitbullChannel;
+
 import java.io.IOException;
 import java.io.InterruptedIOException;
 import java.io.OutputStream;
@@ -17,7 +19,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class BufferedBlockingOutputStream extends OutputStream
 {
-   protected ManagedChannel channel;
+   protected PitbullChannel channel;
    protected ByteBuffer buffer;
    protected int size;
    protected boolean closed;
@@ -29,7 +31,7 @@ public class BufferedBlockingOutputStream extends OutputStream
     *
     * @param out
     */
-   public BufferedBlockingOutputStream(ManagedChannel channel)
+   public BufferedBlockingOutputStream(PitbullChannel channel)
    {
       this(channel, 8192);
    }
@@ -40,7 +42,7 @@ public class BufferedBlockingOutputStream extends OutputStream
     * @param out
     * @param size must be > 0
     */
-   public BufferedBlockingOutputStream(ManagedChannel channel, int size)
+   public BufferedBlockingOutputStream(PitbullChannel channel, int size)
    {
       this.channel = channel;
       setBufferSize(size);

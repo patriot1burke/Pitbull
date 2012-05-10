@@ -2,7 +2,6 @@ package org.jboss.pitbull.internal.nio.http;
 
 import org.jboss.pitbull.internal.nio.socket.EventHandler;
 import org.jboss.pitbull.internal.nio.socket.EventHandlerFactory;
-import org.jboss.pitbull.spi.RequestInitiator;
 import org.jboss.pitbull.util.registry.UriRegistry;
 
 import java.util.concurrent.ExecutorService;

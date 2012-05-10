@@ -33,6 +33,7 @@ import org.jboss.pitbull.internal.nio.websocket.impl.oio.internal.util.Hash;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URI;
 
 /**
  * Implementation of the Hybi-07 Websocket Framing Protocol.
@@ -42,22 +43,14 @@ import java.io.OutputStream;
 public class Hybi07Socket extends AbstractWebSocket
 {
 
-  public Hybi07Socket(final InputStream inputStream,
+  public Hybi07Socket(final URI uri,
+          final InputStream inputStream,
                       final OutputStream outputStream,
                       final ClosingStrategy closingStrategy) {
-    super(inputStream, outputStream, closingStrategy);
+    super(uri, inputStream, outputStream, closingStrategy);
 
   }
 
-  public static OioWebSocket from(final HttpRequestBridge request,
-                               final HttpResponseBridge response,
-                               final ClosingStrategy closingStrategy) throws IOException {
-
-    return new Hybi07Socket(
-            request.getInputStream(),
-            response.getOutputStream(),
-            closingStrategy);
-  }
 
   private static final byte FRAME_OPCODE = 127;
   private static final byte FRAME_MASKED = Byte.MIN_VALUE;

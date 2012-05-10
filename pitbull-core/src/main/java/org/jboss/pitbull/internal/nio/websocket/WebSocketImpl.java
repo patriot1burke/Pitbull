@@ -12,6 +12,7 @@ import org.jboss.pitbull.websocket.WebSocket;
 import org.jboss.pitbull.internal.nio.websocket.impl.oio.OioWebSocket;
 
 import java.io.IOException;
+import java.net.URI;
 
 /**
  * @author <a href="mailto:bill@burkecentral.com">Bill Burke</a>
@@ -21,14 +22,12 @@ public class WebSocketImpl implements WebSocket
 {
    protected OioWebSocket oioWebSocket;
    protected Connection connection;
-   protected RequestHeader requestHeader;
    protected boolean closed;
 
-   public WebSocketImpl(Connection connection, OioWebSocket oioWebSocket, RequestHeader requestHeader)
+   public WebSocketImpl(Connection connection, OioWebSocket oioWebSocket)
    {
       this.connection = connection;
       this.oioWebSocket = oioWebSocket;
-      this.requestHeader = requestHeader;
    }
 
    @Override
@@ -38,9 +37,9 @@ public class WebSocketImpl implements WebSocket
    }
 
    @Override
-   public RequestHeader getRequestHeader()
+   public URI getUri()
    {
-      return requestHeader;
+      return oioWebSocket.getUri();
    }
 
    @Override

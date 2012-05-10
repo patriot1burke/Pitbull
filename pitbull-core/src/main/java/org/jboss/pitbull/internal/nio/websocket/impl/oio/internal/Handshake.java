@@ -22,6 +22,9 @@ import org.jboss.pitbull.internal.nio.websocket.impl.oio.HttpResponseBridge;
 import org.jboss.pitbull.internal.nio.websocket.impl.oio.OioWebSocket;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.URI;
 
 /**
  * @author Mike Brock
@@ -50,12 +53,27 @@ public abstract class Handshake {
   }
 
   protected String getWebSocketLocation(HttpRequestBridge request) {
-    return "ws://" + request.getHeader("Host") + request.getRequestURI();
+     StringBuilder builder = new StringBuilder(100);
+     if (request.isSecure())
+     {
+        builder.append("wss://");
+     }
+     else
+     {
+        builder.append("ws://");
+     }
+     builder.append(request.getHeader("Host")).append(request.getRequestURI());
+     return builder.toString();
   }
 
-  public abstract OioWebSocket getWebSocket(HttpRequestBridge request,
-                                         HttpResponseBridge response,
-                                         ClosingStrategy closingStrategy) throws IOException;
+   public abstract OioWebSocket getClientWebSocket(URI uri,
+                                                   InputStream inputStream,
+                                                   OutputStream outputStream,
+                                                   ClosingStrategy closingStrategy) throws IOException;
+
+  public abstract OioWebSocket getServerWebSocket(HttpRequestBridge request,
+                                                  HttpResponseBridge response,
+                                                  ClosingStrategy closingStrategy) throws IOException;
 
   public abstract boolean matches(HttpRequestBridge request);
 

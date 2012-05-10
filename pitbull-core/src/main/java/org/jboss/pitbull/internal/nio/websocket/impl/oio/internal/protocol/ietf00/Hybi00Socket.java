@@ -20,14 +20,12 @@ import org.jboss.pitbull.internal.nio.websocket.impl.Frame;
 import org.jboss.pitbull.internal.nio.websocket.impl.FrameType;
 import org.jboss.pitbull.internal.nio.websocket.impl.frame.TextFrame;
 import org.jboss.pitbull.internal.nio.websocket.impl.oio.ClosingStrategy;
-import org.jboss.pitbull.internal.nio.websocket.impl.oio.HttpRequestBridge;
-import org.jboss.pitbull.internal.nio.websocket.impl.oio.HttpResponseBridge;
-import org.jboss.pitbull.internal.nio.websocket.impl.oio.OioWebSocket;
 import org.jboss.pitbull.internal.nio.websocket.impl.oio.internal.AbstractWebSocket;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URI;
 
 /**
  * The Hybi-00 Framing Protocol implementation.
@@ -39,21 +37,12 @@ public class Hybi00Socket extends AbstractWebSocket
 {
   private final static int MAX_FRAME_SIZE = 1024 * 32; //32kb
 
-  private Hybi00Socket(final InputStream inputStream,
+
+  protected Hybi00Socket(final URI uri,
+                       final InputStream inputStream,
                        final OutputStream outputStream,
                        final ClosingStrategy closingStrategy) {
-    super(inputStream, outputStream, closingStrategy);
-  }
-
-  public static OioWebSocket from(final HttpRequestBridge request,
-                               final HttpResponseBridge response,
-                               final ClosingStrategy closingStrategy)
-          throws IOException {
-
-    return new Hybi00Socket(
-            request.getInputStream(),
-            response.getOutputStream(),
-            closingStrategy);
+    super(uri, inputStream, outputStream, closingStrategy);
   }
 
   public void writeTextFrame(final String text) throws IOException {

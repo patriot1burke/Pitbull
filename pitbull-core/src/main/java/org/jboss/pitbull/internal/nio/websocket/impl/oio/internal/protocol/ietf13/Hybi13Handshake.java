@@ -24,6 +24,9 @@ import org.jboss.pitbull.internal.nio.websocket.impl.oio.internal.WebSocketHeade
 import org.jboss.pitbull.internal.nio.websocket.impl.oio.internal.protocol.ietf07.Hybi07Handshake;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.URI;
 
 import static org.jboss.pitbull.internal.nio.websocket.impl.oio.internal.WebSocketHeaders.*;
 
@@ -39,13 +42,20 @@ public class Hybi13Handshake extends Hybi07Handshake
   }
 
   @Override
-  public OioWebSocket getWebSocket(final HttpRequestBridge request,
-                                   final HttpResponseBridge response,
-                                   final ClosingStrategy closingStrategy) throws IOException {
-    return Hybi13Socket.from(request, response, closingStrategy);
+  public OioWebSocket getServerWebSocket(final HttpRequestBridge request,
+                                         final HttpResponseBridge response,
+                                         final ClosingStrategy closingStrategy) throws IOException {
+
+     return new Hybi13Socket(URI.create(getWebSocketLocation(request)), request.getInputStream(), response.getOutputStream(), closingStrategy, false);
   }
 
-  @Override
+   @Override
+   public OioWebSocket getClientWebSocket(URI uri, InputStream inputStream, OutputStream outputStream, ClosingStrategy closingStrategy) throws IOException
+   {
+      return new Hybi13Socket(uri, inputStream, outputStream, closingStrategy, true);
+   }
+
+   @Override
   public byte[] generateResponse(final HttpRequestBridge request,
                                    final HttpResponseBridge response) throws IOException {
 

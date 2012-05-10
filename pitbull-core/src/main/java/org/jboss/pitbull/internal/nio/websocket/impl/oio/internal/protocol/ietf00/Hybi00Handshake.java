@@ -16,6 +16,7 @@
 
 package org.jboss.pitbull.internal.nio.websocket.impl.oio.internal.protocol.ietf00;
 
+import org.jboss.pitbull.internal.NotImplementedYetException;
 import org.jboss.pitbull.internal.nio.websocket.impl.oio.ClosingStrategy;
 import org.jboss.pitbull.internal.nio.websocket.impl.oio.HttpRequestBridge;
 import org.jboss.pitbull.internal.nio.websocket.impl.oio.HttpResponseBridge;
@@ -25,6 +26,8 @@ import org.jboss.pitbull.internal.nio.websocket.impl.oio.internal.WebSocketHeade
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.URI;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.security.MessageDigest;
@@ -47,13 +50,19 @@ public class Hybi00Handshake extends Handshake
   }
 
   @Override
-  public OioWebSocket getWebSocket(final HttpRequestBridge request,
-                                   final HttpResponseBridge response,
-                                   final ClosingStrategy closingStrategy) throws IOException {
-    return Hybi00Socket.from(request, response, closingStrategy);
+  public OioWebSocket getServerWebSocket(final HttpRequestBridge request,
+                                         final HttpResponseBridge response,
+                                         final ClosingStrategy closingStrategy) throws IOException {
+    return new Hybi00Socket(URI.create(getWebSocketLocation(request)), request.getInputStream(), response.getOutputStream(), closingStrategy);
   }
 
-  @Override
+   @Override
+   public OioWebSocket getClientWebSocket(URI uri, InputStream inputStream, OutputStream outputStream, ClosingStrategy closingStrategy) throws IOException
+   {
+      throw new NotImplementedYetException();
+   }
+
+   @Override
   public byte[] generateResponse(final HttpRequestBridge request,
                                    final HttpResponseBridge response) throws IOException {
 
