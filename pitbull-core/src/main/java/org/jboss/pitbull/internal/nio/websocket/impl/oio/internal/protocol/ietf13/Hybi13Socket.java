@@ -140,6 +140,7 @@ public class Hybi13Socket extends AbstractWebSocket
          inputStream.read(frameMaskingKey);
       }
 
+
       final byte[] buf = new byte[payloadLength];
 
       int read = 0;
@@ -147,7 +148,7 @@ public class Hybi13Socket extends AbstractWebSocket
       {
          do
          {
-            buf[read] = (byte) ((inputStream.read() ^ frameMaskingKey[read % 4]) & 127);
+            buf[read] = (byte) ((inputStream.read() ^ frameMaskingKey[read % 4]));
          }
          while (++read < payloadLength);
       }
