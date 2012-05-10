@@ -99,6 +99,8 @@ public class OrderedHeadersImpl implements OrderedHeaders
    @Override
    public void addHeader(String name, String value)
    {
+      if (value == null) return;
+      value = value.trim();
       Map.Entry<String, String> entry = new HeaderEntry(name, value);
       headerList.add(entry);
       headerMap.add(name, entry);

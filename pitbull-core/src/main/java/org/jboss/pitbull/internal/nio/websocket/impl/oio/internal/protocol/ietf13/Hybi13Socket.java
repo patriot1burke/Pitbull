@@ -213,7 +213,7 @@ public class Hybi13Socket extends AbstractWebSocket
       {
          if (maskedWrites)
          {
-            outputStream.write((len & 0xFF));
+            outputStream.write(((len & 127) | 0x80));
          }
          else
          {

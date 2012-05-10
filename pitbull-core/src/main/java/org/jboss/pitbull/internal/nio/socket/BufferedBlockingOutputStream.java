@@ -24,7 +24,7 @@ public class BufferedBlockingOutputStream extends OutputStream
    protected int size;
    protected boolean closed;
    protected long timeout;
-   protected boolean committed = true;
+   protected boolean committed = false;
 
    /**
     * delegate OutputStream can be null and set at another time (i.e. at initialFlush time)

@@ -40,7 +40,7 @@ public class Hybi13WebSocketBuilder extends WebSocketBuilder
    protected Random random = new Random();
 
    @Override
-   public WebSocket connect() throws IOException
+   protected WebSocket doConnect() throws IOException
    {
       final ClientConnectionImpl connection;
 
@@ -74,7 +74,7 @@ public class Hybi13WebSocketBuilder extends WebSocketBuilder
 
          if (response.getStatus() != StatusCode.SWITCHING_PROTOCOLS)
          {
-            throw new HandshakeFailure("Response code not 101", response);
+            throw new HandshakeFailure("Error making handshake: " + response.getStatus(), response);
          }
 
          String upgrade = response.getHeaders().getFirstHeader("Upgrade");

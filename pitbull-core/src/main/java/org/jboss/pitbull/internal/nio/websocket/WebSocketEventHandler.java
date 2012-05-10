@@ -5,6 +5,7 @@ import org.jboss.pitbull.OrderedHeaders;
 import org.jboss.pitbull.RequestHeader;
 import org.jboss.pitbull.ResponseHeader;
 import org.jboss.pitbull.StatusCode;
+import org.jboss.pitbull.internal.nio.http.HttpResponse;
 import org.jboss.pitbull.server.handlers.WebSocketHandler;
 import org.jboss.pitbull.websocket.WebSocket;
 import org.jboss.pitbull.internal.nio.socket.BufferedBlockingInputStream;
@@ -133,6 +134,12 @@ public class WebSocketEventHandler implements EventHandler
       };
 
       OioWebSocket oioWebSocket = WebSocketConnectionManager.establish(handler.getProtocolName(), requestBridge, responseBridge, closingStrategy);
+      if (oioWebSocket == null)
+      {
+         HttpResponse response = new HttpResponse(StatusCode.BAD_REQUEST);
+         byte[] bytes = response.responseBytes();
+         channel.writeBlocking(ByteBuffer.wrap(bytes));
+      }
       webSocket = new WebSocketImpl(connection, oioWebSocket);
       webSocketExecutor = new WebSocketExecutor(channel, webSocket, handler, inputStream, executorService);
    }

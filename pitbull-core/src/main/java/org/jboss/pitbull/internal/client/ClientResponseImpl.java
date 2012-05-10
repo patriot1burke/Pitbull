@@ -111,4 +111,12 @@ public class ClientResponseImpl implements ClientResponse
       }
 
    }
+
+   @Override
+   public String toString()
+   {
+      return "ClientResponse{" +
+              "status=" + status +
+              '}';
+   }
 }

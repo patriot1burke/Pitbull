@@ -41,20 +41,15 @@ public abstract class WebSocketBuilder
       throw new NotImplementedYetException();
    }
 
-   /**
-    * URI of the form of ws[s]://host[:port]/path[?query][#fragment]
-    *
-    * "ws" scheme is an vanilla socket connection.
-    * "wss" is over SSL.
-    *
-    *
-    * @param uriString
-    * @return
-    * @throws URISyntaxException
-    */
-   public WebSocketBuilder uri(String uriString) throws URISyntaxException
+   protected WebSocketBuilder uri(String uriString) throws URISyntaxException
    {
-      uri = URI.create(uriString);
+      URI uri = new URI(uriString);
+      return uri(uri);
+   }
+
+   protected WebSocketBuilder uri(URI uri) throws URISyntaxException
+   {
+      this.uri  = uri;
       if (uri.getScheme().equals("ws"))
       {
          secured = false;
@@ -67,7 +62,7 @@ public abstract class WebSocketBuilder
       }
       else
       {
-         throw new URISyntaxException(uriString, "Must have 'ws' or 'wss' as URI scheme");
+         throw new URISyntaxException(uri.toString(), "Must have 'ws' or 'wss' as URI scheme");
       }
       host = uri.getHost();
       if (uri.getPort() != -1)
@@ -125,5 +120,39 @@ public abstract class WebSocketBuilder
       return this;
    }
 
-   public abstract WebSocket connect() throws IOException;
+   /**
+    * URI of the form of ws[s]://host[:port]/path[?query][#fragment]
+    *
+    * "ws" scheme is an vanilla socket connection.
+    * "wss" is over SSL.
+    *
+    *
+    * @param uri
+    * @return
+    * @throws URISyntaxException
+    */
+   public WebSocket connect(String uri) throws URISyntaxException, IOException
+   {
+      uri(uri);
+      return doConnect();
+   }
+
+   /**
+    * URI of the form of ws[s]://host[:port]/path[?query][#fragment]
+    *
+    * "ws" scheme is an vanilla socket connection.
+    * "wss" is over SSL.
+    *
+    *
+    * @param uri
+    * @return
+    * @throws URISyntaxException
+    */
+   public WebSocket connect(URI uri) throws URISyntaxException, IOException
+   {
+      uri(uri);
+      return doConnect();
+   }
+
+   protected abstract WebSocket doConnect() throws IOException;
 }

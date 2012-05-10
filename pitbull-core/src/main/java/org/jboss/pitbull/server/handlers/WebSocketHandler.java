@@ -1,5 +1,6 @@
 package org.jboss.pitbull.server.handlers;
 
+import org.jboss.pitbull.server.spi.RequestHandler;
 import org.jboss.pitbull.websocket.WebSocket;
 
 import java.io.IOException;
@@ -9,7 +10,7 @@ import java.io.IOException;
  * @author Mike Brock
  * @version $Revision: 1 $
  */
-public interface WebSocketHandler
+public interface WebSocketHandler extends RequestHandler
 {
    /**
     * Name of the websocket protocol.  Returned with initial connection.  May be null.
