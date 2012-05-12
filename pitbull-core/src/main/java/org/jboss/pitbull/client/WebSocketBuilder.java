@@ -3,7 +3,7 @@ package org.jboss.pitbull.client;
 import org.jboss.pitbull.OrderedHeaders;
 import org.jboss.pitbull.internal.NotImplementedYetException;
 import org.jboss.pitbull.internal.client.websocket.protocol.ietf13.Hybi13WebSocketBuilder;
-import org.jboss.pitbull.util.OrderedHeadersImpl;
+import org.jboss.pitbull.internal.util.OrderedHeadersImpl;
 import org.jboss.pitbull.websocket.WebSocket;
 import org.jboss.pitbull.websocket.WebSocketVersion;
 

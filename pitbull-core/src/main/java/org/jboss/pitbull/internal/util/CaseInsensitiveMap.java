@@ -1,4 +1,4 @@
-package org.jboss.pitbull.util;
+package org.jboss.pitbull.internal.util;
 
 import java.io.Serializable;
 import java.util.Collection;

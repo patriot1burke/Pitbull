@@ -1,6 +1,6 @@
 package org.jboss.pitbull.servlet.internal;
 
-import org.jboss.pitbull.util.MultivalueMap;
+import org.jboss.pitbull.internal.util.MultivalueMap;
 
 import java.io.BufferedReader;
 import java.io.IOException;

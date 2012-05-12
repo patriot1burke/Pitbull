@@ -1,4 +1,4 @@
-package org.jboss.pitbull.util;
+package org.jboss.pitbull.internal.util;
 
 import java.util.ArrayList;
 import java.util.Collection;

@@ -2,7 +2,7 @@ package org.jboss.pitbull.internal.nio.http;
 
 import org.jboss.pitbull.OrderedHeaders;
 import org.jboss.pitbull.RequestHeader;
-import org.jboss.pitbull.util.OrderedHeadersImpl;
+import org.jboss.pitbull.internal.util.OrderedHeadersImpl;
 
 /**
  * @author <a href="mailto:bill@burkecentral.com">Bill Burke</a>

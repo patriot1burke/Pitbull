@@ -1,4 +1,4 @@
-package org.jboss.pitbull.crypto;
+package org.jboss.pitbull.internal.crypto;
 
 
 import org.bouncycastle.util.encoders.Base64;

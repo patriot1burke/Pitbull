@@ -5,7 +5,7 @@ import org.jboss.pitbull.RequestHeader;
 import org.jboss.pitbull.servlet.internal.ServletRequestHandler;
 import org.jboss.pitbull.server.spi.RequestHandler;
 import org.jboss.pitbull.server.spi.RequestInitiator;
-import org.jboss.pitbull.util.registry.UriRegistry;
+import org.jboss.pitbull.internal.util.registry.UriRegistry;
 
 import java.util.ArrayList;
 import java.util.Collection;

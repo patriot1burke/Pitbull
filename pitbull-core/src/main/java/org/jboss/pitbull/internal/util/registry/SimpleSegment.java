@@ -1,4 +1,4 @@
-package org.jboss.pitbull.util.registry;
+package org.jboss.pitbull.internal.util.registry;
 
 import java.util.List;
 

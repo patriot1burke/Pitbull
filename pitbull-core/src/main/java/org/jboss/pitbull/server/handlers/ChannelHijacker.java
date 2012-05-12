@@ -1,6 +1,7 @@
 package org.jboss.pitbull.server.handlers;
 
 import org.jboss.pitbull.PitbullChannel;
+import org.jboss.pitbull.RequestHeader;
 import org.jboss.pitbull.server.spi.RequestHandler;
 
 /**
@@ -12,5 +13,5 @@ import org.jboss.pitbull.server.spi.RequestHandler;
  */
 public interface ChannelHijacker extends RequestHandler
 {
-   void hijack(PitbullChannel channel);
+   void hijack(RequestHeader request, PitbullChannel channel);
 }

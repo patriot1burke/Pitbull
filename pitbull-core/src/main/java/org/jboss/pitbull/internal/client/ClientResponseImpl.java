@@ -4,9 +4,7 @@ import org.jboss.pitbull.OrderedHeaders;
 import org.jboss.pitbull.StatusCode;
 import org.jboss.pitbull.client.ClientResponse;
 import org.jboss.pitbull.internal.nio.http.ContentInputStream;
-import org.jboss.pitbull.internal.nio.socket.BufferedBlockingInputStream;
-import org.jboss.pitbull.internal.nio.socket.Channels;
-import org.jboss.pitbull.util.OrderedHeadersImpl;
+import org.jboss.pitbull.internal.util.OrderedHeadersImpl;
 
 import java.io.IOException;
 import java.io.InputStream;

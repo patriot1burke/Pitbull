@@ -5,6 +5,7 @@
         <groupId>org.jboss.pitbull</groupId>
         <artifactId>pitbull-pom</artifactId>
         <version>1.0-alpha-1-SNAPSHOT</version>
+        <relativePath>../../pom.xml</relativePath>
     </parent>
     <artifactId>pitbull-stress-server</artifactId>
     <name>Pitbull Stress Server</name>

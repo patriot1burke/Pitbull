@@ -1,6 +1,6 @@
 package org.jboss.pitbull.server;
 
-import org.jboss.pitbull.crypto.KeyTools;
+import org.jboss.pitbull.internal.crypto.KeyTools;
 import org.jboss.pitbull.internal.nio.http.HttpConnector;
 
 import javax.net.ssl.KeyManagerFactory;

@@ -1,4 +1,4 @@
-package org.jboss.pitbull.util.registry;
+package org.jboss.pitbull.internal.util.registry;
 
 /**
  * @author <a href="mailto:bill@burkecentral.com">Bill Burke</a>

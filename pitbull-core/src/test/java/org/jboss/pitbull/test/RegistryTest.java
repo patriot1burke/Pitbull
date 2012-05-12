@@ -1,7 +1,7 @@
 package org.jboss.pitbull.test;
 
-import org.jboss.pitbull.util.registry.NotFoundException;
-import org.jboss.pitbull.util.registry.UriRegistry;
+import org.jboss.pitbull.internal.util.registry.NotFoundException;
+import org.jboss.pitbull.internal.util.registry.UriRegistry;
 import org.junit.Assert;
 import org.junit.Test;
 

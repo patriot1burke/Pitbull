@@ -1,4 +1,4 @@
-package org.jboss.pitbull.crypto;
+package org.jboss.pitbull.internal.crypto;
 
 import java.io.DataInputStream;
 import java.io.InputStream;

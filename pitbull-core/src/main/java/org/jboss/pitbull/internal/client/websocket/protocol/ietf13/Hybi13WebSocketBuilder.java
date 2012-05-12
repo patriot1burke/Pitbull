@@ -1,10 +1,7 @@
 package org.jboss.pitbull.internal.client.websocket.protocol.ietf13;
 
-import org.jboss.pitbull.OrderedHeaders;
-import org.jboss.pitbull.PitbullChannel;
 import org.jboss.pitbull.StatusCode;
 import org.jboss.pitbull.client.ClientInvocation;
-import org.jboss.pitbull.client.ClientResponse;
 import org.jboss.pitbull.client.HandshakeFailure;
 import org.jboss.pitbull.client.HttpConnectionFactory;
 import org.jboss.pitbull.client.WebSocketBuilder;
@@ -18,7 +15,6 @@ import org.jboss.pitbull.internal.nio.websocket.impl.oio.ClosingStrategy;
 import org.jboss.pitbull.internal.nio.websocket.impl.oio.OioWebSocket;
 import org.jboss.pitbull.internal.nio.websocket.impl.oio.internal.protocol.ietf13.Hybi13Handshake;
 import org.jboss.pitbull.internal.nio.websocket.impl.oio.internal.util.Base64;
-import org.jboss.pitbull.util.OrderedHeadersImpl;
 import org.jboss.pitbull.websocket.WebSocket;
 import org.jboss.pitbull.websocket.WebSocketVersion;
 
@@ -26,9 +22,6 @@ import static org.jboss.pitbull.internal.nio.websocket.impl.oio.internal.WebSock
 
 
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.text.NumberFormat;
 import java.util.Random;
 
 /**
