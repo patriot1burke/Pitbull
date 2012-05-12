@@ -10,6 +10,9 @@ import org.apache.http.impl.conn.SingleClientConnManager;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpParams;
 import org.jboss.pitbull.Connection;
+import org.jboss.pitbull.client.ClientConnection;
+import org.jboss.pitbull.client.ClientInvocation;
+import org.jboss.pitbull.client.HttpConnectionFactory;
 import org.jboss.pitbull.server.HttpServer;
 import org.jboss.pitbull.server.HttpServerBuilder;
 import org.jboss.pitbull.RequestHeader;
@@ -64,6 +67,7 @@ public class SslEchoTest
       @Override
       public void execute(Connection connection, RequestHeader requestHeader, InputStream is, StreamedResponse response) throws IOException
       {
+         System.out.println("*** received request ***");
          response.setStatus(StatusCode.OK);
          response.getHeaders().addHeader("Content-Type", "text/plain");
 
@@ -165,4 +169,47 @@ public class SslEchoTest
 
    }
 
+   @Test
+   public void testPitbullClient() throws Exception
+   {
+      Initiator resource = new Initiator();
+      http.register("/echo", resource);
+
+      try
+      {
+         ClientConnection connection = HttpConnectionFactory.https("localhost", 8443);
+         try
+         {
+            System.out.println("******** got connection ********");
+            ClientInvocation invocation = connection.request("/echo").get();
+            org.jboss.pitbull.client.ClientResponse response = invocation.invoke();
+
+            Assert.assertEquals(StatusCode.OK, response.getStatus());
+            InputStream is = response.getResponseBody();
+            byte[] bytes = ReadFromStream.readFromStream(1024, is);
+            String val = new String(bytes);
+            Assert.assertEquals("How are you", val);
+
+            invocation = connection.request("/echo").post();
+            invocation.getRequestBody().write("hello world".getBytes());
+            response = invocation.invoke();
+            Assert.assertEquals(StatusCode.OK, response.getStatus());
+            is = response.getResponseBody();
+            bytes = ReadFromStream.readFromStream(1024, is);
+            val = new String(bytes);
+            Assert.assertEquals("hello world", val);
+         }
+         finally
+         {
+            connection.close();
+         }
+      }
+      finally
+      {
+         http.unregister(resource);
+
+      }
+
+
+   }
 }

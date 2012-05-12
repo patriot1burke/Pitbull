@@ -46,7 +46,8 @@ public class ClientResponseImpl implements ClientResponse
       buffer = ByteBuffer.allocate(8192);
       do
       {
-         int read = Channels.readBlocking(connection.channel.getChannel(), buffer);
+         //int read = Channels.readBlocking(connection.channel.getChannel(), buffer);
+         int read = connection.channel.readBlocking(buffer);
          if (read == -1)
          {
             connection.close();

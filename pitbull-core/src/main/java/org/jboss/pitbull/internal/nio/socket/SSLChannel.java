@@ -122,7 +122,7 @@ public class SSLChannel extends FreeChannel
             {
                case FINISHED:
                   log.trace("Handshake FINISHED");
-                  return appBuffer.remaining();
+                  return 0;
                case NEED_TASK:
                   log.trace("Handshake NEED_TASK");
                   executeEngineTasks();
@@ -139,7 +139,7 @@ public class SSLChannel extends FreeChannel
                   }
                   else
                   {
-                     return appBuffer.remaining();
+                     return 0;
                   }
                case NEED_WRAP:
                   log.trace("Handshake NEED_WRAP");
@@ -147,11 +147,15 @@ public class SSLChannel extends FreeChannel
                   res = engine.wrap(dummy, outputBuffer);
                   handshakeStatus = res.getHandshakeStatus();
                   outputBuffer.flip();
-                  super.writeBlocking(outputBuffer);
+                  if (super.writeBlocking(outputBuffer) == -1)
+                  {
+                     log.debug("Error writing on NEED_WRAP");
+                     return -1;
+                  }
                   break;
                case NOT_HANDSHAKING:
                   log.trace("Handshake NOT_HANDSHAKING");
-                  return appBuffer.remaining();
+                  return 0;
             }
          }
       }
@@ -198,6 +202,7 @@ public class SSLChannel extends FreeChannel
 
    protected int readExecution(ByteBuffer buf, ReadExecution execution) throws IOException
    {
+      log.trace("<--- enter - read");
       try
       {
          int bufBytesRead = readBuffer(buf);
@@ -213,15 +218,25 @@ public class SSLChannel extends FreeChannel
          appBuffer.clear();
 
          // do everything but reading from channel
-         int bytesRead = processHandshake();
-         if (bytesRead == -1)
+         int status = processHandshake();
+         log.trace("finished 1st processEngine");
+         appBuffer.flip();
+         if (appBuffer.hasRemaining())
+         {
+            return readBuffer(buf);
+         }
+         else
+         {
+            appBuffer.clear();
+         }
+         if (status == -1)
          {
             log.trace("processEngine resulted in closed channel");
             return -1;
          }
 
-         bytesRead = execution.read(inputBuffer);
-         log.trace("Bytes read from channel: {0}", bytesRead);
+         int bytesRead = execution.read(inputBuffer);
+         log.trace("Bytes read into inputBuffer: {0}", bytesRead);
          if (bytesRead < 1) return bytesRead;
 
 
@@ -230,7 +245,7 @@ public class SSLChannel extends FreeChannel
          log.trace("Start loop--");
          do
          {
-            int status = processHandshake();
+            status = processHandshake();
             if (status == -1)
             {
                log.trace("channel closed after processHandshake");
@@ -314,6 +329,11 @@ public class SSLChannel extends FreeChannel
    public int write(ByteBuffer buf) throws IOException
    {
       return writeBlocking(buf);
+   }
+
+   protected int writeBlockingSuper(ByteBuffer buf) throws IOException
+   {
+      return super.writeBlocking(buf);
    }
 
    @Override
