@@ -2,9 +2,9 @@ package org.jboss.pitbull.internal.nio.http;
 
 import org.jboss.pitbull.Connection;
 import org.jboss.pitbull.StatusCode;
-import org.jboss.pitbull.server.handlers.stream.StreamRequestHandler;
 import org.jboss.pitbull.internal.logging.Logger;
 import org.jboss.pitbull.internal.nio.socket.ManagedChannel;
+import org.jboss.pitbull.server.handlers.stream.StreamRequestHandler;
 
 import java.nio.ByteBuffer;
 

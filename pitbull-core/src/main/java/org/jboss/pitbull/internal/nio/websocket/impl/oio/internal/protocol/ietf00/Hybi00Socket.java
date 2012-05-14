@@ -35,62 +35,73 @@ import java.net.URI;
  */
 public class Hybi00Socket extends AbstractWebSocket
 {
-  private final static int MAX_FRAME_SIZE = 1024 * 32; //32kb
+   private final static int MAX_FRAME_SIZE = 1024 * 32; //32kb
 
 
-  protected Hybi00Socket(
-                       final String version,
-                       final URI uri,
-                       final InputStream inputStream,
-                       final OutputStream outputStream,
-                       final ClosingStrategy closingStrategy) {
-    super(version, uri, inputStream, outputStream, closingStrategy);
-  }
+   protected Hybi00Socket(
+           final String version,
+           final URI uri,
+           final InputStream inputStream,
+           final OutputStream outputStream,
+           final ClosingStrategy closingStrategy)
+   {
+      super(version, uri, inputStream, outputStream, closingStrategy);
+   }
 
-  public void writeTextFrame(final String text) throws IOException {
-    outputStream.write(0x00);
-    outputStream.write(text.getBytes("UTF-8"));
-    outputStream.write((byte) 0xFF);
-    outputStream.flush();
-  }
+   public void writeTextFrame(final String text) throws IOException
+   {
+      outputStream.write(0x00);
+      outputStream.write(text.getBytes("UTF-8"));
+      outputStream.write((byte) 0xFF);
+      outputStream.flush();
+   }
 
-  @SuppressWarnings("ResultOfMethodCallIgnored")
-  private String _readTextFrame() throws IOException {
-    byte frametype = (byte) inputStream.read();
+   @SuppressWarnings("ResultOfMethodCallIgnored")
+   private String _readTextFrame() throws IOException
+   {
+      byte frametype = (byte) inputStream.read();
 
-    if ((frametype & 0x80) == 0x80) {
-      throw new RuntimeException("binary payload not supported");
-    }
-    else if (frametype == 0) {
-      final StringBuilder buf = new StringBuilder();
-      int b;
-      int read = 0;
-
-      while ((b = inputStream.read()) != 0xFF) {
-        if (++read > MAX_FRAME_SIZE) {
-          throw new RuntimeException("frame too large");
-        }
-        buf.append((char) b);
+      if ((frametype & 0x80) == 0x80)
+      {
+         throw new RuntimeException("binary payload not supported");
       }
+      else if (frametype == 0)
+      {
+         final StringBuilder buf = new StringBuilder();
+         int b;
+         int read = 0;
 
-      return buf.toString();
-    }
-    else {
-      throw new RuntimeException("bad websockets payload");
-    }
-  }
+         while ((b = inputStream.read()) != 0xFF)
+         {
+            if (++read > MAX_FRAME_SIZE)
+            {
+               throw new RuntimeException("frame too large");
+            }
+            buf.append((char) b);
+         }
 
-  public void writeFrame(Frame frame) throws IOException {
-    if (frame.getType() == FrameType.Text) {
-      writeTextFrame(((TextFrame) frame).getText());
-    }
-     else
-    {
-       throw new IOException("unable to handle frame type: " + frame.getType());
-    }
-  }
+         return buf.toString();
+      }
+      else
+      {
+         throw new RuntimeException("bad websockets payload");
+      }
+   }
 
-  public Frame readFrame() throws IOException {
-    return TextFrame.from(_readTextFrame());
-  }
+   public void writeFrame(Frame frame) throws IOException
+   {
+      if (frame.getType() == FrameType.Text)
+      {
+         writeTextFrame(((TextFrame) frame).getText());
+      }
+      else
+      {
+         throw new IOException("unable to handle frame type: " + frame.getType());
+      }
+   }
+
+   public Frame readFrame() throws IOException
+   {
+      return TextFrame.from(_readTextFrame());
+   }
 }

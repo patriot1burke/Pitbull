@@ -4,7 +4,6 @@ import org.jboss.pitbull.PitbullChannel;
 import org.jboss.pitbull.client.ClientConnection;
 import org.jboss.pitbull.client.ClientInvocation;
 
-import javax.net.ssl.SSLSession;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 
@@ -21,7 +20,7 @@ public class ClientConnectionImpl implements ClientConnection
    public ClientConnectionImpl(PitbullChannel channel, String host, int port)
    {
       this.channel = channel;
-      this.host = host + (port == 80 ? "" : (":"+Integer.toString(port)));
+      this.host = host + (port == 80 ? "" : (":" + Integer.toString(port)));
 
    }
 
@@ -81,13 +80,13 @@ public class ClientConnectionImpl implements ClientConnection
    @Override
    public InetSocketAddress getLocalAddress()
    {
-      return (InetSocketAddress)(channel.getChannel().socket().getLocalSocketAddress());
+      return (InetSocketAddress) (channel.getChannel().socket().getLocalSocketAddress());
    }
 
    @Override
    public InetSocketAddress getRemoteAddress()
    {
-      return (InetSocketAddress)(channel.getChannel().socket().getRemoteSocketAddress());
+      return (InetSocketAddress) (channel.getChannel().socket().getRemoteSocketAddress());
    }
 
    @Override

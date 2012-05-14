@@ -18,11 +18,10 @@ import org.jboss.pitbull.internal.nio.websocket.impl.oio.internal.util.Base64;
 import org.jboss.pitbull.websocket.WebSocket;
 import org.jboss.pitbull.websocket.WebSocketVersion;
 
-import static org.jboss.pitbull.internal.nio.websocket.impl.oio.internal.WebSocketHeaders.*;
-
-
 import java.io.IOException;
 import java.util.Random;
+
+import static org.jboss.pitbull.internal.nio.websocket.impl.oio.internal.WebSocketHeaders.*;
 
 /**
  * @author <a href="mailto:bill@burkecentral.com">Bill Burke</a>
@@ -39,7 +38,8 @@ public class Hybi13WebSocketBuilder extends WebSocketBuilder
 
       if (secured)
       {
-         throw new NotImplementedYetException();
+         if (trustStore == null) connection = (ClientConnectionImpl) HttpConnectionFactory.https(host, port);
+         else throw new NotImplementedYetException("wss with truststore not implemented yet");
       }
       else
       {
@@ -63,7 +63,7 @@ public class Hybi13WebSocketBuilder extends WebSocketBuilder
 
          if (protocol != null) invocation.header(SEC_WEBSOCKET_PROTOCOL.getCanonicalHeaderName(), protocol);
 
-         ClientResponseImpl response = (ClientResponseImpl)invocation.invoke();
+         ClientResponseImpl response = (ClientResponseImpl) invocation.invoke();
 
          if (response.getStatus() != StatusCode.SWITCHING_PROTOCOLS)
          {
@@ -113,7 +113,7 @@ public class Hybi13WebSocketBuilder extends WebSocketBuilder
 
          OioWebSocket oioWebSocket = handshake.getClientWebSocket(
                  uri,
-                 new BufferedBlockingInputStream(connection.getChannel(),response.getBuffer()),
+                 new BufferedBlockingInputStream(connection.getChannel(), response.getBuffer()),
                  new BufferedBlockingOutputStream((connection.getChannel())),
                  new ClosingStrategy()
                  {
@@ -123,7 +123,7 @@ public class Hybi13WebSocketBuilder extends WebSocketBuilder
                        connection.close();
                     }
                  }
-                 );
+         );
 
          return new WebSocketImpl(connection, oioWebSocket);
       }

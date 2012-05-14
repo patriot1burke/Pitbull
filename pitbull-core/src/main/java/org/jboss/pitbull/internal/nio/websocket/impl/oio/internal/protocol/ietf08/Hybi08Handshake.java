@@ -21,11 +21,13 @@ import org.jboss.pitbull.internal.nio.websocket.impl.oio.internal.protocol.ietf0
 /**
  * The handshaking protocol impelemtation for Hybi-07, which is identical to Hybi-08, and thus is just a thin
  * subclass of {@link org.jboss.pitbull.internal.nio.websocket.impl.oio.internal.protocol.ietf07.Hybi07Handshake} that sets a different version number.
+ *
  * @author Mike Brock
  */
 public class Hybi08Handshake extends Hybi07Handshake
 {
-  public Hybi08Handshake() {
-    super("8");
-  }
+   public Hybi08Handshake()
+   {
+      super("8");
+   }
 }

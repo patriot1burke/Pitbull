@@ -2,6 +2,7 @@ package org.jboss.pitbull.client;
 
 import org.jboss.pitbull.OrderedHeaders;
 import org.jboss.pitbull.internal.NotImplementedYetException;
+import org.jboss.pitbull.internal.client.websocket.protocol.ietf00.Hybi00WebSocketBuilder;
 import org.jboss.pitbull.internal.client.websocket.protocol.ietf13.Hybi13WebSocketBuilder;
 import org.jboss.pitbull.internal.util.OrderedHeadersImpl;
 import org.jboss.pitbull.websocket.WebSocket;
@@ -10,6 +11,7 @@ import org.jboss.pitbull.websocket.WebSocketVersion;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.security.KeyStore;
 
 /**
  * @author <a href="mailto:bill@burkecentral.com">Bill Burke</a>
@@ -25,6 +27,8 @@ public abstract class WebSocketBuilder
    protected String protocol;
    protected OrderedHeaders headers = new OrderedHeadersImpl();
    protected boolean secured;
+   protected KeyStore trustStore;
+
 
    /**
     * Creates a websocket of latest supported protocol
@@ -38,7 +42,16 @@ public abstract class WebSocketBuilder
 
    public static WebSocketBuilder create(WebSocketVersion version)
    {
-      throw new NotImplementedYetException();
+      switch (version)
+      {
+         case HYBI_13:
+            return new Hybi13WebSocketBuilder();
+         case HYBI_00:
+            return new Hybi00WebSocketBuilder();
+         default:
+            throw new NotImplementedYetException();
+
+      }
    }
 
    protected WebSocketBuilder uri(String uriString) throws URISyntaxException
@@ -49,7 +62,7 @@ public abstract class WebSocketBuilder
 
    protected WebSocketBuilder uri(URI uri) throws URISyntaxException
    {
-      this.uri  = uri;
+      this.uri = uri;
       if (uri.getScheme().equals("ws"))
       {
          secured = false;
@@ -83,7 +96,7 @@ public abstract class WebSocketBuilder
 
    /**
     * Origin defines where the request is coming from.  Some websocket servers may require this setting.
-    *
+    * <p/>
     * see definition at {@link <a href="http://tools.ietf.org/html/rfc6454#section-7">HTTP Origin Header</a>}
     *
     * @param origin
@@ -120,12 +133,17 @@ public abstract class WebSocketBuilder
       return this;
    }
 
+   public WebSocketBuilder truststore(KeyStore trustStore)
+   {
+      this.trustStore = trustStore;
+      return this;
+   }
+
    /**
     * URI of the form of ws[s]://host[:port]/path[?query][#fragment]
-    *
+    * <p/>
     * "ws" scheme is an vanilla socket connection.
-    * "wss" is over SSL.
-    *
+    * "wss" is over SSL.   If you have not provided a truststore, every server will be trusted
     *
     * @param uri
     * @return
@@ -139,10 +157,9 @@ public abstract class WebSocketBuilder
 
    /**
     * URI of the form of ws[s]://host[:port]/path[?query][#fragment]
-    *
+    * <p/>
     * "ws" scheme is an vanilla socket connection.
-    * "wss" is over SSL.
-    *
+    * "wss" is over SSL.  If you have not provided a truststore, every server will be trusted
     *
     * @param uri
     * @return

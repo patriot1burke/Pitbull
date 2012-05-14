@@ -2,7 +2,6 @@ package org.jboss.pitbull.internal.nio.http;
 
 import org.jboss.pitbull.Connection;
 
-import javax.net.ssl.SSLSession;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.util.UUID;

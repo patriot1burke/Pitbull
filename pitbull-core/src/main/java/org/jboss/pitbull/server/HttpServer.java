@@ -3,9 +3,9 @@ package org.jboss.pitbull.server;
 import org.jboss.pitbull.internal.logging.Logger;
 import org.jboss.pitbull.internal.nio.http.HttpConnector;
 import org.jboss.pitbull.internal.nio.socket.Worker;
+import org.jboss.pitbull.internal.util.registry.UriRegistry;
 import org.jboss.pitbull.server.spi.RequestHandler;
 import org.jboss.pitbull.server.spi.RequestInitiator;
-import org.jboss.pitbull.internal.util.registry.UriRegistry;
 
 import java.util.ArrayList;
 import java.util.List;

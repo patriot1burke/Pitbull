@@ -16,7 +16,6 @@
 
 package org.jboss.pitbull.internal.nio.websocket.impl.oio.internal.protocol.ietf00;
 
-import org.jboss.pitbull.internal.NotImplementedYetException;
 import org.jboss.pitbull.internal.nio.websocket.impl.oio.ClosingStrategy;
 import org.jboss.pitbull.internal.nio.websocket.impl.oio.HttpRequestBridge;
 import org.jboss.pitbull.internal.nio.websocket.impl.oio.HttpResponseBridge;
@@ -40,90 +39,102 @@ import static org.jboss.pitbull.internal.nio.websocket.impl.oio.internal.WebSock
  */
 public class Hybi00Handshake extends Handshake
 {
-  public Hybi00Handshake() {
-    super("0", "MD5", null);
-  }
+   public Hybi00Handshake()
+   {
+      super("0", "MD5", null);
+   }
 
-  @Override
-  public boolean matches(HttpRequestBridge request) {
-    return SEC_WEBSOCKET_KEY1.isIn(request) && SEC_WEBSOCKET_KEY2.isIn(request);
-  }
+   @Override
+   public boolean matches(HttpRequestBridge request)
+   {
+      return SEC_WEBSOCKET_KEY1.isIn(request) && SEC_WEBSOCKET_KEY2.isIn(request);
+   }
 
-  @Override
-  public OioWebSocket getServerWebSocket(final HttpRequestBridge request,
-                                         final HttpResponseBridge response,
-                                         final ClosingStrategy closingStrategy) throws IOException {
-    return new Hybi00Socket("0", URI.create(getWebSocketLocation(request)), request.getInputStream(), response.getOutputStream(), closingStrategy);
-  }
+   @Override
+   public OioWebSocket getServerWebSocket(final HttpRequestBridge request,
+                                          final HttpResponseBridge response,
+                                          final ClosingStrategy closingStrategy) throws IOException
+   {
+      return new Hybi00Socket("0", URI.create(getWebSocketLocation(request)), request.getInputStream(), response.getOutputStream(), closingStrategy);
+   }
 
    @Override
    public OioWebSocket getClientWebSocket(URI uri, InputStream inputStream, OutputStream outputStream, ClosingStrategy closingStrategy) throws IOException
    {
-      throw new NotImplementedYetException();
+      return new Hybi00Socket("0", uri, inputStream, outputStream, closingStrategy);
    }
 
    @Override
-  public byte[] generateResponse(final HttpRequestBridge request,
-                                   final HttpResponseBridge response) throws IOException {
+   public byte[] generateResponse(final HttpRequestBridge request,
+                                  final HttpResponseBridge response) throws IOException
+   {
 
-    if (WebSocketHeaders.ORIGIN.isIn(request)) {
-      WebSocketHeaders.SEC_WEBSOCKET_ORIGIN.set(response, WebSocketHeaders.ORIGIN.get(request).trim());
-    }
-
-    final String origin = "ws://" + request.getHeader("Host") + request.getRequestURI();
-
-    WebSocketHeaders.SEC_WEBSOCKET_LOCATION.set(response, origin);
-    WebSocketHeaders.SEC_WEBSOCKET_PROTOCOL.copy(request, response);
-
-    // Calculate the answer of the challenge.
-    final String key1 = SEC_WEBSOCKET_KEY1.get(request);
-    final String key2 = SEC_WEBSOCKET_KEY2.get(request);
-    final byte[] key3 = new byte[8];
-
-    final InputStream inputStream = request.getInputStream();
-    inputStream.read(key3);
-
-    final byte[] solution = solve(getHashAlgorithm(), key1, key2, key3);
-
-    return solution;
-  }
-
-  public static byte[] solve(final String hashAlgorithm, String encodedKey1, String encodedKey2, byte[] key3) {
-    return solve(hashAlgorithm, decodeKey(encodedKey1), decodeKey(encodedKey2), key3);
-  }
-
-  public static byte[] solve(final String hashAlgorithm, long key1, long key2, byte[] key3) {
-    ByteBuffer buffer = ByteBuffer.allocate(16).order(ByteOrder.BIG_ENDIAN);
-
-    buffer.putInt((int) key1);
-    buffer.putInt((int) key2);
-    buffer.put(key3);
-
-    final byte[] solution = new byte[16];
-    buffer.rewind();
-    buffer.get(solution, 0, 16);
-
-    try {
-      final MessageDigest digest = MessageDigest.getInstance(hashAlgorithm);
-      return digest.digest(solution);
-    }
-    catch (NoSuchAlgorithmException e) {
-      throw new RuntimeException("error generating hash", e);
-    }
-  }
-
-  public static long decodeKey(final String encoded) {
-    final int len = encoded.length();
-    int numSpaces = 0;
-
-    for (int i = 0; i < len; ++i) {
-      if (encoded.charAt(i) == ' ') {
-        ++numSpaces;
+      if (WebSocketHeaders.ORIGIN.isIn(request))
+      {
+         WebSocketHeaders.SEC_WEBSOCKET_ORIGIN.set(response, WebSocketHeaders.ORIGIN.get(request).trim());
       }
-    }
 
-    final String digits = encoded.replaceAll("[^0-9]", "");
-    final long product = Long.parseLong(digits);
-    return product / numSpaces;
-  }
+      final String location = getWebSocketLocation(request);
+
+      WebSocketHeaders.SEC_WEBSOCKET_LOCATION.set(response, location);
+      WebSocketHeaders.SEC_WEBSOCKET_PROTOCOL.copy(request, response);
+
+      // Calculate the answer of the challenge.
+      final String key1 = SEC_WEBSOCKET_KEY1.get(request);
+      final String key2 = SEC_WEBSOCKET_KEY2.get(request);
+      final byte[] key3 = new byte[8];
+
+      final InputStream inputStream = request.getInputStream();
+      inputStream.read(key3);
+
+      final byte[] solution = solve(getHashAlgorithm(), key1, key2, key3);
+
+      return solution;
+   }
+
+   public static byte[] solve(final String hashAlgorithm, String encodedKey1, String encodedKey2, byte[] key3)
+   {
+      return solve(hashAlgorithm, decodeKey(encodedKey1), decodeKey(encodedKey2), key3);
+   }
+
+   public static byte[] solve(final String hashAlgorithm, long key1, long key2, byte[] key3)
+   {
+      ByteBuffer buffer = ByteBuffer.allocate(16).order(ByteOrder.BIG_ENDIAN);
+
+      buffer.putInt((int) key1);
+      buffer.putInt((int) key2);
+      buffer.put(key3);
+
+      final byte[] solution = new byte[16];
+      buffer.rewind();
+      buffer.get(solution, 0, 16);
+
+      try
+      {
+         final MessageDigest digest = MessageDigest.getInstance(hashAlgorithm);
+         return digest.digest(solution);
+      }
+      catch (NoSuchAlgorithmException e)
+      {
+         throw new RuntimeException("error generating hash", e);
+      }
+   }
+
+   public static long decodeKey(final String encoded)
+   {
+      final int len = encoded.length();
+      int numSpaces = 0;
+
+      for (int i = 0; i < len; ++i)
+      {
+         if (encoded.charAt(i) == ' ')
+         {
+            ++numSpaces;
+         }
+      }
+
+      final String digits = encoded.replaceAll("[^0-9]", "");
+      final long product = Long.parseLong(digits);
+      return product / numSpaces;
+   }
 }

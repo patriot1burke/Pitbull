@@ -1,10 +1,10 @@
 package org.jboss.pitbull.internal.nio.websocket;
 
-import org.jboss.pitbull.server.handlers.WebSocketHandler;
-import org.jboss.pitbull.websocket.WebSocket;
 import org.jboss.pitbull.internal.logging.Logger;
 import org.jboss.pitbull.internal.nio.socket.BufferedBlockingInputStream;
 import org.jboss.pitbull.internal.nio.socket.ManagedChannel;
+import org.jboss.pitbull.server.handlers.WebSocketHandler;
+import org.jboss.pitbull.websocket.WebSocket;
 
 import java.util.concurrent.ExecutorService;
 

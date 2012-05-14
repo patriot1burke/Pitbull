@@ -22,60 +22,72 @@ import org.jboss.pitbull.internal.nio.websocket.impl.oio.HttpResponseBridge;
 /**
  * @author Mike Brock
  */
-public enum WebSocketHeaders {
-  SEC_WEBSOCKET_KEY("Sec-WebSocket-Key"),
-  SEC_WEBSOCKET_KEY1("Sec-WebSocket-Key1"),
-  SEC_WEBSOCKET_KEY2("Sec-WebSocket-Key2"),
-  SEC_WEBSOCKET_LOCATION("Sec-WebSocket-Location"),
-  ORIGIN("Origin"),
-  SEC_WEBSOCKET_ORIGIN("Sec-WebSocket-Origin"),
-  SEC_WEBSOCKET_PROTOCOL("Sec-WebSocket-Protocol"),
-  SEC_WEBSOCKET_VERSION("Sec-WebSocket-Version"),
-  SEC_WEBSOCKET_ACCEPT("Sec-WebSocket-Accept");
+public enum WebSocketHeaders
+{
+   SEC_WEBSOCKET_KEY("Sec-WebSocket-Key"),
+   SEC_WEBSOCKET_KEY1("Sec-WebSocket-Key1"),
+   SEC_WEBSOCKET_KEY2("Sec-WebSocket-Key2"),
+   SEC_WEBSOCKET_LOCATION("Sec-WebSocket-Location"),
+   ORIGIN("Origin"),
+   SEC_WEBSOCKET_ORIGIN("Sec-WebSocket-Origin"),
+   SEC_WEBSOCKET_PROTOCOL("Sec-WebSocket-Protocol"),
+   SEC_WEBSOCKET_VERSION("Sec-WebSocket-Version"),
+   SEC_WEBSOCKET_ACCEPT("Sec-WebSocket-Accept");
 
-  private final String canonicalHeaderName;
+   private final String canonicalHeaderName;
 
-  private WebSocketHeaders(String canonicalHeaderName) {
-    this.canonicalHeaderName = canonicalHeaderName;
-  }
+   private WebSocketHeaders(String canonicalHeaderName)
+   {
+      this.canonicalHeaderName = canonicalHeaderName;
+   }
 
-  public final String getCanonicalHeaderName() {
-    return canonicalHeaderName;
-  }
+   public final String getCanonicalHeaderName()
+   {
+      return canonicalHeaderName;
+   }
 
-  public final String get(final HttpRequestBridge request) {
-    return request.getHeader(getCanonicalHeaderName());
-  }
+   public final String get(final HttpRequestBridge request)
+   {
+      return request.getHeader(getCanonicalHeaderName());
+   }
 
-  public final String get(final HttpResponseBridge response) {
-    return response.getHeader(getCanonicalHeaderName());
-  }
+   public final String get(final HttpResponseBridge response)
+   {
+      return response.getHeader(getCanonicalHeaderName());
+   }
 
-  public final boolean isIn(final HttpRequestBridge request) {
-    return get(request) != null;
-  }
+   public final boolean isIn(final HttpRequestBridge request)
+   {
+      return get(request) != null;
+   }
 
-  public final boolean isIn(final HttpResponseBridge response) {
-    return get(response) != null;
-  }
+   public final boolean isIn(final HttpResponseBridge response)
+   {
+      return get(response) != null;
+   }
 
-  public final void copy(final HttpRequestBridge from, final HttpResponseBridge response) {
-    if (isIn(from)) {
-      set(response, get(from));
-    }
-  }
+   public final void copy(final HttpRequestBridge from, final HttpResponseBridge response)
+   {
+      if (isIn(from))
+      {
+         set(response, get(from));
+      }
+   }
 
-  public final void set(final HttpResponseBridge response, final String value) {
-    response.setHeader(getCanonicalHeaderName(), value);
-  }
+   public final void set(final HttpResponseBridge response, final String value)
+   {
+      response.setHeader(getCanonicalHeaderName(), value);
+   }
 
-  public final boolean matches(final HttpRequestBridge request, final String matchTo) {
-    final String val = get(request);
-    return val != null && val.equals(matchTo);
-  }
+   public final boolean matches(final HttpRequestBridge request, final String matchTo)
+   {
+      final String val = get(request);
+      return val != null && val.equals(matchTo);
+   }
 
-  public final boolean matches(final HttpResponseBridge request, final String matchTo) {
-    final String val = get(request);
-    return val != null && val.equals(matchTo);
-  }
+   public final boolean matches(final HttpResponseBridge request, final String matchTo)
+   {
+      final String val = get(request);
+      return val != null && val.equals(matchTo);
+   }
 }

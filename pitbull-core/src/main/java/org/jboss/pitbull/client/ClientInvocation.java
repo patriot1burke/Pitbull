@@ -13,10 +13,15 @@ import java.util.concurrent.Future;
 public interface ClientInvocation
 {
    ClientInvocation header(String name, String value);
+
    ClientInvocation get();
+
    ClientInvocation put();
+
    ClientInvocation post();
+
    ClientInvocation delete();
+
    ClientInvocation method(String method);
 
    /**
@@ -43,8 +48,6 @@ public interface ClientInvocation
     * @return
     */
    Future<ClientResponse> submit() throws IOException;
-
-
 
 
 }

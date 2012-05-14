@@ -58,6 +58,11 @@ public final class Hash
       return r;
    }
 
+   public static int nextInt(int max)
+   {
+      return getRandom().nextInt(max);
+   }
+
    public static void getRandomBytes(byte[] bytes)
    {
       getRandom().nextBytes(bytes);

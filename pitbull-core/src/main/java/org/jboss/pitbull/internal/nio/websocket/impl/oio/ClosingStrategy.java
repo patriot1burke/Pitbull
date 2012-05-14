@@ -8,9 +8,10 @@ import java.io.IOException;
  *
  * @author Mike Brock
  */
-public interface ClosingStrategy {
-  /**
-   * Close the socket.
-   */
-  public void doClose() throws IOException;
+public interface ClosingStrategy
+{
+   /**
+    * Close the socket.
+    */
+   public void doClose() throws IOException;
 }

@@ -8,13 +8,15 @@ import org.jboss.pitbull.internal.nio.websocket.impl.FrameType;
  */
 public class AbstractFrame implements Frame
 {
-  private final FrameType type;
+   private final FrameType type;
 
-  protected AbstractFrame(final FrameType type) {
-    this.type = type;
-  }
+   protected AbstractFrame(final FrameType type)
+   {
+      this.type = type;
+   }
 
-  public FrameType getType() {
-    return type;
-  }
+   public FrameType getType()
+   {
+      return type;
+   }
 }

@@ -105,7 +105,6 @@ public abstract class HttpMessageDecoder
    }
 
 
-
    protected abstract OrderedHeaders getHeaders();
 
    protected boolean readHeader(ByteBuffer buffer)

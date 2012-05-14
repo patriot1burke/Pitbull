@@ -13,6 +13,7 @@ import java.io.OutputStream;
 public interface HttpResponseBridge
 {
    String getHeader(String name);
+
    void setHeader(String name, String val);
 
    OutputStream getOutputStream();

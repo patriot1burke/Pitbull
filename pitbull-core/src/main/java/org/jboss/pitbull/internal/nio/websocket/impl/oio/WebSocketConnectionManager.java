@@ -55,7 +55,6 @@ public class WebSocketConnectionManager
    }
 
 
-
    public static OioWebSocket handshake(String protocolName, HttpRequestBridge request, HttpResponseBridge response, ClosingStrategy closingStrategy, Handshake handshake) throws IOException
    {
       /**

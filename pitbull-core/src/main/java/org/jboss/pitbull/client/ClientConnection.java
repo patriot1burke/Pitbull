@@ -17,5 +17,6 @@ public interface ClientConnection extends Connection
    public ClientInvocation request(String uri);
 
    public boolean isClosed();
+
    public void close();
 }

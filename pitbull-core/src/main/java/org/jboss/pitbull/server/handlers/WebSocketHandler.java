@@ -18,5 +18,6 @@ public interface WebSocketHandler extends RequestHandler
     * @return
     */
    String getProtocolName();
+
    void onReceivedFrame(WebSocket socket) throws IOException;
 }

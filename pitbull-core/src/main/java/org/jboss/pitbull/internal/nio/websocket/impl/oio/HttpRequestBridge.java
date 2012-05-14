@@ -12,7 +12,10 @@ import java.io.InputStream;
 public interface HttpRequestBridge
 {
    boolean isSecure();
+
    String getHeader(String name);
+
    String getRequestURI();
+
    InputStream getInputStream();
 }

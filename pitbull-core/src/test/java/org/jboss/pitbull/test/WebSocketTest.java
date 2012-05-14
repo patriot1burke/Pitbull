@@ -7,6 +7,7 @@ import org.jboss.pitbull.server.handlers.WebSocketHandler;
 import org.jboss.pitbull.websocket.BinaryFrame;
 import org.jboss.pitbull.websocket.TextFrame;
 import org.jboss.pitbull.websocket.WebSocket;
+import org.jboss.pitbull.websocket.WebSocketVersion;
 import org.jboss.resteasy.util.Hex;
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -29,7 +30,7 @@ public class WebSocketTest
    @BeforeClass
    public static void startup() throws Exception
    {
-      http = new HttpServerBuilder().connector().add()
+      http = new HttpServerBuilder().connector().add().connector().https().add()
               .workers(1)
               .maxRequestThreads(1).build();
       http.start();
@@ -87,30 +88,28 @@ public class WebSocketTest
          {
             throw new RuntimeException(e);
          }
-         //socket.writeBinaryFrame(frame.getBytes());
+         socket.writeBinaryFrame(frame.getBytes());
       }
    }
 
    @Test
-   public void testTextFrames() throws Exception
+   public void testFrames() throws Exception
+   {
+      testTextFrames(WebSocketVersion.HYBI_00);
+      testTextFrames(WebSocketVersion.HYBI_13);
+      testBinaryFrames(WebSocketVersion.HYBI_13);
+   }
+
+   private void testTextFrames(WebSocketVersion version) throws Exception
    {
       TextHandler handler = new TextHandler();
       http.register("/websocket", handler);
       try
       {
-         WebSocket socket = WebSocketBuilder.create().connect("ws://localhost:8080/websocket");
-         socket.writeTextFrame("hello world");
-         TextFrame frame = (TextFrame)socket.readFrame();
-         Assert.assertEquals("hello world", frame.getText());
-         for (int i = 0; i < 10; i++)
-         {
-            socket.writeTextFrame(Integer.toString(i));
-         }
-         for (int i = 0; i < 10; i++)
-         {
-            frame = (TextFrame)socket.readFrame();
-            Assert.assertEquals(Integer.toString(i), frame.getText());
-         }
+         WebSocket socket = WebSocketBuilder.create(version).connect("ws://localhost:8080/websocket");
+         testTextFrame(socket);
+         socket = WebSocketBuilder.create(version).connect("wss://localhost:8443/websocket");
+         testTextFrame(socket);
       }
       finally
       {
@@ -118,37 +117,57 @@ public class WebSocketTest
       }
    }
 
-   @Test
-   public void testBinaryFrames() throws Exception
+   private void testTextFrame(WebSocket socket) throws IOException
+   {
+      socket.writeTextFrame("hello world");
+      TextFrame frame = (TextFrame)socket.readFrame();
+      Assert.assertEquals("hello world", frame.getText());
+      for (int i = 0; i < 10; i++)
+      {
+         socket.writeTextFrame(Integer.toString(i));
+      }
+      for (int i = 0; i < 10; i++)
+      {
+         frame = (TextFrame)socket.readFrame();
+         Assert.assertEquals(Integer.toString(i), frame.getText());
+      }
+   }
+
+   private void testBinaryFrames(WebSocketVersion version) throws Exception
    {
       BinaryHandler handler = new BinaryHandler();
       http.register("/websocket", handler);
       try
       {
-         WebSocket socket = WebSocketBuilder.create().connect("ws://localhost:8080/websocket");
-         ArrayList<byte[]> frames = new ArrayList<byte[]>(10);
-         Random random = new Random();
-
-         for (int i = 0; i < 1; i++)
-         {
-            byte[] bytes = new byte[10];
-            random.nextBytes(bytes);
-            System.out.println("client bytes: " + Hex.encodeHex(bytes));
-            frames.add(bytes);
-            socket.writeBinaryFrame(bytes);
-         }
-         /*
-         for (int i = 0; i < 10; i++)
-         {
-            BinaryFrame frame = (BinaryFrame)socket.readFrame();
-            byte[] bytes = frames.get(i);
-            Assert.assertTrue(Arrays.equals(bytes, frame.getBytes()));
-         }
-         */
+         WebSocket socket = WebSocketBuilder.create(version).connect("ws://localhost:8080/websocket");
+         testBinaryFrame(socket);
+         socket = WebSocketBuilder.create(version).connect("wss://localhost:8443/websocket");
+         testBinaryFrame(socket);
       }
       finally
       {
          http.unregister(handler);
+      }
+   }
+
+   private void testBinaryFrame(WebSocket socket) throws IOException
+   {
+      ArrayList<byte[]> frames = new ArrayList<byte[]>(10);
+      Random random = new Random();
+
+      for (int i = 0; i < 10; i++)
+      {
+         byte[] bytes = new byte[10];
+         random.nextBytes(bytes);
+         System.out.println("client bytes: " + Hex.encodeHex(bytes));
+         frames.add(bytes);
+         socket.writeBinaryFrame(bytes);
+      }
+      for (int i = 0; i < 10; i++)
+      {
+         BinaryFrame frame = (BinaryFrame)socket.readFrame();
+         byte[] bytes = frames.get(i);
+         Assert.assertTrue(Arrays.equals(bytes, frame.getBytes()));
       }
    }
 }

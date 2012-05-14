@@ -7,7 +7,8 @@ import org.jboss.pitbull.internal.nio.websocket.impl.FrameType;
  */
 public class PingFrame extends AbstractFrame
 {
-  public PingFrame() {
-    super(FrameType.Ping);
-  }
+   public PingFrame()
+   {
+      super(FrameType.Ping);
+   }
 }

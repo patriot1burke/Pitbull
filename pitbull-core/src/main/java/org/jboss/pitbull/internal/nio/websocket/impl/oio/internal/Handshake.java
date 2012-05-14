@@ -29,54 +29,60 @@ import java.net.URI;
 /**
  * @author Mike Brock
  */
-public abstract class Handshake {
-  private final String version;
-  private final String hashAlgorithm;
-  private final String magicNumber;
+public abstract class Handshake
+{
+   private final String version;
+   private final String hashAlgorithm;
+   private final String magicNumber;
 
-  public Handshake(String version, String hashAlgorithm, String magicNumber) {
-    this.version = version;
-    this.hashAlgorithm = hashAlgorithm;
-    this.magicNumber = magicNumber;
-  }
+   public Handshake(String version, String hashAlgorithm, String magicNumber)
+   {
+      this.version = version;
+      this.hashAlgorithm = hashAlgorithm;
+      this.magicNumber = magicNumber;
+   }
 
-  public String getVersion() {
-    return this.version;
-  }
+   public String getVersion()
+   {
+      return this.version;
+   }
 
-  public String getHashAlgorithm() {
-    return hashAlgorithm;
-  }
+   public String getHashAlgorithm()
+   {
+      return hashAlgorithm;
+   }
 
-  public String getMagicNumber() {
-    return magicNumber;
-  }
+   public String getMagicNumber()
+   {
+      return magicNumber;
+   }
 
-  protected String getWebSocketLocation(HttpRequestBridge request) {
-     StringBuilder builder = new StringBuilder(100);
-     if (request.isSecure())
-     {
-        builder.append("wss://");
-     }
-     else
-     {
-        builder.append("ws://");
-     }
-     builder.append(request.getHeader("Host")).append(request.getRequestURI());
-     return builder.toString();
-  }
+   protected String getWebSocketLocation(HttpRequestBridge request)
+   {
+      StringBuilder builder = new StringBuilder(100);
+      if (request.isSecure())
+      {
+         builder.append("wss://");
+      }
+      else
+      {
+         builder.append("ws://");
+      }
+      builder.append(request.getHeader("Host")).append(request.getRequestURI());
+      return builder.toString();
+   }
 
    public abstract OioWebSocket getClientWebSocket(URI uri,
                                                    InputStream inputStream,
                                                    OutputStream outputStream,
                                                    ClosingStrategy closingStrategy) throws IOException;
 
-  public abstract OioWebSocket getServerWebSocket(HttpRequestBridge request,
-                                                  HttpResponseBridge response,
-                                                  ClosingStrategy closingStrategy) throws IOException;
+   public abstract OioWebSocket getServerWebSocket(HttpRequestBridge request,
+                                                   HttpResponseBridge response,
+                                                   ClosingStrategy closingStrategy) throws IOException;
 
-  public abstract boolean matches(HttpRequestBridge request);
+   public abstract boolean matches(HttpRequestBridge request);
 
-  public abstract byte[] generateResponse(HttpRequestBridge request,
-                                         HttpResponseBridge response) throws IOException;
+   public abstract byte[] generateResponse(HttpRequestBridge request,
+                                           HttpResponseBridge response) throws IOException;
 }

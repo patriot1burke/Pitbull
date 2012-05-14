@@ -3,16 +3,16 @@ package org.jboss.pitbull.internal.nio.http;
 import org.jboss.pitbull.Connection;
 import org.jboss.pitbull.RequestHeader;
 import org.jboss.pitbull.StatusCode;
-import org.jboss.pitbull.internal.nio.websocket.WebSocketEventHandler;
-import org.jboss.pitbull.server.handlers.WebSocketHandler;
-import org.jboss.pitbull.server.handlers.stream.StreamRequestHandler;
 import org.jboss.pitbull.internal.logging.Logger;
 import org.jboss.pitbull.internal.nio.socket.EventHandler;
 import org.jboss.pitbull.internal.nio.socket.ManagedChannel;
-import org.jboss.pitbull.server.spi.RequestHandler;
-import org.jboss.pitbull.server.spi.RequestInitiator;
+import org.jboss.pitbull.internal.nio.websocket.WebSocketEventHandler;
 import org.jboss.pitbull.internal.util.registry.NotFoundException;
 import org.jboss.pitbull.internal.util.registry.UriRegistry;
+import org.jboss.pitbull.server.handlers.WebSocketHandler;
+import org.jboss.pitbull.server.handlers.stream.StreamRequestHandler;
+import org.jboss.pitbull.server.spi.RequestHandler;
+import org.jboss.pitbull.server.spi.RequestInitiator;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -108,12 +108,12 @@ public class HttpEventHandler implements EventHandler
             {
                if (match instanceof RequestInitiator)
                {
-                  initiator = (RequestInitiator)match;
+                  initiator = (RequestInitiator) match;
                   requestHandler = initiator.begin(connection, requestHeader);
                }
                else if (match instanceof RequestHandler)
                {
-                  requestHandler = (RequestHandler)match;
+                  requestHandler = (RequestHandler) match;
                }
                if (requestHandler != null) break;
             }
@@ -140,7 +140,7 @@ public class HttpEventHandler implements EventHandler
          {
             ByteBuffer oldBuffer = buffer;
             buffer = null;
-            executeStreamRequestHandler(oldBuffer,  channel, requestHeader, (StreamRequestHandler) requestHandler);
+            executeStreamRequestHandler(oldBuffer, channel, requestHeader, (StreamRequestHandler) requestHandler);
          }
          else if (requestHandler instanceof WebSocketHandler)
          {
@@ -154,7 +154,10 @@ public class HttpEventHandler implements EventHandler
             log.error("Unsupported requestHandler type: " + requestHandler.getClass().getName());
             if (initiator != null)
             {
-               try { initiator.illegalHandler(requestHandler); } catch (Throwable ignored) {}
+               try
+               { initiator.illegalHandler(requestHandler); }
+               catch (Throwable ignored)
+               {}
             }
             try
             {
@@ -182,7 +185,7 @@ public class HttpEventHandler implements EventHandler
       channel.setHandler(webSocketEventHandler);
       channel.suspendReads();
 
-      executor.execute( new Runnable()
+      executor.execute(new Runnable()
       {
          @Override
          public void run()

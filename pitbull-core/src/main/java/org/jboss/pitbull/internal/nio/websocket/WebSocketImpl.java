@@ -1,6 +1,7 @@
 package org.jboss.pitbull.internal.nio.websocket;
 
 import org.jboss.pitbull.Connection;
+import org.jboss.pitbull.internal.nio.websocket.impl.oio.OioWebSocket;
 import org.jboss.pitbull.websocket.BinaryFrame;
 import org.jboss.pitbull.websocket.CloseFrame;
 import org.jboss.pitbull.websocket.Frame;
@@ -8,7 +9,6 @@ import org.jboss.pitbull.websocket.PingFrame;
 import org.jboss.pitbull.websocket.PongFrame;
 import org.jboss.pitbull.websocket.TextFrame;
 import org.jboss.pitbull.websocket.WebSocket;
-import org.jboss.pitbull.internal.nio.websocket.impl.oio.OioWebSocket;
 
 import java.io.IOException;
 import java.net.URI;
@@ -51,49 +51,52 @@ public class WebSocketImpl implements WebSocket
    public Frame readFrame() throws IOException
    {
       org.jboss.pitbull.internal.nio.websocket.impl.Frame frame = oioWebSocket.readFrame();
-      switch (frame.getType()) {
-        case Text:
-        {
-           final org.jboss.pitbull.internal.nio.websocket.impl.frame.TextFrame textFrame = (org.jboss.pitbull.internal.nio.websocket.impl.frame.TextFrame)frame;
-           return new TextFrame() {
-              @Override
-              public String getText()
-              {
-                 return textFrame.getText();
-              }
+      switch (frame.getType())
+      {
+         case Text:
+         {
+            final org.jboss.pitbull.internal.nio.websocket.impl.frame.TextFrame textFrame = (org.jboss.pitbull.internal.nio.websocket.impl.frame.TextFrame) frame;
+            return new TextFrame()
+            {
+               @Override
+               public String getText()
+               {
+                  return textFrame.getText();
+               }
 
-              @Override
-              public String getEncoding()
-              {
-                 return "UTF-8";
-              }
-           };
-        }
-        case Binary:
-        {
-           final org.jboss.pitbull.internal.nio.websocket.impl.frame.BinaryFrame binaryFrame = (org.jboss.pitbull.internal.nio.websocket.impl.frame.BinaryFrame)frame;
-           return new BinaryFrame() {
-              @Override
-              public byte[] getBytes()
-              {
-                 return binaryFrame.getByteArray();
-              }
-           };
-        }
-        case ConnectionClose:
-          return new CloseFrame()
-          {
-          };
-        case Ping:
-          return new PingFrame()
-          {
-          };
-        case Pong:
-          return new PongFrame()
-          {
-          };
-        default:
-          throw new IOException("unable to handle frame type: " + frame.getType());
+               @Override
+               public String getEncoding()
+               {
+                  return "UTF-8";
+               }
+            };
+         }
+         case Binary:
+         {
+            final org.jboss.pitbull.internal.nio.websocket.impl.frame.BinaryFrame binaryFrame = (org.jboss.pitbull.internal.nio.websocket.impl.frame.BinaryFrame) frame;
+            return new BinaryFrame()
+            {
+               @Override
+               public byte[] getBytes()
+               {
+                  return binaryFrame.getByteArray();
+               }
+            };
+         }
+         case ConnectionClose:
+            return new CloseFrame()
+            {
+            };
+         case Ping:
+            return new PingFrame()
+            {
+            };
+         case Pong:
+            return new PongFrame()
+            {
+            };
+         default:
+            throw new IOException("unable to handle frame type: " + frame.getType());
       }
    }
 

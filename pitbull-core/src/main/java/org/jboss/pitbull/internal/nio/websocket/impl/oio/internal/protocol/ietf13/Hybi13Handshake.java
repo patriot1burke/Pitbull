@@ -37,17 +37,19 @@ import static org.jboss.pitbull.internal.nio.websocket.impl.oio.internal.WebSock
  */
 public class Hybi13Handshake extends Hybi07Handshake
 {
-  public Hybi13Handshake() {
-    super("13");
-  }
+   public Hybi13Handshake()
+   {
+      super("13");
+   }
 
-  @Override
-  public OioWebSocket getServerWebSocket(final HttpRequestBridge request,
-                                         final HttpResponseBridge response,
-                                         final ClosingStrategy closingStrategy) throws IOException {
+   @Override
+   public OioWebSocket getServerWebSocket(final HttpRequestBridge request,
+                                          final HttpResponseBridge response,
+                                          final ClosingStrategy closingStrategy) throws IOException
+   {
 
-     return new Hybi13Socket(getVersion(), URI.create(getWebSocketLocation(request)), request.getInputStream(), response.getOutputStream(), closingStrategy, false);
-  }
+      return new Hybi13Socket(getVersion(), URI.create(getWebSocketLocation(request)), request.getInputStream(), response.getOutputStream(), closingStrategy, false);
+   }
 
    @Override
    public OioWebSocket getClientWebSocket(URI uri, InputStream inputStream, OutputStream outputStream, ClosingStrategy closingStrategy) throws IOException
@@ -56,20 +58,21 @@ public class Hybi13Handshake extends Hybi07Handshake
    }
 
    @Override
-  public byte[] generateResponse(final HttpRequestBridge request,
-                                   final HttpResponseBridge response) throws IOException {
+   public byte[] generateResponse(final HttpRequestBridge request,
+                                  final HttpResponseBridge response) throws IOException
+   {
 
-    ORIGIN.copy(request, response);
+      ORIGIN.copy(request, response);
 
-    SEC_WEBSOCKET_PROTOCOL.copy(request, response);
+      SEC_WEBSOCKET_PROTOCOL.copy(request, response);
 
-    SEC_WEBSOCKET_LOCATION.set(response, getWebSocketLocation(request));
+      SEC_WEBSOCKET_LOCATION.set(response, getWebSocketLocation(request));
 
-    final String key = SEC_WEBSOCKET_KEY.get(request);
-    final String solution = solve(key);
+      final String key = SEC_WEBSOCKET_KEY.get(request);
+      final String solution = solve(key);
 
-    WebSocketHeaders.SEC_WEBSOCKET_ACCEPT.set(response, solution);
+      WebSocketHeaders.SEC_WEBSOCKET_ACCEPT.set(response, solution);
 
-    return new byte[0];
-  }
+      return new byte[0];
+   }
 }

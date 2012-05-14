@@ -2,7 +2,6 @@ package org.jboss.pitbull.internal.nio.websocket;
 
 import org.jboss.pitbull.ResponseHeader;
 import org.jboss.pitbull.internal.nio.http.HttpResponse;
-import org.jboss.pitbull.internal.nio.socket.BufferedBlockingInputStream;
 import org.jboss.pitbull.internal.nio.socket.BufferedBlockingOutputStream;
 import org.jboss.pitbull.internal.nio.socket.ManagedChannel;
 
@@ -17,7 +16,7 @@ public class HandshakeOutputStream extends BufferedBlockingOutputStream
 {
    protected ResponseHeader responseHeader;
 
-   public HandshakeOutputStream(ResponseHeader responseHeader,ManagedChannel channel, int size)
+   public HandshakeOutputStream(ResponseHeader responseHeader, ManagedChannel channel, int size)
    {
       super(channel, size);
       this.responseHeader = responseHeader;

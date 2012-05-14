@@ -7,7 +7,8 @@ import org.jboss.pitbull.internal.nio.websocket.impl.FrameType;
  */
 public class PongFrame extends AbstractFrame
 {
-  public PongFrame() {
-    super(FrameType.Pong);
-  }
+   public PongFrame()
+   {
+      super(FrameType.Pong);
+   }
 }

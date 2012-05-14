@@ -24,10 +24,9 @@ public interface StreamedResponse extends ResponseHeader
 
    /**
     * Flushes status code, response headers, and OutputStream if they haven't been flushed already.
-    *
+    * <p/>
     * If the connection is keepalive, then control of underlying channel is returned to PitBull.  Connection may
     * be closed automatically if an internal error condition is met.
-    *
     */
    void end();
 
@@ -50,7 +49,6 @@ public interface StreamedResponse extends ResponseHeader
    /**
     * Calling this method will detach
     * the StreamedResponse and it will -not- be automatically ended when the RequestHandler returns.
-    *
     */
    void detach();
 }

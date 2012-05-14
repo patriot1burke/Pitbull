@@ -34,7 +34,9 @@ public class BufferedContentOutputStream extends ContentOutputStream
    public interface ContentMessage
    {
       OrderedHeaders getHeaders();
+
       byte[] getMessageBytes() throws IOException;
+
       void prepareEmptyBody();
    }
 

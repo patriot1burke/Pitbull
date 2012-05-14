@@ -43,20 +43,23 @@ import static org.jboss.pitbull.internal.nio.websocket.impl.oio.internal.WebSock
  */
 public class Hybi07Handshake extends Handshake
 {
-  protected Hybi07Handshake(final String version) {
-    super(version, "SHA1", "258EAFA5-E914-47DA-95CA-C5AB0DC85B11");
-  }
+   protected Hybi07Handshake(final String version)
+   {
+      super(version, "SHA1", "258EAFA5-E914-47DA-95CA-C5AB0DC85B11");
+   }
 
-  public Hybi07Handshake() {
-    this("7");
-  }
+   public Hybi07Handshake()
+   {
+      this("7");
+   }
 
-  @Override
-  public OioWebSocket getServerWebSocket(final HttpRequestBridge request,
-                                         final HttpResponseBridge response,
-                                         final ClosingStrategy closingStrategy) throws IOException {
-    return new Hybi07Socket(getVersion(), URI.create(getWebSocketLocation(request)), request.getInputStream(), response.getOutputStream(), closingStrategy);
-  }
+   @Override
+   public OioWebSocket getServerWebSocket(final HttpRequestBridge request,
+                                          final HttpResponseBridge response,
+                                          final ClosingStrategy closingStrategy) throws IOException
+   {
+      return new Hybi07Socket(getVersion(), URI.create(getWebSocketLocation(request)), request.getInputStream(), response.getOutputStream(), closingStrategy);
+   }
 
    @Override
    public OioWebSocket getClientWebSocket(URI uri, InputStream inputStream, OutputStream outputStream, ClosingStrategy closingStrategy) throws IOException
@@ -65,48 +68,55 @@ public class Hybi07Handshake extends Handshake
    }
 
    @Override
-  public boolean matches(final HttpRequestBridge request) {
-    return (SEC_WEBSOCKET_KEY.isIn(request) && SEC_WEBSOCKET_VERSION.matches(request, getVersion()));
-  }
+   public boolean matches(final HttpRequestBridge request)
+   {
+      return (SEC_WEBSOCKET_KEY.isIn(request) && SEC_WEBSOCKET_VERSION.matches(request, getVersion()));
+   }
 
-  @Override
-  public byte[] generateResponse(final HttpRequestBridge request,
-                                 final HttpResponseBridge response) throws IOException {
+   @Override
+   public byte[] generateResponse(final HttpRequestBridge request,
+                                  final HttpResponseBridge response) throws IOException
+   {
 
-    if (ORIGIN.isIn(request)) {
-      SEC_WEBSOCKET_ORIGIN.set(response, ORIGIN.get(request));
-    }
+      if (ORIGIN.isIn(request))
+      {
+         SEC_WEBSOCKET_ORIGIN.set(response, ORIGIN.get(request));
+      }
 
-    SEC_WEBSOCKET_PROTOCOL.copy(request, response);
+      SEC_WEBSOCKET_PROTOCOL.copy(request, response);
 
-    SEC_WEBSOCKET_LOCATION.set(response, getWebSocketLocation(request));
+      SEC_WEBSOCKET_LOCATION.set(response, getWebSocketLocation(request));
 
-    final String key = SEC_WEBSOCKET_KEY.get(request);
-    final String solution = solve(key);
+      final String key = SEC_WEBSOCKET_KEY.get(request);
+      final String solution = solve(key);
 
-    WebSocketHeaders.SEC_WEBSOCKET_ACCEPT.set(response, solution);
+      WebSocketHeaders.SEC_WEBSOCKET_ACCEPT.set(response, solution);
 
-    return new byte[0];
-  }
+      return new byte[0];
+   }
 
-  public String solve(final String nonceBase64) {
-    try {
-      final String concat = nonceBase64.trim().concat(getMagicNumber());
-      final MessageDigest digest = MessageDigest.getInstance(getHashAlgorithm());
-      digest.update(concat.getBytes("UTF-8"));
-      final String result = Base64.encodeBase64String(digest.digest()).trim();
+   public String solve(final String nonceBase64)
+   {
+      try
+      {
+         final String concat = nonceBase64.trim().concat(getMagicNumber());
+         final MessageDigest digest = MessageDigest.getInstance(getHashAlgorithm());
+         digest.update(concat.getBytes("UTF-8"));
+         final String result = Base64.encodeBase64String(digest.digest()).trim();
 //
 //      System.out.println("Browser Key: '" + nonceBase64 + "'");
 //      System.out.println("Concat     : '" + concat + "'");
 //      System.out.println("Result     : '" + result + "'");
 
-      return result;
-    }
-    catch (NoSuchAlgorithmException e) {
-      throw new RuntimeException("error generating hash", e);
-    }
-    catch (UnsupportedEncodingException e) {
-      throw new RuntimeException("could not get UTF-8 bytes");
-    }
-  }
+         return result;
+      }
+      catch (NoSuchAlgorithmException e)
+      {
+         throw new RuntimeException("error generating hash", e);
+      }
+      catch (UnsupportedEncodingException e)
+      {
+         throw new RuntimeException("could not get UTF-8 bytes");
+      }
+   }
 }

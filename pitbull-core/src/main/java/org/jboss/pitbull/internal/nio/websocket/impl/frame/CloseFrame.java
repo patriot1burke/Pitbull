@@ -7,7 +7,8 @@ import org.jboss.pitbull.internal.nio.websocket.impl.FrameType;
  */
 public class CloseFrame extends AbstractFrame
 {
-  public CloseFrame() {
-    super(FrameType.ConnectionClose);
-  }
+   public CloseFrame()
+   {
+      super(FrameType.ConnectionClose);
+   }
 }

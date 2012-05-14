@@ -6,9 +6,6 @@ import org.jboss.pitbull.RequestHeader;
 import org.jboss.pitbull.ResponseHeader;
 import org.jboss.pitbull.StatusCode;
 import org.jboss.pitbull.internal.nio.http.HttpResponse;
-import org.jboss.pitbull.internal.util.OrderedHeadersImpl;
-import org.jboss.pitbull.server.handlers.WebSocketHandler;
-import org.jboss.pitbull.websocket.WebSocket;
 import org.jboss.pitbull.internal.nio.socket.BufferedBlockingInputStream;
 import org.jboss.pitbull.internal.nio.socket.EventHandler;
 import org.jboss.pitbull.internal.nio.socket.ManagedChannel;
@@ -17,6 +14,9 @@ import org.jboss.pitbull.internal.nio.websocket.impl.oio.HttpRequestBridge;
 import org.jboss.pitbull.internal.nio.websocket.impl.oio.HttpResponseBridge;
 import org.jboss.pitbull.internal.nio.websocket.impl.oio.OioWebSocket;
 import org.jboss.pitbull.internal.nio.websocket.impl.oio.WebSocketConnectionManager;
+import org.jboss.pitbull.internal.util.OrderedHeadersImpl;
+import org.jboss.pitbull.server.handlers.WebSocketHandler;
+import org.jboss.pitbull.websocket.WebSocket;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -79,6 +79,7 @@ public class WebSocketEventHandler implements EventHandler
       final ResponseHeader responseHeader = new ResponseHeader()
       {
          OrderedHeaders headers = new OrderedHeadersImpl();
+
          @Override
          public StatusCode getStatusCode()
          {

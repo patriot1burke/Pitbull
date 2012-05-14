@@ -4,10 +4,10 @@ import org.jboss.pitbull.ContentOutputStream;
 import org.jboss.pitbull.OrderedHeaders;
 import org.jboss.pitbull.RequestHeader;
 import org.jboss.pitbull.StatusCode;
-import org.jboss.pitbull.internal.util.OrderedHeadersImpl;
-import org.jboss.pitbull.server.handlers.stream.StreamedResponse;
 import org.jboss.pitbull.internal.logging.Logger;
 import org.jboss.pitbull.internal.nio.socket.ManagedChannel;
+import org.jboss.pitbull.internal.util.OrderedHeadersImpl;
+import org.jboss.pitbull.server.handlers.stream.StreamedResponse;
 
 import java.nio.ByteBuffer;
 

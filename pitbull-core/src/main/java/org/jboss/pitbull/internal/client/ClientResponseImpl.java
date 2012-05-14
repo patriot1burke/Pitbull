@@ -103,9 +103,9 @@ public class ClientResponseImpl implements ClientResponse
    {
       if (closed) return;
       closed = true;
-      if (is != null )
+      if (is != null)
       {
-         if (is instanceof ContentInputStream) ((ContentInputStream)is).eat();
+         if (is instanceof ContentInputStream) ((ContentInputStream) is).eat();
          is.close();
       }
 
